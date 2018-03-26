@@ -1,13 +1,14 @@
 \section{Background}
 
-To understand the problem that is posed, and the solution presented in this
-paper, it's important to familiarize oneself with a few key concepts.
+To motivate this work, we must first familiarize ourselves with the conditions
+in which open-source software is developed, as well as some of the core
+technologies and ideas which inspired this work.
 
 \paragraph{The Open-Source Movement.} Software whose source code is publicly
 available is called \emph{open-source}. Most of the software we use on a daily
 basis relies on free and public code. In an increasingly digitalized society,
-these open-source projects have become the foundation of our digital
-infrastructure.
+these open-source projects have become the foundation of digital infrastructure
+underpinning many of our societal goods and services.
 
 Over the last few years, with the emergence of software hosting sites like
 GitHub and community sites like Stack Overflow, the open-source paradigm became
@@ -18,7 +19,7 @@ the market faster and (b) to recruit talent from a new pool of technologists,
 educated on the basis of open-source software.
 
 Today, many open-source projects are started by individuals or small groups of
-people solving a personally-, socially-, or technically-relevant problem. By
+people solving a personally, socially, or technically relevant problem. By
 analysing people's motivations for participating in open-source software
 development the following themes emerge: (a) pride in one's work, (b)
 reputation, (c) learning, (d) responsibility for something they believe in,
@@ -26,15 +27,17 @@ i.e.\ \emph{the project got attention, I have to maintain it}, (e) being part
 of a community and (f) financial compensation.
 
 While most open-source software projects start for the reasons above, the ones
-that gain momentum require significant resources in time or money. This creates
-a fundamental problem: projects often created at the spare time of a developer
-are becoming critical public infrastructure. This transition leads project
-maintainers to feel stress and exhaustion trying to keep up with the requests
-of the community during their free time, often abandoning their own projects or
-burning out under the increased responsibility. Left unchecked, this leads to a
-tragedy of the commons~\cite{tragedy-commons} which is at the core of the
-problem \oscoin{} attempts to address: financial sustainability and
-transparency in the development of open-source software.
+that gain momentum require significant resources in time and money to maintain.
+This creates a fundamental problem: projects created in the spare time of a
+developer are becoming critical public infrastructure. As their projects
+gain popularity, developers experience stress and exhaustion trying to keep up
+with the requests of the community during their free time, often abandoning
+their own projects or burning out under the increased responsibility. Left
+unchecked, this leads to a tragedy of the commons~\cite{tragedy-commons} which
+is at the core of the problem \oscoin{} attempts to address: financial
+sustainability and transparency in the development of open-source software.
+
+% TODO: Talk about the effect on code too!
 
 \paragraph{Version control systems.} At the core of open-source collaboration
 is the version control system, or VCS---a system for tracking changes to source
@@ -81,3 +84,4 @@ often more resilient, sustainable and available than their centralized
 counterparts, properties which are important when designing public
 infrastructure.
 
+\pagebreak
