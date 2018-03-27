@@ -2,70 +2,33 @@
 
 The rules according to which transactions on the \oscoin{} network are
 validated comprise a \emph{protocol}. This protocol has a well defined semantics
-which we shall describe formally in this section.
+which we shall describe in this section.
 
-\subsection{Entities}
+\subsection{Operations}
 
-\noindent Several distinct entities comprise the network.  Entities which
-transact on the network are called \emph{participants}. The following
-participants exist on the \oscoin{} network.
+Operations are signed messages constructed by participants in the protocol,
+which trigger a state transition in the network. A valid operation $T$ takes
+the form:
+\[
+    T \equiv \langle T_m, T_p, T_n \rangle_{\sigma}
+\]
 
-\addvspace{1em}
+A valid operation $T$ applied to the current state of
+the protocol $\mathcal{S}_e$ at epoch $e$ can be formulated as:
+\[
+    \mathcal{S}_{e+1} \equiv \Upsilon(\mathcal{S}_e, T)
+\]
+where $\Upsilon$ is \emph{apply}, the state-transition function.
 
-\begin{description}
-    \item[User] A user is any person or bot active on \oscoin{}.  Activity
-        includes browsing and submitting code, reading and commenting on
-        issues, and any other interaction allowed on \oscoin{}'s network.
-    \item[Maintainer] A user is considered a \emph{maintainer} if they
-        are responsible for the maintenance, organization and general health of
-        one or more \emph{projects}.
-    \item[Contributor] A user is considered a \emph{contributor} if they
-        perform a \emph{public transaction} on the network which is considered
-        to have value by one or more \emph{maintainers}. This includes but is
-        not limited to committing code, opening and closing issues, commenting
-        and voting.
-    \item[Operator] A user is considered an \emph{operator} if they are involved
-        in the core operation of the network. This includes any user operating
-        physical hardware on which the \oscoin{} services run, and typically
-        involves transaction processing and validation. Operators in \oscoin{}
-        are equivalent to \emph{miners} in Bitcoin. The term \emph{validator}
-        is often used interchangeably with \emph{operator}.
-\end{description}
-\addvspace{1em}
+We can describe the current state of the network $\mathcal{S}_e$ as a sequence
+of operations ${T_1 \dots T_e}$ applied recursively to an initial empty state
+$\varnothing$:
+\[
+    \mathcal{S}_e \equiv \Upsilon(\dots \Upsilon(\Upsilon(\Upsilon(\varnothing,
+    T_1), T_2), T_3), \dots T_e)
+\]
 
-We can define the \emph{network}, $\mathcal{N}$ as the set of all active
-participants. Beyond active participants, the following social entities
-exist:
-
-\begin{description}
-    \item[Projects] A project is a collection of source code, issues,
-        documentation, and other objects commonly found in version
-        controlled repositories. Notably, several users contribute to a
-        project.
-    \item[Organizations] At the highest level we have the organization: a
-        collection of projects governed by users. Example organizations
-        include large software foundations like the Linux Foundation,
-        decentralized autonomous organizations (DAOs) such as Dash, and
-        individuals managing their own personal projects. Organizations are
-        the unit of governance in \oscoin{}.
-\end{description}
-\addvspace{1em}
-
-And finally, tying all participants and entities together,
-
-\begin{description}
-    \item[The Ledger, $\mathcal{L}$] acts as a global source of truth for all
-        participants in the network and holds the totally ordered set of all
-        \emph{valid} transactions having taken place. These transactions are
-        organized in \emph{epochs}, representing periods of time. If $t$ is a
-        an epoch, then $\mathcal{L}_t$ is the state of the ledger at epoch $t$.
-        All participants in the network have access to the latest state
-        $\mathcal{L}_t$.
-\end{description}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Code,} or \emph{source code} is the fundamental product or
+\subsection{Code} or \emph{source code} is the fundamental product or
 \emph{artifact} of the \oscoin{} network. Our protocol defines the \emph{patch}
 primitive as the atomic unit of code. A patch is a set of metadata and code
 changes, or \emph{changeset}, that can be applied on existing source
