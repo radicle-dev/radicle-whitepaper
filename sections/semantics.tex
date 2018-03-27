@@ -10,18 +10,22 @@ Operations are signed messages constructed by participants in the protocol,
 which trigger a state transition in the network. A valid operation $T$ takes
 the form:
 \[
-    T \equiv \langle T_m, T_p, T_n \rangle_{\sigma}
+    T \equiv \langle T_i, T_m, T_p, T_n \rangle_{\sigma}
 \]
+where $T_i$ is the identity of the sender of the operation, $T_m$ is the
+message, $T_p$ is a reference to a parent operation which $T$ should succeed,
+and $T_n \in \mathbb{N}$ taken together with $T_i$ forms a globally unique
+operation identifier, such that there can be at most one operation with a
+certain $\langle T_i, T_n \rangle$ tuple.
 
 A valid operation $T$ applied to the current state of
 the protocol $\mathcal{S}_e$ at epoch $e$ can be formulated as:
 \[
     \mathcal{S}_{e+1} \equiv \Upsilon(\mathcal{S}_e, T)
 \]
-where $\Upsilon$ is \emph{apply}, the state-transition function.
-
-We can describe the current state of the network $\mathcal{S}_e$ as a sequence
-of operations ${T_1 \dots T_e}$ applied recursively to an initial empty state
+where $\Upsilon$ is \emph{apply}, the state-transition function.  We can
+describe the current state of the network $\mathcal{S}_e$ as a sequence of
+operations ${T_1 \dots T_e}$ applied recursively to an initial empty state
 $\varnothing$:
 \[
     \mathcal{S}_e \equiv \Upsilon(\dots \Upsilon(\Upsilon(\Upsilon(\varnothing,
