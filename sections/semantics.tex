@@ -1,0 +1,138 @@
+\section{Formal Semantics}
+
+The rules according to which transactions on the \oscoin{} network are
+validated comprise a \emph{protocol}. This protocol has a well defined semantics
+which we shall describe formally in this section.
+
+\subsection{Entities}
+
+\noindent Several distinct entities comprise the network.  Entities which
+transact on the network are called \emph{participants}. The following
+participants exist on the \oscoin{} network.
+
+\addvspace{1em}
+
+\begin{description}
+    \item[User] A user is any person or bot active on \oscoin{}.  Activity
+        includes browsing and submitting code, reading and commenting on
+        issues, and any other interaction allowed on \oscoin{}'s network.
+    \item[Maintainer] A user is considered a \emph{maintainer} if they
+        are responsible for the maintenance, organization and general health of
+        one or more \emph{projects}.
+    \item[Contributor] A user is considered a \emph{contributor} if they
+        perform a \emph{public transaction} on the network which is considered
+        to have value by one or more \emph{maintainers}. This includes but is
+        not limited to committing code, opening and closing issues, commenting
+        and voting.
+    \item[Operator] A user is considered an \emph{operator} if they are involved
+        in the core operation of the network. This includes any user operating
+        physical hardware on which the \oscoin{} services run, and typically
+        involves transaction processing and validation. Operators in \oscoin{}
+        are equivalent to \emph{miners} in Bitcoin. The term \emph{validator}
+        is often used interchangeably with \emph{operator}.
+\end{description}
+\addvspace{1em}
+
+We can define the \emph{network}, $\mathcal{N}$ as the set of all active
+participants. Beyond active participants, the following social entities
+exist:
+
+\begin{description}
+    \item[Projects] A project is a collection of source code, issues,
+        documentation, and other objects commonly found in version
+        controlled repositories. Notably, several users contribute to a
+        project.
+    \item[Organizations] At the highest level we have the organization: a
+        collection of projects governed by users. Example organizations
+        include large software foundations like the Linux Foundation,
+        decentralized autonomous organizations (DAOs) such as Dash, and
+        individuals managing their own personal projects. Organizations are
+        the unit of governance in \oscoin{}.
+\end{description}
+\addvspace{1em}
+
+And finally, tying all participants and entities together,
+
+\begin{description}
+    \item[The Ledger, $\mathcal{L}$] acts as a global source of truth for all
+        participants in the network and holds the totally ordered set of all
+        \emph{valid} transactions having taken place. These transactions are
+        organized in \emph{epochs}, representing periods of time. If $t$ is a
+        an epoch, then $\mathcal{L}_t$ is the state of the ledger at epoch $t$.
+        All participants in the network have access to the latest state
+        $\mathcal{L}_t$.
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Code,} or \emph{source code} is the fundamental product or
+\emph{artifact} of the \oscoin{} network. Our protocol defines the \emph{patch}
+primitive as the atomic unit of code. A patch is a set of metadata and code
+changes, or \emph{changeset}, that can be applied on existing source
+code to modify it. We define a patch $P$ as the tuple $\langle P_a, P_m, P_f
+\rangle$, where $P_a$ is the author of the patch, $P_m$ is the patch metadata
+and $P_f$ is the changeset. A set of patches in no particular order is called a
+\emph{patchset}.
+
+Patches can be composed sequentially, taking an initial \emph{context} $A$ into
+a modified context $B$. The empty context is defined as $\varnothing$, such
+that there exists a mapping $P_f \varnothing \mapsto P_f$.  Let $f \prec g
+\prec h$ be an ordered sequence of patches, then the formulation:
+\[
+h \cdot g \cdot f : A \to B
+\]
+is the in-order composition of patches $f$, $g$ and $h$, taking an initial
+context from $A$ to $B$.
+
+% TODO: Contexts form a free monoid?
+% TODO: Reference patch theory.
+
+\subsection{Issues}
+
+On the \oscoin{} network, collaboration on code takes place through \emph{issues};
+and since project governance is specified in code---through the use of
+\emph{smart contracts}---organizational decisions are also made through issues.
+
+An issue $I$ is described at epoch $e$ by the tuple:
+\[
+    \big<\langle I_a, I_t, I_b, I_P \rangle_{\sigma}, I_s, I_V \big>_e
+\]
+where $I_a$ is the issue author, $I_t$ is the title or subject of the issue,
+$I_b$ is the description in plain text of the issue, $I_p$ is the patchset
+attached to the issue, $\sigma$ is the signature of $I_a$, $I_s \in \{open,
+closed, accepted, rejected\}$ is the current state and $I_V$ is the set of
+votes on the issue. The initial value of $I_s$, $I_{s_0} = open$, the initial
+value of $I_V$, $I_{V_0} = \varnothing$ and the initial value of $I_P$,
+$I_{P_0} = \varnothing$.  The following table lists the valid state transitions
+between any two states $I_s$ and $I_{s'}$.
+
+\begin{table}[!hbtp]
+    \begin{tabular}{rcl}
+        \toprule
+        $I_s$    & \to & $I_{s'}$ \\
+        \midrule
+        $open$   & \to & $accepted$ \\
+        $open$   & \to & $rejected$ \\
+        $open$   & \to & $closed$ \\
+        $closed$ & \to & $open$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Issues can be voted on with the \emph{voice} operation. See section
+\ref{source-chain-transactions} for details. When an issue receives a new vote,
+it is added to $I_V$. A vote $v$ is represented by the tuple $\langle v_i, v_a,
+v_{\omega}, v_e \rangle_{\sigma}$ where $v_a$ is the voter, $v_i$ is the issue
+being voted on, $v_{\omega} \in \{accept, reject\}$ and $v_e$ is the epoch $e$
+at which the vote is valid.
+
+\subsubsection{Amendments}
+
+An issue $I$ where $I_s = open$ can be amended with the \emph{amend} operation
+$\alpha$ Only $I_t$, $I_b$ and $I_P$ can be amended.  Amending an issue creates
+a new empty set of votes $V'$, ensuring two versions of a given issue never
+share a set of votes. Formally, amendment is defined as:
+\begin{align*}
+    \alpha(I, \langle I_a, t', b', P' \rangle_{\sigma}) \equiv \big<\langle I_a, t', b', P'
+    \rangle_{\sigma}, I_s, \varnothing \big>, \qquad I_s = open
+\end{align*}
