@@ -62,17 +62,18 @@ and since project governance is specified in code---through the use of
 
 An issue $I$ is described at epoch $e$ by the tuple:
 \[
-    \big<\langle I_a, I_t, I_b, I_o, I_P \rangle_{\sigma}, I_s, I_V \big>_e
+    \big<\langle I_a, I_t, I_b, I_o, I_r, I_P \rangle_{\sigma}, I_s, I_V \big>_e
 \]
 where $I_a$ is the issue author, $I_t$ is the title or subject of the issue,
 $I_b$ is the description in plain text of the issue, $I_o$ is a list of
-operations to be applied when $I_s$ changes, $I_P$ is the patchset attached to
-the issue, $\sigma$ is the signature of $I_a$, $I_s \in \{open, closed,
-accepted, rejected\}$ is the current state of the issue and $I_V$ is the set of
-votes on the issue. The initial value of $I_s$, $I_{s_0} = open$, the initial
-value of $I_V$, $I_{V_0} = \varnothing$ and the initial value of $I_P$,
-$I_{P_0} = \varnothing$.  A list of valid state transitions between any two
-states $I_s$ and $I_{s'}$ can be found in Table \ref{issues-valid-transitions}.
+operations to be applied when $I_s$ changes, $I_r$ is the issue resolution
+function, $I_P$ is the patchset attached to the issue, $\sigma$ is the
+signature of $I_a$, $I_s \in \{open, closed, accepted, rejected\}$ is the
+current state of the issue and $I_V$ is the set of votes on the issue. The
+initial value of $I_s$, $I_{s_0} = open$, the initial value of $I_V$, $I_{V_0}
+= \varnothing$ and the initial value of $I_P$, $I_{P_0} = \varnothing$.  A list
+of valid state transitions between any two states $I_s$ and $I_{s'}$ can be
+found in Table \ref{issues-valid-transitions}.
 
 \begin{table}[hbt]
     \caption{\label{issues-valid-transitions}}
@@ -88,22 +89,36 @@ states $I_s$ and $I_{s'}$ can be found in Table \ref{issues-valid-transitions}.
     \end{tabular}
 \end{table}
 
+The patchset $I_P$ attached to an issue represents a set of proposed changes to
+some project, while the subject $I_t$ and body $I_b$ of the issue provide a
+description of the changes contained in $I_P$. Issue \emph{resolution} is the
+process of voting on an issue with the aim to move to an \emph{accepted} or
+\emph{rejected} state.
+
 Issues can be voted on with the \emph{voice} operation. When an issue receives
 a new vote, it is added to $I_V$. A vote $v$ is represented by the tuple
 $\langle v_i, v_a, v_{\omega}, v_e \rangle_{\sigma}$ where $v_a$ is the voter,
 $v_i$ is the issue being voted on, $v_{\omega} \in \{accept, reject\}$ and
 $v_e$ is the epoch $e$ at which the vote is valid.
 
+When a certain threshold of votes is reached, an issue transitions to either an
+\emph{accepted} or \emph{rejected} state. Given an open issue $i$, the rules of
+issue resolution are defined by the function $i_r : I \to I$, applied to the
+issue $i$ for every vote added to $i_V$.
+
 \subsubsection{Amendments}
 
 An issue $I$ where $I_s = open$ can be amended with the \emph{amend} operation
-$\amend$. Only $I_t$, $I_b$ and $I_P$ can be amended.  Amending an issue creates
+$\amend$. Only $I_t$, $I_b$, $I_o$, $I_r$ and $I_P$ can be amended.  Amending an issue creates
 a new empty set of votes $V'$, ensuring two versions of a given issue never
 share a set of votes. Formally, amendment is defined as:
 \begin{align*}
-    I \amend{} \langle I_a, t', b', P' \rangle_{\sigma} \equiv \big<\langle
-    I_a, t', b', P' \rangle_{\sigma}, I_s, \varnothing \big>, \qquad I_s = open
+    I \amend{} \langle I_a, t', b', o', r', P' \rangle_{\sigma} \equiv
+    \big<\langle I_a, t', b', o', r', P' \rangle_{\sigma}, I_s, \varnothing
+    \big>, \qquad I_s = open
 \end{align*}
+
+% TODO: The amendment should include the issue it is amending.
 
 \subsubsection{Accepted Issues} When an issue has been accepted by a majority
 of votes, the issue transitions permanently into an \emph{accepted} state. The
@@ -116,9 +131,9 @@ steps taken by the protocol are as follows:
     \item The list of operations $I_o$ belonging to the issue are executed by
         the protocol.
     \item The issue's \emph{patchset} $I_P$ is permanently added to the code
-        repository and branch it pertains to. Note that a patchset may contain
-        individual patches pertaining to different repositories, in which case
-        the patches are applied individually to their respective repositories.
+        project it pertains to. Note that a patchset may contain individual
+        patches pertaining to different projects, in which case the patches are
+        applied individually to their respective projects.
 \end{enumerate}
 
 \subsubsection{Rejected issues} When an issue is rejected,
