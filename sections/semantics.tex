@@ -106,13 +106,15 @@ share a set of votes. Formally, amendment is defined as:
 \end{align*}
 
 \subsubsection{Accepted Issues} When an issue has been accepted by a majority
-of votes, the issue transitions permanently into an \emph{accepted} state.
+of votes, the issue transitions permanently into an \emph{accepted} state. The
+steps taken by the protocol are as follows:
 
 \begin{enumerate}
-    \item The issue's state is set to \emph{accepted}.
-    \item The issue's \emph{patchset} is permanently added to the code
+    \item The issue's state $I_s$ is set to \emph{accepted}.
+    \item The list of operations $I_o$ belonging to the issue are executed by
+        the protocol.
+    \item The issue's \emph{patchset} $I_P$ is permanently added to the code
         repository and branch it pertains to. Note that a patchset may contain
-        individual patches pertaining to different repositories.
-    \item Operations attached to the \emph{accepted} state of the issue are
-        executed by the protocol.
+        individual patches pertaining to different repositories, in which case
+        the patches are applied individually to their respective repositories.
 \end{enumerate}
