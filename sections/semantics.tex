@@ -62,12 +62,13 @@ and since project governance is specified in code---through the use of
 
 An issue $I$ is described at epoch $e$ by the tuple:
 \[
-    \big<\langle I_a, I_t, I_b, I_P \rangle_{\sigma}, I_s, I_V \big>_e
+    \big<\langle I_a, I_t, I_b, I_o, I_P \rangle_{\sigma}, I_s, I_V \big>_e
 \]
 where $I_a$ is the issue author, $I_t$ is the title or subject of the issue,
-$I_b$ is the description in plain text of the issue, $I_p$ is the patchset
-attached to the issue, $\sigma$ is the signature of $I_a$, $I_s \in \{open,
-closed, accepted, rejected\}$ is the current state and $I_V$ is the set of
+$I_b$ is the description in plain text of the issue, $I_o$ is a list of
+operations to be applied when $I_s$ changes, $I_P$ is the patchset attached to
+the issue, $\sigma$ is the signature of $I_a$, $I_s \in \{open, closed,
+accepted, rejected\}$ is the current state of the issue and $I_V$ is the set of
 votes on the issue. The initial value of $I_s$, $I_{s_0} = open$, the initial
 value of $I_V$, $I_{V_0} = \varnothing$ and the initial value of $I_P$,
 $I_{P_0} = \varnothing$.  A list of valid state transitions between any two
