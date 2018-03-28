@@ -21,29 +21,29 @@ certain $\langle T_i, T_n \rangle$ tuple.
 A valid operation $T$ applied to the current state of
 the protocol $\mathcal{S}_e$ at epoch $e$ can be formulated as:
 \[
-    \mathcal{S}_{e+1} \equiv \Upsilon(\mathcal{S}_e, T)
+    \mathcal{S}_{e+1} \equiv \delta(\mathcal{S}_e, T)
 \]
-where $\Upsilon$ is \emph{apply}, the state-transition function.  We can
+where $\delta$ is \emph{apply}, the state-transition function.  We can
 describe the current state of the network $\mathcal{S}_e$ as a sequence of
 operations ${T_1 \dots T_e}$ applied recursively to an initial empty state
 $\varnothing$:
 \[
-    \mathcal{S}_e \equiv \Upsilon(\dots \Upsilon(\Upsilon(\Upsilon(\varnothing,
+    \mathcal{S}_e \equiv \delta(\dots \delta(\delta(\delta(\varnothing,
     T_1), T_2), T_3), \dots T_e)
 \]
 
-\subsection{Code} or \emph{source code} is the fundamental product or
-\emph{artifact} of the \oscoin{} network. Our protocol defines the \emph{patch}
+\subsection{Code} The fundamental product or \emph{artifact} of the \oscoin{}
+network is code, or source code. Our protocol defines the \emph{patch}
 primitive as the atomic unit of code. A patch is a set of metadata and code
-changes, or \emph{changeset}, that can be applied on existing source
-code to modify it. We define a patch $P$ as the tuple $\langle P_a, P_m, P_f
-\rangle$, where $P_a$ is the author of the patch, $P_m$ is the patch metadata
-and $P_f$ is the changeset. A set of patches in no particular order is called a
-\emph{patchset}.
+changes, or \emph{changeset}, that can be applied to an existing body of code,
+or \emph{context}, to modify it. We define a patch $P$ as the tuple $\langle
+P_a, P_m, P_f \rangle$, where $P_a$ is the author of the patch, $P_m$ is the
+patch metadata and $P_f$ is the changeset. A set of patches in no particular
+order is called a \emph{patchset}.
 
-Patches can be composed sequentially, taking an initial \emph{context} $A$ into
+Patches can be composed sequentially, taking an initial context $A$ into
 a modified context $B$. The empty context is defined as $\varnothing$, such
-that there exists a mapping $P_f \varnothing \mapsto P_f$.  Let $f \prec g
+that there exists a mapping $P_f \varnothing \mapsto P_f$. Let $f \prec g
 \prec h$ be an ordered sequence of patches, then the formulation:
 \[
 h \cdot g \cdot f : A \to B
@@ -70,36 +70,48 @@ attached to the issue, $\sigma$ is the signature of $I_a$, $I_s \in \{open,
 closed, accepted, rejected\}$ is the current state and $I_V$ is the set of
 votes on the issue. The initial value of $I_s$, $I_{s_0} = open$, the initial
 value of $I_V$, $I_{V_0} = \varnothing$ and the initial value of $I_P$,
-$I_{P_0} = \varnothing$.  The following table lists the valid state transitions
-between any two states $I_s$ and $I_{s'}$.
+$I_{P_0} = \varnothing$.  A list of valid state transitions between any two
+states $I_s$ and $I_{s'}$ can be found in Table \ref{issues-valid-transitions}.
 
-\begin{table}[!hbtp]
+\begin{table}[hbt]
+    \caption{\label{issues-valid-transitions}}
     \begin{tabular}{rcl}
         \toprule
         $I_s$    & \to & $I_{s'}$ \\
         \midrule
-        $open$   & \to & $accepted$ \\
-        $open$   & \to & $rejected$ \\
-        $open$   & \to & $closed$ \\
-        $closed$ & \to & $open$ \\
+        $open$     & \to & $accepted$ \\
+        $open$     & \to & $rejected$ \\
+        $open$     & \to & $closed$ \\
+        $closed$   & \to & $open$ \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-Issues can be voted on with the \emph{voice} operation. See section
-\ref{source-chain-transactions} for details. When an issue receives a new vote,
-it is added to $I_V$. A vote $v$ is represented by the tuple $\langle v_i, v_a,
-v_{\omega}, v_e \rangle_{\sigma}$ where $v_a$ is the voter, $v_i$ is the issue
-being voted on, $v_{\omega} \in \{accept, reject\}$ and $v_e$ is the epoch $e$
-at which the vote is valid.
+Issues can be voted on with the \emph{voice} operation. When an issue receives
+a new vote, it is added to $I_V$. A vote $v$ is represented by the tuple
+$\langle v_i, v_a, v_{\omega}, v_e \rangle_{\sigma}$ where $v_a$ is the voter,
+$v_i$ is the issue being voted on, $v_{\omega} \in \{accept, reject\}$ and
+$v_e$ is the epoch $e$ at which the vote is valid.
 
 \subsubsection{Amendments}
 
 An issue $I$ where $I_s = open$ can be amended with the \emph{amend} operation
-$\alpha$ Only $I_t$, $I_b$ and $I_P$ can be amended.  Amending an issue creates
+$\amend$. Only $I_t$, $I_b$ and $I_P$ can be amended.  Amending an issue creates
 a new empty set of votes $V'$, ensuring two versions of a given issue never
 share a set of votes. Formally, amendment is defined as:
 \begin{align*}
-    \alpha(I, \langle I_a, t', b', P' \rangle_{\sigma}) \equiv \big<\langle I_a, t', b', P'
+    I \amend{} \langle I_a, t', b', P' \rangle_{\sigma} \equiv \big<\langle I_a, t', b', P'
     \rangle_{\sigma}, I_s, \varnothing \big>, \qquad I_s = open
 \end{align*}
+
+\subsubsection{Accepted Issues} When an issue has been accepted by a majority
+of votes, the issue transitions permanently into an \emph{accepted} state.
+
+\begin{enumerate}
+    \item The issue's state is set to \emph{accepted}.
+    \item The issue's \emph{patchset} is permanently added to the code
+        repository and branch it pertains to. Note that a patchset may contain
+        individual patches pertaining to different repositories.
+    \item Operations attached to the \emph{accepted} state of the issue are
+        executed by the protocol.
+\end{enumerate}
