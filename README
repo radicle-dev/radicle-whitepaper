@@ -1,0 +1,3 @@
+The oscoin white paper is a formal definition of the oscoin protocol and
+network. To build it, run the ./build command. This requires the pdflatex
+command.  The generated pdf can be found in the ./out directory.
