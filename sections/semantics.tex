@@ -111,6 +111,8 @@ steps taken by the protocol are as follows:
 
 \begin{enumerate}
     \item The issue's state $I_s$ is set to \emph{accepted}.
+    \item The issue is \emph{frozen}, such that no further amendments or state
+        changes are possible.
     \item The list of operations $I_o$ belonging to the issue are executed by
         the protocol.
     \item The issue's \emph{patchset} $I_P$ is permanently added to the code
@@ -118,3 +120,17 @@ steps taken by the protocol are as follows:
         individual patches pertaining to different repositories, in which case
         the patches are applied individually to their respective repositories.
 \end{enumerate}
+
+\subsubsection{Rejected issues} When an issue is rejected,
+\begin{enumerate}
+    \item The issue transitions to a \emph{rejected} state.
+    \item The issue is frozen so that no further amendments or state
+        transitions are possible.
+    \item The list of operations $I_o$ belonging to the issue are executed by
+        the protocol.
+\end{enumerate}
+
+\subsubsection{Closed issues} When an issue is closed, its state changes to
+\emph{closed} until it is re-opened. No operations from $I_o$ are run, since
+an issue can be opened and closed many times. Only the author $I_a$ of an issue
+can close it.
