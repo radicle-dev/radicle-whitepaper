@@ -16,7 +16,7 @@ where $T_i$ is the identity of the sender of the operation, $T_m$ is the
 message, $T_p$ is a reference to a parent operation which $T$ should succeed,
 and $T_n \in \mathbb{N}$ taken together with $T_i$ forms a globally unique
 operation identifier, such that there can be at most one operation with a
-certain $\langle T_i, T_n \rangle$ tuple.
+given $\langle T_i, T_n \rangle$ tuple.
 
 A valid operation $T$ applied to the current state of
 the protocol $\mathcal{S}_e$ at epoch $e$ can be formulated as:
@@ -149,3 +149,18 @@ steps taken by the protocol are as follows:
 \emph{closed} until it is re-opened. No operations from $I_o$ are run, since
 an issue can be opened and closed many times. Only the author $I_a$ of an issue
 can close it.
+
+\subsection{Tokens}
+
+To enable the transfer of value in the network, the protocol defines a scarce
+token we shall refer to in the remainder of this paper as~\token{}, or
+\oscoin{}.
+
+\subsubsection{Supply}
+
+The supply of \token{} tokens is subject to an inflation $e_{\iota} \in
+\mathbb{N}$, carried out by the protocol every epoch $e$, and determined by a
+function $f : e \to e_{\iota}$, such that
+\[
+    \lim_{e\to\infty} f(e) = 0
+\]
