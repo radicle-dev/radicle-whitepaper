@@ -13,10 +13,10 @@ the form:
     T \equiv \langle T_i, T_m, T_p, T_n \rangle_{\sigma}
 \]
 where $T_i$ is the identity of the sender of the operation, $T_m$ is the
-message, $T_p$ is a reference to a parent operation which $T$ should succeed,
-and $T_n \in \mathbb{N}$ taken together with $T_i$ forms a globally unique
-operation identifier, such that there can be at most one operation with a
-given $\langle T_i, T_n \rangle$ tuple.
+message, $T_p$ is a reference to a parent operation which $T$, such that $T_p
+\prec T$, and $T_n \in \mathbb{N}$ taken together with $T_i$ forms a globally
+unique operation identifier, such that there can be at most one operation with
+a given $\langle T_i, T_n \rangle$ tuple.
 
 A valid operation $T$ applied to the current state of
 the protocol $\mathcal{S}_e$ at epoch $e$ can be formulated as:
@@ -95,7 +95,7 @@ description of the changes contained in $I_P$. Issue \emph{resolution} is the
 process of voting on an issue with the aim to move to an \emph{accepted} or
 \emph{rejected} state.
 
-Issues can be voted on with the \emph{voice} operation. When an issue receives
+Issues can be voted on with the \textsc{voice} operation. When an issue receives
 a new vote, it is added to $I_V$. A vote $v$ is represented by the tuple
 $\langle v_i, v_a, v_{\omega}, v_e \rangle_{\sigma}$ where $v_a$ is the voter,
 $v_i$ is the issue being voted on, $v_{\omega} \in \{accept, reject\}$ and
@@ -164,3 +164,18 @@ function $f : e \to e_{\iota}$, such that
 \[
     \lim_{e\to\infty} f(e) = 0
 \]
+
+\subsubsection{Accounts}
+
+Tokens are held in \emph{accounts} which can be unlocked by the signature of
+the account holder. Accounts have addresses which are used to send and receive
+tokens.
+
+\subsubsection{Transfer}
+
+Tokens can be transfered from one account to another with the \textsc{send}
+operation, formally defined as $\langle \textsc{send}, a_{f}, a_{t}, n
+\rangle_{\sigma}$, where $a_{f}$ and $a_{t}$ are the addresses \emph{from}
+which and \emph{to} which the tokens should be transfered, $n$ is the number of
+tokens to transfer, and $\sigma$ is the signature for $a_{f}$, authorizing the
+transfer of tokens.
