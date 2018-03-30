@@ -4,6 +4,30 @@ The rules according to which transactions on the \oscoin{} network are
 validated comprise a \emph{protocol}. This protocol has a well defined semantics
 which we shall describe in this section.
 
+\subsection{Overview} The \oscoin{} protocol is composed of interrelated
+\emph{objects} which form a hierarchical graph as seen in Figure
+\ref{object-relationships}, and \emph{operations}, which act on these objects.
+
+\medskip
+
+\begin{figure}[htp]
+\begin{tikzpicture}[sibling distance=8em]
+    \node {\emph{organizations}}
+    child { node {\emph{members}} }
+    child { node {\emph{projects}}
+        child { node {\emph{patches}} }
+        child { node {\emph{issues}}
+            child { node {\emph{author}} }
+            child { node {\emph{patchset}} }
+            child { node {\emph{votes}} } }
+        child { node {\emph{dependencies}} } }
+    child { node {\emph{account}} }
+\end{tikzpicture}
+\bigskip
+\caption{Object relationships in the \oscoin{} protocol.
+\label{object-relationships}}
+\end{figure}
+
 \subsection{Operations}
 
 Operations are signed messages constructed by participants in the protocol,
