@@ -134,10 +134,11 @@ issue $i$ for every vote added to $i_V$.
 
 \subsubsection{Amendments}
 
-An issue $I$ where $I_s = open$ can be amended with the \emph{amend} operation
-$\amend$. Only $I_t$, $I_b$, $I_o$, $I_r$ and $I_P$ can be amended.  Amending an issue creates
-a new empty set of votes $V'$, ensuring two versions of a given issue never
-share a set of votes. Formally, amendment is defined as:
+An issue $I$ where $I_s = open$ can be amended with the \textsc{amend}
+operation, or $\amend$. Only $I_t$, $I_b$, $I_o$, $I_r$ and $I_P$ can be
+amended.  Amending an issue creates a new empty set of votes $V'$, ensuring two
+versions of a given issue never share a set of votes. Formally, amendment is
+defined as:
 \begin{align*}
     I \amend{} \langle I_a, t', b', o', r', P' \rangle_{\sigma} \equiv
     \big<\langle I_a, t', b', o', r', P' \rangle_{\sigma}, I_s, \varnothing
