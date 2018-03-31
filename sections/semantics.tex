@@ -198,8 +198,28 @@ tokens.
 \subsubsection{Transfer}
 
 Tokens can be transfered from one account to another with the \textsc{send}
-operation, formally defined as $\langle \textsc{send}, a_{f}, a_{t}, n
-\rangle_{\sigma}$, where $a_{f}$ and $a_{t}$ are the addresses \emph{from}
-which and \emph{to} which the tokens should be transfered, $n$ is the number of
-tokens to transfer, and $\sigma$ is the signature for $a_{f}$, authorizing the
-transfer of tokens.
+operation, formally defined as $\langle \textsc{send}, a_{s}, a_{r}, n
+\rangle_{\sigma}$, where $a_{s}$ and $a_{r}$ are the \emph{sender} and
+\emph{recipient} address between which the tokens should be transfered, $n$ is
+the number of tokens to transfer, and $\sigma$ is the signature for $a_{s}$,
+authorizing the transfer of tokens.
+
+\subsubsection{Bonding}
+
+Tokens can be locked in the system via an operation called \emph{bonding}.
+This operation turns \emph{liquid} tokens into \emph{bonded} tokens, preventing
+them from being moved for a certain amount of time, and can be used to perform
+security deposits or other forms of commitment which require a collateral or
+pledge. Bonding and unbonding are performed with the
+\textsc{bond} and \textsc{unbond} operations defined as:
+\[
+    \langle \textsc{bond}, a, a_b, n \rangle_{\sigma} \qquad
+    \langle \textsc{unbond}, a, a_b, n \rangle_{\sigma}
+\]
+where $a$ is the address from which to withdraw the tokens for bonding, $a_b$
+is the address where these tokens are to be bonded and $n$ is the amount of
+tokens to bond.
+
+When the \textsc{unbond} operation is used, an unbonding period $e_u$ is
+started, measured in epochs. Once $e_{u}$ epochs have passed, the tokens are
+withdrawn from the bonding address $a_b$ and credited back to $a$.
