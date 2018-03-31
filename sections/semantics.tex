@@ -40,7 +40,8 @@ where $T_i$ is the identity of the sender of the operation, $T_m$ is the
 message, $T_p$ is a reference to a parent operation which $T$, such that $T_p
 \prec T$, and $T_n \in \mathbb{N}$ taken together with $T_i$ forms a globally
 unique operation identifier, such that there can be at most one operation with
-a given $\langle T_i, T_n \rangle$ tuple.
+a given $\langle T_i, T_n \rangle$ tuple. In the remainder of the paper, we shall
+use the word \emph{operation} to mean either a tuple $T$, or its message $T_m$.
 
 A valid operation $T$ applied to the current state of
 the protocol $\mathcal{S}_e$ at epoch $e$ can be formulated as:
@@ -213,16 +214,15 @@ Tokens can be locked in the system via an operation called \emph{bonding}.
 This operation turns \emph{liquid} tokens into \emph{bonded} tokens, preventing
 them from being moved for a certain amount of time, and can be used to perform
 security deposits or other forms of commitment which require a collateral or
-pledge. Bonding and unbonding are performed with the
-\textsc{bond} and \textsc{unbond} operations defined as:
+pledge. Bonding and unbonding operations are performed with the
+\textsc{bond} and \textsc{unbond} messages defined as:
 \[
-    \langle \textsc{bond}, a, a_b, n \rangle_{\sigma} \qquad
-    \langle \textsc{unbond}, a, a_b, n \rangle_{\sigma}
+    \langle \textsc{bond}, a, a_b, n \rangle \qquad
+    \langle \textsc{unbond}, a, a_b, n \rangle
+    \medskip
 \]
 where $a$ is the address from which to withdraw the tokens for bonding, $a_b$
 is the address where these tokens are to be bonded and $n$ is the amount of
-tokens to bond.
-
-When the \textsc{unbond} operation is used, an unbonding period $e_u$ is
-started, measured in epochs. Once $e_{u}$ epochs have passed, the tokens are
-withdrawn from the bonding address $a_b$ and credited back to $a$.
+tokens to bond. When the \textsc{unbond} operation is used, an unbonding period
+$e_u$ is started, measured in epochs. Once $e_{u}$ epochs have passed, the
+tokens are withdrawn from the bonding address $a_b$ and credited back to $a$.
