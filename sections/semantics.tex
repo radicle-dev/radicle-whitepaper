@@ -1,5 +1,8 @@
 \section{Formal Semantics}
 
+% TODO: Distinguish operations from messages, make sure messages aren't signed.
+% TODO: Make sure all operations, ex. around issues are using a message token.
+
 The rules according to which transactions on the \oscoin{} network are
 validated comprise a \emph{protocol}. This protocol has a well defined semantics
 which we shall describe in this section.
@@ -202,11 +205,11 @@ tokens.
 \subsubsection{Transfer}
 
 Tokens can be transfered from one account to another with the \textsc{send}
-operation, formally defined as $\langle \textsc{send}, a_{s}, a_{r}, n
-\rangle_{\sigma}$, where $a_{s}$ and $a_{r}$ are the \emph{sender} and
-\emph{recipient} address between which the tokens should be transfered, $n$ is
-the number of tokens to transfer, and $\sigma$ is the signature for $a_{s}$,
-authorizing the transfer of tokens.
+message, formally defined as $\langle \textsc{send}, a_{s}, a_{r}, n
+\rangle$, where $a_{s}$ and $a_{r}$ are the \emph{sender} and
+\emph{recipient} address between which the tokens should be transfered and $n$ is
+the number of tokens to transfer. To be valid, a \textsc{send} operation must
+be signed by the owner of $a_{s}$.
 
 \subsubsection{Bonding}
 
