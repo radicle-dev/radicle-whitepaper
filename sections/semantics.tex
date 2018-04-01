@@ -109,7 +109,7 @@ of valid state transitions between any two states $I_s$ and $I_{s'}$ can be
 found in Table \ref{issues-valid-transitions}.
 
 \begin{table}[hbt]
-    \caption{\label{issues-valid-transitions}}
+    \caption{Valid state transitions.\label{issues-valid-transitions}}
     \begin{tabular}{rcl}
         \toprule
         $I_s$      & $\to$ & $I_{s'}$ \\
@@ -184,40 +184,39 @@ steps taken by the protocol are as follows:
 an issue can be opened and closed many times. Only the author $I_a$ of an issue
 can close it.
 
-\subsection{Tokens}
+\subsection{Value}
 
 To enable the transfer of value in the network, the protocol defines a scarce
-token we shall refer to in the remainder of this paper as~\token{}, or
+currency we shall refer to in the remainder of this paper as~\coin{}, or
 \oscoin{}.
 
 \subsubsection{Supply}
 
-The supply of \token{} tokens is subject to an inflation $e_{\iota} \in
-\mathbb{N}$, carried out by the protocol every epoch $e$, and determined by a
-function $f : e \to e_{\iota}$, such that
+The supply of \coin{} is subject to an inflation $e_{\iota} \in \mathbb{N}$,
+carried out by the protocol every epoch $e$, and determined by a function $f :
+e \to e_{\iota}$, such that
 \[
     \lim_{e\to\infty} f(e) = 0
 \]
 
 \subsubsection{Accounts}
 
-Tokens are held in \emph{accounts} which can be unlocked by the signature of
+Currency is held in \emph{accounts} which can be unlocked by the signature of
 the account holder. Accounts have addresses which are used to send and receive
-tokens.
+\coin{}.
 
 \subsubsection{Transfer}
 
-Tokens can be transfered from one account to another with the \textsc{send}
-message, formally defined as $\langle \textsc{send}, a_{s}, a_{r}, n
-\rangle$, where $a_{s}$ and $a_{r}$ are the \emph{sender} and
-\emph{recipient} address between which the tokens should be transfered and $n$ is
-the number of tokens to transfer. To be valid, a \textsc{send} operation must
-be signed by the owner of $a_{s}$.
+Value can be transfered from one account to another with the \textsc{send}
+message, formally defined as $\langle \textsc{send}, a_{s}, a_{r}, n \rangle$,
+where $a_{s}$ and $a_{r}$ are the \emph{sender} and \emph{recipient} address
+between which the value should be transfered and $n$ is the value to transfer.
+To be valid, a \textsc{send} operation must be signed by the owner of $a_{s}$.
 
 \subsubsection{Bonding}
 
-Tokens can be locked in the system via an operation called \emph{bonding}.
-This operation turns \emph{liquid} tokens into \emph{bonded} tokens, preventing
+Value can be locked in the system via an operation called \emph{bonding}.
+This operation turns \emph{liquid} value into \emph{bonded} value, preventing
 them from being moved for a certain amount of time, and can be used to perform
 security deposits or other forms of commitment which require a collateral or
 pledge. Bonding and unbonding operations are performed with the
