@@ -34,7 +34,7 @@ which we shall describe in this section.
 \label{object-relationships}}
 \end{figure}
 
-\subsection{Operations}
+\subsection{Operations and State}
 
 Operations are signed messages constructed by participants in the protocol,
 which trigger a state transition in the network. A valid operation $T$ takes
@@ -217,7 +217,7 @@ e \to e_{\iota}$, such that
 
 Currency is held in \emph{accounts} which can be unlocked by the signature of
 the account holder. Accounts have addresses which are used to send and receive
-\coin{}.
+\coin{}. The set of all accounts is known as $\mathcal{A}$.
 
 \subsubsection{Transfer}
 
@@ -283,6 +283,8 @@ or parts of $b$. Formally, we represent this as:
 \[
     D \equiv \tuple{D_a, D_b, D_e} \qquad or \qquad a \dep b
 \]
+
+% TODO: dependencies with \overrightarrow{AB}, like vectors.
 
 Let $\accentset{*}{R}$ be the set $O_{1_R} \cup O_{2_R} \cup \cdots \cup
 O_{n_R}$ of all projects accross all organizations, and $\mathcal{D}_e$ be the
