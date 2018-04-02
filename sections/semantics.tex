@@ -16,18 +16,18 @@ which we shall describe in this section.
 \begin{figure}[htp]
 \begin{tikzpicture}[sibling distance=8em]
     \node {\emph{registry}}
-    child { node {\emph{accounts}} }
+        child { node {\emph{accounts}} }
         child { node {\emph{organizations}}
-        child { node {\emph{members}} }
-        child { node {\emph{projects}}
-            child { node {\emph{patches}} }
-            child { node {\emph{issues}}
-                child { node {\emph{author}} }
-                child { node {\emph{patchset}} }
-                child { node {\emph{votes}} } }
-            child { node {\emph{dependencies}} } }
-        child { node {\emph{account}} } }
-    child { node {\emph{stakes}} }
+            child { node {\emph{members}} }
+            child { node {\emph{projects}}
+                child { node {\emph{patches}} }
+                child { node {\emph{issues}}
+                    child { node {\emph{author}} }
+                    child { node {\emph{patchset}} }
+                    child { node {\emph{votes}} } }
+                child { node {\emph{dependencies}} } }
+            child { node {\emph{account}} } }
+        child { node {\emph{stakes}} };
 \end{tikzpicture}
 \bigskip
 \caption{Object relationships in the \oscoin{} protocol.
@@ -64,7 +64,7 @@ $\varnothing$:
 \]
 The state $\mathcal{S}$ of the protocol is defined as:
 \[
-    \mathcal{S} & \equiv \tuple{\mathcal{A}, \mathcal{O}, \mathcal{D}, \mathcal{L}} \\
+    \mathcal{S} \equiv \tuple{\mathcal{A}, \mathcal{O}, \mathcal{D}, \mathcal{L}} \\
 \]
 where $\mathcal{A}$ is the set of accounts (\ref{accounts}), $\mathcal{O}$ is
 the set of organizations known to the protocol (\ref{orgs}), $\mathcal{D}$ is
