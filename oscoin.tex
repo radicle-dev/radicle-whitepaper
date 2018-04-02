@@ -38,6 +38,11 @@
 \newcommand{\cvdots}{\multicolumn{1}{c}{\small{\vdots}}}
 \newcommand{\dep}{\xrightharpoondown[e]{d}}
 
+% No paragraph indentation after section headers.
+\makeatletter
+\let\@afterindenttrue\@afterindentfalse
+\makeatother
+
 % Issue amend operator.
 \DeclareMathOperator{\amend}{\times}
 
