@@ -278,11 +278,12 @@ in $\mathcal{O}$.
 \subsection{Dependencies}
 \label{dependencies}
 
-A project $a$ depends on a project $b$ at epoch $e$ if it could not function
-without modification, were $b$ destroyed. Formally, we represent this as:
+A project $a$ depends on a project $b$ at epoch $e$ if it references $b$
+or parts of $b$. Formally, we represent this as:
 \[
-    a \dep b
+    D \equiv \tuple{D_a, D_b, D_e} \qquad or \qquad a \dep b
 \]
+
 Let $\accentset{*}{R}$ be the set $O_{1_R} \cup O_{2_R} \cup \cdots \cup
 O_{n_R}$ of all projects accross all organizations, and $\mathcal{D}_e$ be the
 set of all dependencies at epoch $e$, then:
@@ -291,3 +292,7 @@ set of all dependencies at epoch $e$, then:
     \land b \in \accentset{*}{R}
     \land a \dep b \}
 \]
+
+Dependencies are recorded with the $\tx{depend}{D_a, D_b, D_e, D_{e'}}$
+operation, which records a dependency between $a$ and $b$ for each epoch $x$
+where $e \leqslant x \leqslant e'$.
