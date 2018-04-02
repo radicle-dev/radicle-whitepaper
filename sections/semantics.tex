@@ -54,23 +54,35 @@ the protocol $\mathcal{S}_e$ at epoch $e$ can be formulated as:
 \[
     \mathcal{S}_{e+1} \equiv \delta(\mathcal{S}_e, T)
 \]
-where $\delta$ is \emph{apply}, the state-transition function.  We can
-describe the current state of the network $\mathcal{S}_e$ as a sequence of
-operations ${T_1 \dots T_e}$ applied recursively to an initial empty state
+where $\delta$ is \emph{apply}, the state-transition function.  We can describe
+the current state of the network $\mathcal{S}_e$ as a sequence of operations
+$\mathcal{L} = T_1 \dots T_e$ applied recursively to an initial empty state
 $\varnothing$:
 \[
     \mathcal{S}_e \equiv \delta(\dots \delta(\delta(\delta(\varnothing,
     T_1), T_2), T_3), \dots T_e)
 \]
+The state $\mathcal{S}$ of the protocol is defined as:
+\[
+    \mathcal{S} & \equiv \tuple{\mathcal{A}, \mathcal{O}, \mathcal{D}, \mathcal{L}} \\
+\]
+where $\mathcal{A}$ is the set of accounts (\ref{accounts}), $\mathcal{O}$ is
+the set of organizations known to the protocol (\ref{orgs}), $\mathcal{D}$ is
+the set of dependencies between projects (\ref{dependencies}) and $\mathcal{L}$
+is the sequence of operations which have been applied to $\mathcal{S}$. It is
+thus possible to reconstruct $\mathcal{S}$ from $\mathcal{L}$ via the $\delta$
+function, as seen above.
 
-\subsection{Code} The fundamental product or \emph{artifact} of the \oscoin{}
-network is code, or source code. Our protocol defines the \emph{patch}
-primitive as the atomic unit of code. A patch is a set of metadata and code
-changes, or \emph{changeset}, that can be applied to an existing body of code,
-or \emph{context}, to modify it. We define a patch $P$ as the tuple $\tuple{
-P_a, P_m, P_f}$, where $P_a$ is the author of the patch, $P_m$ is the
-patch metadata and $P_f$ is the changeset. A set of patches in no particular
-order is called a \emph{patchset}.
+\subsection{Patches}
+\label{patches}
+
+The fundamental product or \emph{artifact} of the \oscoin{} network is code, or
+source code. Our protocol defines the \emph{patch} primitive as the atomic unit
+of code. A patch is a set of metadata and code changes, or \emph{changeset},
+that can be applied to an existing body of code, or \emph{context}, to modify
+it. We define a patch $P$ as the tuple $\tuple{ P_a, P_m, P_f}$, where $P_a$ is
+the author of the patch, $P_m$ is the patch metadata and $P_f$ is the
+changeset. A set of patches in no particular order is called a \emph{patchset}.
 
 Patches can be composed sequentially, taking an initial context $A$ into
 a modified context $B$. The empty context is defined as $\varnothing$, such
@@ -86,6 +98,7 @@ context from $A$ to $B$.
 % TODO: Reference patch theory.
 
 \subsection{Issues}
+\label{issues}
 
 On the \oscoin{} network, collaboration on code takes place through \emph{issues};
 and since project governance is specified in code---through the use of
@@ -200,6 +213,7 @@ e \to e_{\iota}$, such that
 \]
 
 \subsubsection{Accounts}
+\label{accounts}
 
 Currency is held in \emph{accounts} which can be unlocked by the signature of
 the account holder. Accounts have addresses which are used to send and receive
@@ -225,8 +239,47 @@ pledge. Bonding and unbonding operations are performed with the
     \tx{bond}{a, a_b, n} \qquad \tx{unbond}{a, a_b, n}
     \medskip
 \]
-where $a$ is the address from which to withdraw the tokens for bonding, $a_b$
-is the address where these tokens are to be bonded and $n$ is the amount of
-tokens to bond. When the \textsc{unbond} operation is used, an unbonding period
-$e_u$ is started, measured in epochs. Once $e_{u}$ epochs have passed, the
-tokens are withdrawn from the bonding address $a_b$ and credited back to $a$.
+where $a$ is the address from which to withdraw the value for bonding, $a_b$ is
+the address where the value is to be bonded and $n$ is the value to bond. When
+the \textsc{unbond} operation is used, an unbonding period $e_u$ is started,
+measured in epochs. Once $e_{u}$ epochs have passed, the value is withdrawn
+from the bonding address $a_b$ and credited back to $a$.
+
+\subsection{Organizations}
+\label{orgs}
+
+An organization $O$ is described by the tuple:
+\[
+    \tuple{O_{id}, O_{a}, O_R, O_M}
+\]
+where $O_{id}$ is the organization's identifier, $O_a$ is its account, $O_R$ is
+the set of repositories under $O$ and $O_M$ is the set of members belonging to
+the organization. We can relate patches (\ref{patches}) and issues
+(\ref{issues}) to repositories with the equations:
+\begin{align*}
+    O_R & \equiv \{R_1, R_2, \dots, R_n\}         \\
+    R   & \equiv \tuple{R_{id}, R_I, R_P}         \\
+    R_I & \equiv \{I_1, I_2, \dots, I_n\}         \\
+    R_P & \equiv \tuple{P_1, P_2, \dots, P_n}
+\end{align*}
+where $R_{id}$ is the repository's identifier, $R_I$ is the set of issues
+related to $R$, and $R_P$ is the sequence of patches composing its codebase.
+
+The set $\mathcal{O} = \{O_1, O_2, \dots, O_n\}$ is the set of all organizations
+known to the protocol.  Let $o$ be an organization, then $\tx{register}{o}$ is
+an operation that registers $o$ and makes it known to the protocol such that:
+\[
+    \delta_o(\mathcal{O}, \tx{register}{o})
+    \equiv \mathcal{O} \cup \{o\}
+\]
+where $\delta_o$ is a sub-function of $\delta$, and defines state-transitions
+in $\mathcal{O}$.
+
+\subsection{Dependencies}
+\label{dependencies}
+\[
+    \accentset{*}{R} \equiv O_{1_R} \cup O_{2_R} \cup \cdots \cup O_{n_R}
+\]
+\[
+    \mathcal{D} \equiv \{(a, b) : a \in R \land b \in R \land a \overset{d}{\mapsto} b \} \\
+\]
