@@ -281,7 +281,7 @@ in $\mathcal{O}$.
 A project $a$ depends on a project $b$ at epoch $e$ if it could not function
 without modification, were $b$ destroyed. Formally, we represent this as:
 \[
-    a \overset{d}{\underset{e}{\mapsto}} b
+    a \dep b
 \]
 Let $\accentset{*}{R}$ be the set $O_{1_R} \cup O_{2_R} \cup \cdots \cup
 O_{n_R}$ of all projects accross all organizations, and $\mathcal{D}_e$ be the
@@ -289,5 +289,5 @@ set of all dependencies at epoch $e$, then:
 \[
     \mathcal{D}_e \equiv \{(a, b) : a \in \accentset{*}{R}
     \land b \in \accentset{*}{R}
-    \land a \overset{d}{\underset{e}{\mapsto}} b \}
+    \land a \dep b \}
 \]
