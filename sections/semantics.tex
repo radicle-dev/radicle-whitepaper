@@ -40,13 +40,13 @@ Operations are signed messages constructed by participants in the protocol,
 which trigger a state transition in the network. A valid operation $T$ takes
 the form:
 \[
-    T \equiv \langle T_i, T_m, T_p, T_n \rangle_{\sigma}
+    T \equiv \tuple{T_i, T_m, T_p, T_n}_{\sigma}
 \]
 where $T_i$ is the identity of the sender of the operation, $T_m$ is the
 message, $T_p$ is a reference to a parent operation which $T$, such that $T_p
 \prec T$, and $T_n \in \mathbb{N}$ taken together with $T_i$ forms a globally
 unique operation identifier, such that there can be at most one operation with
-a given $\langle T_i, T_n \rangle$ tuple. In the remainder of the paper, we shall
+a given $\tuple{T_i, T_n}$ tuple. In the remainder of the paper, we shall
 use the word \emph{operation} to mean either a tuple $T$, or its message $T_m$.
 
 A valid operation $T$ applied to the current state of
@@ -67,8 +67,8 @@ $\varnothing$:
 network is code, or source code. Our protocol defines the \emph{patch}
 primitive as the atomic unit of code. A patch is a set of metadata and code
 changes, or \emph{changeset}, that can be applied to an existing body of code,
-or \emph{context}, to modify it. We define a patch $P$ as the tuple $\langle
-P_a, P_m, P_f \rangle$, where $P_a$ is the author of the patch, $P_m$ is the
+or \emph{context}, to modify it. We define a patch $P$ as the tuple $\tuple{
+P_a, P_m, P_f}$, where $P_a$ is the author of the patch, $P_m$ is the
 patch metadata and $P_f$ is the changeset. A set of patches in no particular
 order is called a \emph{patchset}.
 
@@ -95,7 +95,7 @@ and since project governance is specified in code---through the use of
 
 An issue $I$ is described at epoch $e$ by the tuple:
 \[
-    \big<\langle I_a, I_t, I_b, I_o, I_r, I_P \rangle_{\sigma}, I_s, I_V \big>_e
+    \big<\tuple{I_a, I_t, I_b, I_o, I_r, I_P}_{\sigma}, I_s, I_V \big>_e
 \]
 where $I_a$ is the issue author, $I_t$ is the title or subject of the issue,
 $I_b$ is the description in plain text of the issue, $I_o$ is a list of
@@ -130,7 +130,7 @@ process of voting on an issue with the aim to move to an \emph{accepted} or
 
 Issues can be voted on with the \textsc{voice} operation. When an issue receives
 a new vote, it is added to $I_V$. A vote $v$ is represented by the tuple
-$\langle v_i, v_a, v_{\omega}, v_e \rangle_{\sigma}$ where $v_a$ is the voter,
+$\tuple{v_i, v_a, v_{\omega}, v_e}_{\sigma}$ where $v_a$ is the voter,
 $v_i$ is the issue being voted on, $v_{\omega} \in \{accept, reject\}$ and
 $v_e$ is the epoch $e$ at which the vote is valid.
 
@@ -208,10 +208,10 @@ the account holder. Accounts have addresses which are used to send and receive
 \subsubsection{Transfer}
 
 Value can be transfered from one account to another with the \textsc{send}
-message, formally defined as $\langle \textsc{send}, a_{s}, a_{r}, n \rangle$,
-where $a_{s}$ and $a_{r}$ are the \emph{sender} and \emph{recipient} address
-between which the value should be transfered and $n$ is the value to transfer.
-To be valid, a \textsc{send} operation must be signed by the owner of $a_{s}$.
+message, formally defined as $\tx{send}{a_{s}, a_{r}, n}$, where $a_{s}$ and
+$a_{r}$ are the \emph{sender} and \emph{recipient} address between which the
+value should be transfered and $n$ is the value to transfer.  To be valid, a
+\textsc{send} operation must be signed by the owner of $a_{s}$.
 
 \subsubsection{Bonding}
 
@@ -222,8 +222,7 @@ security deposits or other forms of commitment which require a collateral or
 pledge. Bonding and unbonding operations are performed with the
 \textsc{bond} and \textsc{unbond} messages defined as:
 \[
-    \langle \textsc{bond}, a, a_b, n \rangle \qquad
-    \langle \textsc{unbond}, a, a_b, n \rangle
+    \tx{bond}{a, a_b, n} \qquad \tx{unbond}{a, a_b, n}
     \medskip
 \]
 where $a$ is the address from which to withdraw the tokens for bonding, $a_b$
