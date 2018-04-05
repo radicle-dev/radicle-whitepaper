@@ -12,6 +12,14 @@
 \usepackage{tikz}
 \usepackage{accents}
 
+\usetikzlibrary{fit}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{positioning}
+\usetikzlibrary{decorations}
+\usetikzlibrary{decorations.pathmorphing}
+
+\hyphenation{block-chain block-chains}
+
 \hypersetup{colorlinks,
     citecolor=black,
     filecolor=black,
@@ -37,6 +45,9 @@
 \newcommand{\tuple}[1]{\langle #1 \rangle}
 \newcommand{\cvdots}{\multicolumn{1}{c}{\small{\vdots}}}
 \newcommand{\dep}{\xrightharpoondown[e]{d}}
+
+\newcommand{\State}{\mathcal{S}}
+\newcommand{\Ledger}{\mathcal{L}}
 
 % No paragraph indentation after section headers.
 \makeatletter

@@ -1,4 +1,5 @@
 \section{Protocol Semantics}
+\label{sec:protocol-semantics}
 
 % TODO: Distinguish operations from messages, make sure messages aren't signed.
 % TODO: Make sure all operations, ex. around issues are using a message token.
@@ -35,6 +36,11 @@ which we shall describe in this section.
 \end{figure}
 
 \subsection{Operations and State}
+\label{operations-and-state}
+
+% TODO: Call operation messages 'commands'. Then refer to all future
+% operations as commands. Move the author, nonce etc. to the command. Make
+% operations as a sequence of commands.
 
 Operations are signed messages constructed by participants in the protocol,
 which trigger a state transition in the network. A valid operation $T$ takes
@@ -43,7 +49,7 @@ the form:
     T \equiv \tuple{T_i, T_m, T_p, T_n}_{\sigma}
 \]
 where $T_i$ is the identity of the sender of the operation, $T_m$ is the
-message, $T_p$ is a reference to a parent operation which $T$, such that $T_p
+message, $T_p$ is a reference to a parent operation, such that $T_p
 \prec T$, and $T_n \in \mathbb{N}$ taken together with $T_i$ forms a globally
 unique operation identifier, such that there can be at most one operation with
 a given $\tuple{T_i, T_n}$ tuple. In the remainder of the paper, we shall
