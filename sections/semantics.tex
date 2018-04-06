@@ -58,14 +58,14 @@ use the word \emph{operation} to mean either a tuple $T$, or its message $T_m$.
 A valid operation $T$ applied to the current state of
 the protocol $\mathcal{S}_e$ at epoch $e$ can be formulated as:
 \[
-    \mathcal{S}_{e+1} \equiv \delta(\mathcal{S}_e, T)
+    \mathcal{S}_{e+1} \equiv \apply(\mathcal{S}_e, T)
 \]
-where $\delta$ is \emph{apply}, the state-transition function.  We can describe
+where $\apply$ is \emph{apply}, the state-transition function.  We can describe
 the current state of the network $\mathcal{S}_e$ as a sequence of operations
 $\mathcal{L} = T_1 \dots T_e$ applied recursively to an initial empty state
 $\varnothing$:
 \[
-    \mathcal{S}_e \equiv \delta(\dots \delta(\delta(\delta(\varnothing,
+    \mathcal{S}_e \equiv \apply(\dots \apply(\apply(\apply(\varnothing,
     T_1), T_2), T_3), \dots T_e)
 \]
 The state $\mathcal{S}$ of the protocol is defined as:
@@ -76,7 +76,7 @@ where $\mathcal{A}$ is the set of accounts (\ref{accounts}), $\mathcal{O}$ is
 the set of organizations known to the protocol (\ref{orgs}), $\mathcal{D}$ is
 the set of dependencies between projects (\ref{dependencies}) and $\mathcal{L}$
 is the sequence of operations which have been applied to $\mathcal{S}$. It is
-thus possible to reconstruct $\mathcal{S}$ from $\mathcal{L}$ via the $\delta$
+thus possible to reconstruct $\mathcal{S}$ from $\mathcal{L}$ via the $\apply$
 function, as seen above.
 
 \subsection{Patches}
@@ -275,10 +275,10 @@ The set $\mathcal{O} = \{O_1, O_2, \dots, O_n\}$ is the set of all organizations
 known to the protocol.  Let $o$ be an organization, then $\tx{register}{o}$ is
 an operation that registers $o$ and makes it known to the protocol such that:
 \[
-    \delta_o(\mathcal{O}, \tx{register}{o})
+    \apply(\mathcal{O}, \tx{register}{o})
     \equiv \mathcal{O} \cup \{o\}
 \]
-where $\delta_o$ is a sub-function of $\delta$, and defines state-transitions
+where $\apply_o$ is a sub-function of $\apply$, and defines state-transitions
 in $\mathcal{O}$.
 
 \subsection{Dependencies}
