@@ -96,10 +96,14 @@ the ledger $\Ledger$ by a \emph{blockchain}.
 \subsubsection{Root Chain Transactions}
 
 \begin{description}
-    \item[Register] $\tx{register}{r_{org}}$: Registers a
-        name on the root chain. Note that there is no `unregister'
-        transaction, since withdrawing all existing deposits under the name and
-        waiting a certain amount of blocks accomplishes this.
+    \item[Register] $\tx{register}{r_{org}}$: Registers a name on the root
+        chain. Note that there is no `unregister' transaction, since
+        withdrawing all existing deposits under the name and waiting a certain
+        amount of blocks accomplishes this. (Figure~\ref{org-registration}.)
+        \begin{figure}
+            \input{figures/org-registration.tikz}
+            \caption{Org Registration. \label{org-registration}}
+        \end{figure}
     \item[Update] $\tx{update}{u_{org}, u_{digest}, u_{height}, u_{P}}$. Commits
         a new source chain state to the root chain. The state digest and height
         are included in the transaction. This transaction is used by source
