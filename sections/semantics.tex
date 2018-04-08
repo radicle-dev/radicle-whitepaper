@@ -86,7 +86,7 @@ The fundamental product or \emph{artifact} of the \oscoin{} network is code, or
 source code. Our protocol defines the \emph{patch} primitive as the atomic unit
 of code. A patch is a set of metadata and code changes, or \emph{changeset},
 that can be applied to an existing body of code, or \emph{context}, to modify
-it. We define a patch $P$ as the tuple $\tuple{ P_a, P_m, P_f}$, where $P_a$ is
+it. We define a patch $P$ as the tuple $\tuple{P_a, P_m, P_f}$, where $P_a$ is
 the author of the patch, $P_m$ is the patch metadata and $P_f$ is the
 changeset. A set of patches in no particular order is called a \emph{patchset}.
 
@@ -95,7 +95,7 @@ a modified context $B$. The empty context is defined as $\varnothing$, such
 that there exists a mapping $P_f \varnothing \mapsto P_f$. Let $f \prec g
 \prec h$ be an ordered sequence of patches, then the formulation:
 \[
-h \cdot g \cdot f : A \to B
+    h \cdot g \cdot f : A \to B
 \]
 is the in-order composition of patches $f$, $g$ and $h$, taking an initial
 context from $A$ to $B$.
