@@ -212,11 +212,8 @@ currency we shall refer to in the remainder of this paper as~\coin{}, or
 \subsubsection{Supply}
 
 The supply of \coin{} is subject to an inflation $e_{\iota} \in \mathbb{N}$,
-carried out by the protocol every epoch $e$, and determined by a function $f :
-e \to e_{\iota}$, such that
-\[
-    f = \frac{\partial}{\partial e}\log e
-\]
+carried out by the protocol every epoch $e$, and determined by a logarithmic
+function $f : e \to e_{\iota}$, such that $\lim_{e \to \infty} f(e) = 0$.
 
 \subsubsection{Accounts}
 \label{accounts}
