@@ -58,15 +58,15 @@ use the word \emph{operation} to mean either a tuple $\op$, or its message $\op_
 A valid operation $\op$ applied to the current state of
 the protocol $\mathcal{S}_e$ at epoch $e$ can be formulated as:
 \[
-    \mathcal{S}_{e+1} \equiv \apply(\mathcal{S}_e, \op)
+    \mathcal{S}_{e+1} \equiv \applys(\mathcal{S}_e, \op)
 \]
-where $\apply$ is \emph{apply}, the state-transition function.  We can describe
-the current state of the network $\mathcal{S}_e$ as a sequence of operations
-$\mathcal{L} = \op_1 \dots \op_e$ applied recursively to an initial empty state
+where $\applys$ is the state-transition function.  We can describe the current
+state of the network $\mathcal{S}_e$ as a sequence of operations $\mathcal{L} =
+\op_1 \dotso \op_e$ applied recursively to an initial empty state
 $\varnothing$:
 \[
-    \mathcal{S}_e \equiv \apply(\dots \apply(\apply(\apply(\varnothing,
-    \op_1), \op_2), \op_3), \dots \op_e)
+    \mathcal{S}_e \equiv \applys(\dotso \applys(\applys(\applys(\varnothing,
+    \op_1), \op_2), \op_3) \dotso \op_e)
 \]
 The state $\mathcal{S}$ of the protocol is defined as:
 \[
@@ -76,7 +76,7 @@ where $\mathcal{A}$ is the set of accounts (\ref{accounts}), $\mathcal{O}$ is
 the set of organizations known to the protocol (\ref{orgs}), $\mathcal{D}$ is
 the set of dependencies between projects (\ref{dependencies}) and $\mathcal{L}$
 is the sequence of operations which have been applied to $\mathcal{S}$. It is
-thus possible to reconstruct $\mathcal{S}$ from $\mathcal{L}$ via the $\apply$
+thus possible to reconstruct $\mathcal{S}$ from $\mathcal{L}$ via the $\applys$
 function, as seen above.
 
 \subsection{Patches}
@@ -260,23 +260,23 @@ the set of repositories under $O$ and $O_M$ is the set of members belonging to
 the organization. We can relate patches (\ref{patches}) and issues
 (\ref{issues}) to repositories with the equations:
 \begin{align*}
-    O_R & \equiv \{R_1, R_2, \dots, R_n\}         \\
+    O_R & \equiv \{R_1, R_2, \dotsc, R_n\}         \\
     R   & \equiv \tuple{R_{id}, R_I, R_P}         \\
-    R_I & \equiv \{I_1, I_2, \dots, I_n\}         \\
-    R_P & \equiv \tuple{P_1, P_2, \dots, P_n}
+    R_I & \equiv \{I_1, I_2, \dotsc, I_n\}         \\
+    R_P & \equiv \tuple{P_1, P_2, \dotsc, P_n}
 \end{align*}
 where $R_{id}$ is the repository's identifier, $R_I$ is the set of issues
 related to $R$, and $R_P$ is the sequence of patches composing its codebase.
 
-The set $\mathcal{O} = \{O_1, O_2, \dots, O_n\}$ is the set of all organizations
+The set $\mathcal{O} = \{O_1, O_2, \dotsc, O_n\}$ is the set of all organizations
 known to the protocol.  Let $o$ be an organization, then $\tx{register}{o}$ is
 an operation that registers $o$ and makes it known to the protocol such that:
 \[
-    \apply(\mathcal{O}, \tx{register}{o})
+    \apply_o(\mathcal{O}, \tx{register}{o})
     \equiv \mathcal{O} \cup \{o\}
 \]
-where $\apply_o$ is a sub-function of $\apply$, and defines state-transitions
-in $\mathcal{O}$.
+where $\apply_o$ is a sub-function of $\applys$, and defines
+state-transitions in $\mathcal{O}$.
 
 \subsection{Dependencies}
 \label{dependencies}

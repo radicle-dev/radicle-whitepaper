@@ -23,11 +23,11 @@
         edge [pointer] (org-a-4.east);
 
     \node (root-0) at (-3, 0)        {$\cdots$};
-    \node (root-1) at (-1, 0) [root] {$\gamma_{n-2}$}
+    \node (root-1) at (-1, 0) [root] {$\rootchain_{n-2}$}
         edge [pointer] (root-0.east);
-    \node (root-2) at ( 3, 0) [root] {$\gamma_{n-1}$}
+    \node (root-2) at ( 3, 0) [root] {$\rootchain_{n-1}$}
         edge [pointer] (root-1.east);
-    \node (root-3) at ( 7, 0) [root] {$\gamma_{n}$}
+    \node (root-3) at ( 7, 0) [root] {$\rootchain_{n}$}
         edge [pointer] (root-2.east);
 
     \node (org-b-0) at (-1, -2.2) {$\cdots$};

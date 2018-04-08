@@ -17,13 +17,13 @@
     \tikzstyle{pointer} = [thin, -latex];
 
     \node (root-0) at (-3, 3) {$\cdots$};
-    \node (root-1) at (-1, 3) [root] edge [pointer] (root-0.east);
-    \node (root-2) at ( 3, 3) [root] edge [pointer] (root-1.east);
-    \node (root-3) at ( 7, 3) [root] edge [pointer] (root-2.east);
+    \node (root-1) at (-1, 3) [root] edge [pointer] (root-0.east) {};
+    \node (root-2) at ( 3, 3) [root] edge [pointer] (root-1.east) {};
+    \node (root-3) at ( 7, 3) [root] edge [pointer] (root-2.east) {};
 
-    \node (root-1-header) [root-header, below=(2mm of root-1.north] {$B_^r{n-2}$};
-    \node (root-2-header) [root-header, below=(2mm of root-2.north] {$B_^r{n-2}$};
-    \node (root-3-header) [root-header, below=(2mm of root-3.north] {$B_^r{n-2}$};
+    \node (root-1-header) [root-header, below=(2mm of root-1.north)] {$B_^r{n-2}$};
+    \node (root-2-header) [root-header, below=(2mm of root-2.north)] {$B_^r{n-2}$};
+    \node (root-3-header) [root-header, below=(2mm of root-3.north)] {$B_^r{n-2}$};
 
     \node[genesis-block] (genesis-a) [above=(2.5mm of root-1.south)] {\small{$A_{0}$}};
     \node                (genesis-b) [above=(2.5mm of root-2.south)] {$\cdots$};
