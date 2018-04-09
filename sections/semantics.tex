@@ -100,6 +100,41 @@ that there exists a mapping $P_f \varnothing \mapsto P_f$. Let $f \prec g
 is the in-order composition of patches $f$, $g$ and $h$, taking an initial
 context from $A$ to $B$.
 
+% TODO: Repository section. A repository is a context C, initially {} with an
+% identifier (to which patches can refer), that patches can be applied to,
+% and issues can refer to.
+
+% TODO: In git, a repository contains: a set of commit objects, a set of
+% references called 'heads', to commit objects (ex. branches).
+% A project always has one commit object with no parents, this is the first
+% commit.
+
+% TODO: Storing patch metadata (instead of hash, and not the changeset) is for
+% 'lazy-repositories' - you can download them and read the history without
+% downloading the files.
+
+% TODO: The sequence of patches is called the 'inventory'. Doesn't seem to have
+% parent pointers in darcs!
+
+% TODO: There's a "set of patches" and a "sequence of patches". They are both
+% useful views on the dataset.
+
+% "any permutation of a patch sequence allowed by Darcs leads to the same exact repository (if not, we have a bug)" ?!
+% TODO: Therefore there is a set of valid orders which lead to the same repository!
+
+\subsubsection{The \textsc{record} operation}
+\label{record-op}
+
+In order for a patch to be applied to the protocol state $\State$, we define
+an operation $\tx{patch}{P'_{id}, P}_{\sigma}$.
+
+\subsubsection{The \textsc{fork} operation}
+\label{fork-op}
+
+% TODO: Are patches tied to orgs/repos/branches, or free-floating, and the
+% PATCH operation is what is tied to them?
+
+
 % TODO: Contexts form a free monoid?
 % TODO: Reference patch theory.
 
