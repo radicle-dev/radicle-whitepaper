@@ -11,33 +11,33 @@
     \tikzstyle{pointer} = [thin, -latex];
 
     \node (org-a-0) at (-2.5, 2.2)                {$\cdots$};
-    \node[org-block] (org-a-1) [right=of org-a-0] {$A_{n-4}$}
+    \node[org-block] (org-a-1) [right=of org-a-0] {$B_{a-4}$}
         edge [pointer] (org-a-0.east);
-    \node[org-block] (org-a-2)  [right=of org-a-1] {$A_{n-3}$}
+    \node[org-block] (org-a-2)  [right=of org-a-1] {$B_{a-3}$}
         edge [pointer] (org-a-1.east);
-    \node[org-block] (org-a-3)  [right=of org-a-2] {$A_{n-2}$}
+    \node[org-block] (org-a-3)  [right=of org-a-2] {$B_{a-2}$}
         edge [pointer] (org-a-2.east);
-    \node[org-block] (org-a-4)  [right=of org-a-3] {$A_{n-1}$}
+    \node[org-block] (org-a-4)  [right=of org-a-3] {$B_{a-1}$}
         edge [pointer] (org-a-3.east);
-    \node[org-block] (org-a-5)  [right=of org-a-4] {$A_{n}$}
+    \node[org-block] (org-a-5)  [right=of org-a-4] {$B_{a}$}
         edge [pointer] (org-a-4.east);
 
     \node (root-0) at (-3, 0)        {$\cdots$};
-    \node (root-1) at (-1, 0) [root] {$\rootchain_{n-2}$}
+    \node (root-1) at (-1, 0) [root] {$B_{\rootchain - 2}$}
         edge [pointer] (root-0.east);
-    \node (root-2) at ( 3, 0) [root] {$\rootchain_{n-1}$}
+    \node (root-2) at ( 3, 0) [root] {$B_{\rootchain - 1}$}
         edge [pointer] (root-1.east);
-    \node (root-3) at ( 7, 0) [root] {$\rootchain_{n}$}
+    \node (root-3) at ( 7, 0) [root] {$B_{\rootchain}$}
         edge [pointer] (root-2.east);
 
     \node (org-b-0) at (-1, -2.2) {$\cdots$};
-    \node[org-block] (org-b-1) [right=of org-b-0] {$B_{n-3}$}
+    \node[org-block] (org-b-1) [right=of org-b-0] {$B_{b-3}$}
         edge [pointer] (org-b-0.east);
-    \node[org-block] (org-b-2) [right=of org-b-1] {$B_{n-2}$}
+    \node[org-block] (org-b-2) [right=of org-b-1] {$B_{b-2}$}
         edge [pointer] (org-b-1.east);
-    \node[org-block] (org-b-3) [right=of org-b-2] {$B_{n-1}$}
+    \node[org-block] (org-b-3) [right=of org-b-2] {$B_{b-1}$}
         edge [pointer] (org-b-2.east);
-    \node[org-block] (org-b-4) [right=of org-b-3] {$B_{n}$}
+    \node[org-block] (org-b-4) [right=of org-b-3] {$B_{b}$}
         edge [pointer] (org-b-3.east);
 
     \draw [link] (org-a-2) -- (root-2);
