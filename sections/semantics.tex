@@ -42,42 +42,60 @@ which we shall describe in this section.
 % operations as commands. Move the author, nonce etc. to the command. Make
 % operations as a sequence of commands.
 
+% TODO: Better word for Contexts?
+% TODO: Issue resolution. Voicing. Voicing can be used to implement voting mechanisms.
+% TODO: Merge accounts (A) and orgs (O).
+
 Operations are signed messages constructed by participants in the protocol,
-which trigger a state transition in the network. A valid operation $\op$ takes
+which trigger a state transition in the network. An operation $\op$ takes
 the form:
 \[
     \op \equiv \tuple{\op_i, \op_m, \op_p, \op_n}_{\sigma}
 \]
 where $\op_i$ is the identity of the sender of the operation, $\op_m$ is the
-message, $\op_p$ is a reference to a parent operation, such that $\op_p
-\prec \op$, and $\op_n \in \mathbb{N}$ taken together with $\op_i$ forms a globally
-unique operation identifier, such that there can be at most one operation with
-a given $\tuple{\op_i, \op_n}$ tuple. In the remainder of the paper, we shall
-use the word \emph{operation} to mean either a tuple $\op$, or its message $\op_m$.
+message, $\op_p$ is a reference to a parent operation, such that $\op_p \prec
+\op$. Finally, $\op_n \in \mathbb{N}$ taken together with $\op_i$ forms a
+globally unique operation identifier, such that there can be at most one
+operation with a given $\tuple{\op_i, \op_n}$ tuple. If $\mathcal{T}$ is the
+set of all operations, then $\mathcal{T}_v \subset \mathcal{T}$ is the set of all \emph{valid}
+operations.
 
-A valid operation $\op$ applied to the current state of
-the protocol $\mathcal{S}_e$ at epoch $e$ can be formulated as:
+An operation $t \in \mathcal{T}_v$ applied to the current state of the protocol $\mathcal{S}_e$
+at epoch $e$ can be formulated as:
 \[
-    \mathcal{S}_{e+1} \equiv \applys(\mathcal{S}_e, \op)
+    \mathcal{S}_{e+1} \equiv \apply(\mathcal{S}_e, t)
 \]
-where $\applys$ is the state-transition function.  We can describe the current
-state of the network $\mathcal{S}_e$ as a sequence of operations $\mathcal{L} =
-\op_1 \dotso \op_e$ applied recursively to an initial empty state
-$\varnothing$:
+where $\apply$ is the state-transition function defined by:
 \[
-    \mathcal{S}_e \equiv \applys(\dotso \applys(\applys(\applys(\varnothing,
+    \apply(\State, t) \equiv \begin{cases}
+        \apply_{s}(\State, t) & \text{if} \quad t \in \mathcal{T}_v \\
+        \State                & \text{otherwise}
+    \end{cases}
+\]
+and $\apply_s$ is a sub-function of $\apply$ which applies valid operations to
+$\State$.  We can describe the current
+state of the network $\mathcal{S}_e$ as a sequence of operations $\mathcal{L} =
+\op_1 \dotso \op_e$, (the ``ledger'') applied recursively to an initial empty
+state $\varnothing$:
+\[
+    \mathcal{S}_e \equiv \apply(\dotso \apply(\apply(\apply(\varnothing,
     \op_1), \op_2), \op_3) \dotso \op_e)
 \]
 The state $\mathcal{S}$ of the protocol is defined as:
 \[
-    \mathcal{S} \equiv \tuple{\mathcal{A}, \mathcal{O}, \mathcal{D}, \mathcal{L}} \\
+    \mathcal{S} \equiv \tuple{\mathcal{A}, \mathcal{O}, \mathcal{D}, \mathcal{C}, \mathcal{L}} \\
 \]
-where $\mathcal{A}$ is the set of accounts (\ref{accounts}), $\mathcal{O}$ is
-the set of organizations known to the protocol (\ref{orgs}), $\mathcal{D}$ is
-the set of dependencies between projects (\ref{dependencies}) and $\mathcal{L}$
-is the sequence of operations which have been applied to $\mathcal{S}$. It is
-thus possible to reconstruct $\mathcal{S}$ from $\mathcal{L}$ via the $\applys$
-function, as seen above.
+where $\mathcal{A}$ is the set of accounts (\S \ref{accounts}), $\mathcal{O}$
+is the set of organizations known to the protocol (\S \ref{orgs}),
+$\mathcal{D}$ is the set of dependencies between projects (\S
+\ref{dependencies}), $\mathcal{C}$ is the set of contexts onto which patches
+can be applied (\S \ref{contexts}) and $\mathcal{L}$ is the sequence of
+operations which have been applied to $\mathcal{S}$. It is thus possible to
+reconstruct $\mathcal{S}$ from $\mathcal{L}$ via the $\apply$ function, as
+seen above. In the remainder of the section, we shall use the word
+\emph{operation} to mean a valid message that has been applied to the state
+$\State$ and recorded in a ledger $\Ledger$, and \emph{message} to mean an
+object sent between participants of the protocol to communicate.
 
 \subsection{Patches}
 \label{patches}
@@ -86,9 +104,10 @@ The fundamental product or \emph{artifact} of the \oscoin{} network is code, or
 source code. Our protocol defines the \emph{patch} primitive as the atomic unit
 of code. A patch is a set of metadata and code changes, or \emph{changeset},
 that can be applied to an existing body of code, or \emph{context}, to modify
-it. We define a patch $P$ as the tuple $\tuple{P_a, P_m, P_f}$, where $P_a$ is
-the author of the patch, $P_m$ is the patch metadata and $P_f$ is the
-changeset. A set of patches in no particular order is called a \emph{patchset}.
+it. We define a patch $P$ as the tuple $\tuple{P_i, P_m, P_f}$, where $P_i$ is
+the identity of the author of the patch, $P_m$ is the patch metadata and $P_f$
+is the changeset. A set of patches in no particular order is called a
+\emph{patchset}.
 
 Patches can be composed sequentially, taking an initial context $A$ into
 a modified context $B$. The empty context is defined as $\varnothing$, such
@@ -98,7 +117,8 @@ that there exists a mapping $P_f \varnothing \mapsto P_f$. Let $f \prec g
     h \cdot g \cdot f : A \to B
 \]
 is the in-order composition of patches $f$, $g$ and $h$, taking an initial
-context from $A$ to $B$.
+context from $A$ to $B$. In \oscoin{}, typical examples of contexts include
+code repositories, files and branches.
 
 % TODO: Repository section. A repository is a context C, initially {} with an
 % identifier (to which patches can refer), that patches can be applied to,
@@ -261,7 +281,7 @@ the account holder. Accounts have addresses which are used to send and receive
 
 Value can be transfered from one account to another with the \textsc{send}
 message, formally defined as $\tx{send}{a_{s}, a_{r}, n}$, where $a_{s}$ and
-$a_{r}$ are the \emph{sender} and \emph{recipient} address between which the
+$a_{r}$ are the \emph{sender} and \emph{recipient} addresses between which the
 value should be transfered and $n$ is the value to transfer.  To be valid, a
 \textsc{send} operation must be signed by the owner of $a_{s}$.
 
@@ -310,7 +330,7 @@ an operation that registers $o$ and makes it known to the protocol such that:
     \apply_o(\mathcal{O}, \tx{register}{o})
     \equiv \mathcal{O} \cup \{o\}
 \]
-where $\apply_o$ is a sub-function of $\applys$, and defines
+where $\apply_o$ is a sub-function of $\apply$, and defines
 state-transitions in $\mathcal{O}$.
 
 \subsection{Dependencies}
