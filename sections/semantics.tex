@@ -142,14 +142,34 @@ code repositories, files and branches.
 % "any permutation of a patch sequence allowed by Darcs leads to the same exact repository (if not, we have a bug)" ?!
 % TODO: Therefore there is a set of valid orders which lead to the same repository!
 
-\subsubsection{The \textsc{record} operation}
+\subsubsection{The \textsc{patch} message}
+\label{patch-op}
+
+To exchange patches amongst protocol participants, we define the
+$\tx{patch}{p}$ message, which allows a patch or patchset $p$ to be broadcast
+to all participants.
+
+\subsubsection{The \textsc{record} message}
 \label{record-op}
 
-In order for a patch to be applied to the protocol state $\State$, we define
-an operation $\tx{patch}{P'_{id}, P}_{\sigma}$.
+In order for a patch or patchset to be applied to some context $r_c \in
+\mathcal{C}$ , we define a message $\tx{record}{r_p, r_c}$, which takes a
+patchset $r_p$ and applies it to a context $r_c$.
 
-\subsubsection{The \textsc{fork} operation}
+\subsubsection{The \textsc{fork} message}
 \label{fork-op}
+
+Given an existing context $k_c$, the $\tx{fork}{k_c, k_{c'}}$ message derives
+a new context $k_{c'}$ which shares all existing patches with $k_c$. From that
+point on, $k_c$ and $k_{c'}$ are allowed to diverge.
+
+The \textsc{fork} message can also be used to create entirely new contexts, by
+passing the empty context $\mathcal{C}_\varnothing$ as $k_c$.
+
+\subsection{Contexts}
+\todo{}
+
+% TODO: Concept of ownership!?
 
 % TODO: Are patches tied to orgs/repos/branches, or free-floating, and the
 % PATCH operation is what is tied to them?
