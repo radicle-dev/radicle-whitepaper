@@ -1,7 +1,7 @@
 \section{Network Protocol and Architecture}
 
 The \oscoin{} network protocol is a realization of the protocol semantics
-described in \S~\ref{sec:protocol-semantics}, into the asynchronous network
+described in \S~\ref{sec:protocol-semantics}, into an asynchronous network
 model.
 
 \subsection{Overview}
@@ -16,30 +16,25 @@ model.
 
 The \oscoin{} network is composed of a set of nodes, or \emph{replicas}, which
 execute a protocol $\mathcal{P}$. Together, these nodes form a \emph{Replicated
-State Machine} with a set of states $\State^*$, a transition function $\delta$,
+State Machine} with a set of states $\State^*$, a transition function $\apply$,
 a starting state $\State_0$, a set of inputs $B_0 \dotso B_n$, and an empty set
-of outputs $\varnothing$.
+of outputs.
 
-Participation in the network protocol is \emph{open}, which makes the replica
-set \emph{dynamic}. To achieve consensus in the permissionless setting, we make
-use of \emph{blockchains} as the underlying replicated data-structure, with the
-assumption that a greater than $50\%$ majority of replicas are honest.
-However, unlike other blockchain protocols, we describe a ``block-lattice''
-design similar to~\cite{raiblocks}, with numerous advantages for our use case.
+Participation in the network protocol is \emph{open} (\ie ``permissionless''),
+which makes the replica set dynamic. To achieve consensus in the permissionless
+setting, we make use of \emph{blockchains} as the underlying replicated
+data-structure, with the assumption that a greater than $50\%$ majority of
+replicas are honest.  However, unlike other blockchain protocols, we describe a
+``block-lattice'' design in the spirit of~\cite{raiblocks}, with causal
+consistency guarantees~\cite{causal-consistency} and partial ordering accross
+chains.
 
 \subsubsection{Blockchain Architecture}
 
-% TODO: Reference plasma?
-
-\begin{description}
-    \item[Sub-chain] hold source code in the form of repositories and
-        patches.  They have members, issues and hold the balances to their
-        native token.  Source chains function as a unit of governance.  In
-        other words, organizations and communities are expected to operate
-        under a single source chain.
-    \item[Root chain] on the other hand functions as the canonical registry
-        of all \emph{Source} chains. It holds the balances in oscoin.
-\end{description}
+Chains hold source code in the form of repositories and patches.  They have
+members, issues and hold the balances to their native token.  Source chains
+function as a unit of governance.  In other words, organizations and
+communities are expected to operate under a single source chain.
 
 \begin{figure}[htp]
     \input{figures/block-lattice.tikz}

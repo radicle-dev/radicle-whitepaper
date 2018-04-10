@@ -5,45 +5,47 @@
 
 \begin{document}
 \begin{tikzpicture}[scale=0.96]
-    \tikzstyle{root} = [draw=black, thick, fill=black!20, rectangle, minimum height=3.5em, minimum width=3.5em, node distance=3em];
-    \tikzstyle{org-block} = [draw, thick, fill=white, rectangle, minimum height=3.5em, minimum width=3.5em, node distance=2em];
+    \tikzstyle{block} = [draw, thick, rectangle, minimum height=2.5em, minimum width=2.5em, node distance=3em];
     \tikzstyle{link} = [-, thin, densely dashed];
     \tikzstyle{pointer} = [thin, -latex];
 
-    \node (org-a-0) at (-2.5, 2.2)                {$\cdots$};
-    \node[org-block] (org-a-1) [right=of org-a-0] {$B_{a-4}$}
+    \node (org-a-0) at (-2.5, 2)                {$\cdots$};
+    \node[block] (org-a-1) [right=of org-a-0] {\Small{$B_{a-4}$}}
         edge [pointer] (org-a-0.east);
-    \node[org-block] (org-a-2)  [right=of org-a-1] {$B_{a-3}$}
+    \node[block] (org-a-2)  [right=of org-a-1] {\Small{$B_{a-3}$}}
         edge [pointer] (org-a-1.east);
-    \node[org-block] (org-a-3)  [right=of org-a-2] {$B_{a-2}$}
+    \node[block] (org-a-3)  [right=of org-a-2] {\Small{$B_{a-2}$}}
         edge [pointer] (org-a-2.east);
-    \node[org-block] (org-a-4)  [right=of org-a-3] {$B_{a-1}$}
+    \node[block] (org-a-4)  [right=of org-a-3] {\Small{$B_{a-1}$}}
         edge [pointer] (org-a-3.east);
-    \node[org-block] (org-a-5)  [right=of org-a-4] {$B_{a}$}
+    \node[block] (org-a-5)  [right=of org-a-4] {\Small{$B_{a}$}}
         edge [pointer] (org-a-4.east);
 
-    \node (root-0) at (-3, 0)        {$\cdots$};
-    \node (root-1) at (-1, 0) [root] {$B_{\rootchain - 2}$}
-        edge [pointer] (root-0.east);
-    \node (root-2) at ( 3, 0) [root] {$B_{\rootchain - 1}$}
-        edge [pointer] (root-1.east);
-    \node (root-3) at ( 7, 0) [root] {$B_{\rootchain}$}
-        edge [pointer] (root-2.east);
+    \node (org-c-0) at (-3, 0)        {$\cdots$};
+    \node[block] (org-c-1) [right=of org-c-0] {\Small{$B_{c - 2}$}}
+        edge [pointer] (org-c-0.east);
+    \node[block] (org-c-2) [right=of org-c-1] {\Small{$B_{c - 1}$}}
+        edge [pointer] (org-c-1.east);
+    \node[block] (org-c-3) [right=of org-c-2] {\Small{$B_{c - 1}$}}
+        edge [pointer] (org-c-2.east);
+    \node[block] (org-c-4) [right=of org-c-3] {\Small{$B_{c}$}}
+        edge [pointer] (org-c-3.east);
 
-    \node (org-b-0) at (-1, -2.2) {$\cdots$};
-    \node[org-block] (org-b-1) [right=of org-b-0] {$B_{b-3}$}
+    \node (org-b-0) at (-1, -2) {$\cdots$};
+    \node[block] (org-b-1) [right=of org-b-0] {\Small{$B_{b-3}$}}
         edge [pointer] (org-b-0.east);
-    \node[org-block] (org-b-2) [right=of org-b-1] {$B_{b-2}$}
+    \node[block] (org-b-2) [right=of org-b-1] {\Small{$B_{b-2}$}}
         edge [pointer] (org-b-1.east);
-    \node[org-block] (org-b-3) [right=of org-b-2] {$B_{b-1}$}
+    \node[block] (org-b-3) [right=of org-b-2] {\Small{$B_{b-1}$}}
         edge [pointer] (org-b-2.east);
-    \node[org-block] (org-b-4) [right=of org-b-3] {$B_{b}$}
+    \node[block] (org-b-4) [right=of org-b-3] {\Small{$B_{b}$}}
         edge [pointer] (org-b-3.east);
 
-    \draw [link] (org-a-2) -- (root-2);
-    \draw [link] (org-a-4) -- (root-3);
-    \draw [link] (org-b-2) -- (root-1);
-    \draw [link] (org-b-1) -- (root-2);
-    \draw [link] (org-b-3) -- (root-3);
+    \draw [link] (org-a-2) -- (org-c-2);
+    \draw [link] (org-a-4) -- (org-c-3);
+    \draw [link] (org-b-2) -- (org-c-1);
+    \draw [link] (org-b-1) -- (org-c-2);
+    \draw [link] (org-b-3) -- (org-c-3);
+    \draw [link] (org-a-4) -- (org-b-4);
 \end{tikzpicture}
 \end{document}
