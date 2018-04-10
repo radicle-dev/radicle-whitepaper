@@ -56,6 +56,15 @@
 \newcommand{\applys}{\Upsilon}
 \newcommand{\op}{T}
 
+% Adjust spacing around equations. It can be a bit tight!
+\expandafter\def\expandafter\normalsize\expandafter{
+    \normalsize
+    \addtolength{\abovedisplayskip}{2pt}
+    \addtolength{\abovedisplayshortskip}{2pt}
+    \addtolength{\belowdisplayskip}{2pt}
+    \addtolength{\belowdisplayshortskip}{2pt}
+}
+
 % No paragraph indentation after section headers.
 \makeatletter
 \let\@afterindenttrue\@afterindentfalse
