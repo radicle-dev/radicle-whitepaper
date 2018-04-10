@@ -26,10 +26,20 @@ setting, we make use of \emph{blockchains} as the underlying replicated
 data-structure, with the assumption that a greater than $50\%$ majority of
 replicas are honest.  However, unlike other blockchain protocols, we describe a
 ``block-lattice'' design in the spirit of~\cite{raiblocks}, with causal
-consistency guarantees~\cite{causal-consistency} and partial ordering accross
+consistency guarantees~\cite{causal-consistency} and partial ordering across
 chains.
 
-\subsubsection{Blockchain Architecture}
+\subsubsection{Block-lattice Architecture}
+
+Block-lattices are a replicated data-structure composed of chains of blocks
+which allow both parallel and synchronized operations to be expressed.  A pair
+of transactions on two chains are either considered \emph{free}, if they may be
+processed in parallel, or \emph{synchronized}, if a dependency (causal or
+acausal) exists between them.
+
+% TODO: Is "dependent" a better word for "synchronized"?
+% TODO: Organize txs according to free/dependent?
+% TODO: Categorize types of transactions and explain them?
 
 Chains hold source code in the form of repositories and patches.  They have
 members, issues and hold the balances to their native token.  Source chains
