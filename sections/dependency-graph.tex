@@ -1,0 +1,123 @@
+\section{The Dependency Graph}
+\subsection{The Dependency Game}
+
+% TODO: "As an individual entity, you are not a party to the flow of value
+% in the economy."
+
+To incentivize the building of a dependency graph for open-source, we create a
+mechanism which rewards participants for identifying dependencies correctly and
+punishes them for acting maliciously.
+
+There are two types of players in the game: \emph{proposers} and
+\emph{verifiers}.  The former propose a dependency between two projects which
+they believe to be valid, and place a security deposit $G_{\delta}$ which they
+are prepared to lose if they are lying. The later verify proposals by casting a
+vote which can have either of two values: $1$ (\emph{true}), for proposals
+believed to be valid, and $0$ (\emph{false}), for proposals considered
+invalid. Verifiers who manage to agree on $G_d$ without communicating
+are each rewarded with an amount of tokens $\delta$.
+
+% TODO: Problem: how to stop validators from communicating.
+% TODO: Automation for proposers and validators.
+
+A dependency game $G$ is initiated by a proposer $G_p$ and progresses in a
+sequence of rounds $G_r \equiv r_1 \dots r_n$, where $n \geqslant 1$. Each
+round $r$ attempts to resolve the dependency $G_d$ (the ``proposal''), by
+either marking it \emph{true} or \emph{false}, and involves two verifiers,
+their votes $r_{v_1}$ and $r_{v_2}$, and their deposits $r_{\delta_1}$ and
+$r_{\delta_2}$. When $r_{v_1} \equiv r_{v_2}$, the game ends.  Formally, we
+have:
+
+\begin{align*}
+    G      & \equiv \tuple{G_d, G_p, G_{\delta}, G_r} \\
+    G_r    & \equiv \{r_1, \dots, r_n\} \\
+    r      & \equiv \tuple{r_{v_1}, r_{v_2}, r_{\delta_1}, r_{\delta_2}} \\
+    r_v    & \in \{0, 1\} \\
+\end{align*}
+
+% We recall that a dependency is represented by the tuple $\tuple{D_a, D_b, D_e}$
+% described in~\S~\ref{dependencies}.
+
+The game starts with an initial state $G_0$, where $G_{0_r} = \varnothing$.
+The first round $r_1$ is played as such, where $r \equiv r_1$:
+
+\begin{enumerate}
+    \item Two players with deposits $r_{\delta}$ are selected at random to
+        become verifiers, and presented with $G_d$. Their identities are not
+        revealed to one another.
+    \item The players each cast a vote $r_{v_1}$ and $r_{v_2}$ signaling
+        whether they believe $G_d$ to be \emph{true} or \emph{false}. The votes
+        are not revealed until both players have cast their vote.
+\end{enumerate}
+
+Now, the system is in either of three states:
+
+\begin{enumerate}
+    \item[(a)] $r_{v_1} \equiv r_{v_2}$, \qquad $r_{v_1} = 1 \; \wedge \; r_{v_2} = 1$
+    \item[(b)] $r_{v_1} \equiv r_{v_2}$, \qquad $r_{v_1} = 0 \; \wedge \; r_{v_2} = 0$
+    \item[(c)] $r_{v_1} \not\equiv r_{v_2}$
+\end{enumerate}
+
+If we find ourselves in state (a), all deposits are returned to the
+participants, and $r_{V_1}$ and $r_{V_2}$ are rewarded.  In the case of (b),
+the proposer loses their deposit $G_{\delta}$, and it is split between
+$r_{V_1}$ and $r_{V_2}$.  Finally, in (c), the verifiers have voted
+differently, and there is no way to resolve the round.  Therefore we proceed
+with the following:
+
+\begin{enumerate}
+    \item A new round is initiated with the same proposal $G_d$, and two new
+        verifiers $r_{V_3}$ and $r_{V_4}$, which are picked at random:
+        \begin{equation*}
+            r_2 \equiv \tuple{r_{v_3}, r_{v_4}, r_{\delta_3}, r_{\delta_4}}
+        \end{equation*}
+    \item Again, we have three outcomes:
+        \smallskip
+        \begin{enumerate}
+            \item[(a)] $r_{v_3} \equiv r_{v_4}$, \qquad $r_{v_3} = 1 \; \wedge \; r_{v_4} = 1$
+            \item[(b)] $r_{v_3} \equiv r_{v_4}$, \qquad $r_{v_3} = 0 \; \wedge \; r_{v_4} = 0$
+            \item[(c)] $r_{v_3} \not\equiv r_{v_4}$
+        \end{enumerate}
+        \smallskip
+        In both outcomes (a) and (b), $r_{v_3}$ and $r_{v_4}$ settle the
+        previous round $r_1$, by forming a $\frac{3}{1}$ majority vote for
+        either $1$ or $0$. This causes the minority voters to lose their
+        deposits to the majority. Note that in each round where agreement is
+        not reached, we have an additional $2\delta$ at stake.
+
+        In the case of (c), we proceed the same way as in $r_1$, initiating a
+        new round with new verifiers.  Each additional round increases the
+        total value at stake. Since additional rounds do not cost the system
+        more, there is no limit to the number of rounds.
+\end{enumerate}
+
+\begin{table}[hbt]
+    \caption{Outcomes for $G$ when $G_d$ was voted \emph{invalid}}
+    \begin{tabular}{lccrrrc}
+    \toprule
+        \hspace   & \multicolumn{2}{c}{Vote} & \multicolumn{3}{c}{Reward} & Cost                    \\
+    \midrule
+        \hspace   & $r_{v_i}$  & $r_{v_j}$   & $r_{v_i}$ & $r_{v_j}$ & $G_p$    & $r_{v_i}+r_{v_j}$ \\
+    \addlinespace[0.5em]
+        $r_{n-2}$ & $1$        & $0$         & $\delta$  & $-\delta$ &          & $0$               \\
+        $r_{n-1}$ & $0$        & $1$         & $-\delta$ & $\delta$  &          & $0$               \\
+        $r_{n}$   & $1$        & $1$         & $\delta$  & $\delta$  & $\delta$ & $3\delta$         \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[hbt]
+    \caption{Outcomes for $G$ when $G_d$ was voted \emph{valid}}
+    \begin{tabular}{lccrrrc}
+    \toprule
+        \hspace   & \multicolumn{2}{c}{Vote} & \multicolumn{3}{c}{Reward} & Cost                     \\
+    \midrule
+        \hspace   & $r_{v_i}$  & $r_{v_j}$   & $r_{v_i}$ & $r_{v_j}$ & $G_p$     & $r_{v_i}+r_{v_j}$ \\
+    \addlinespace[0.5em]
+        $r_{n-2}$ & $1$        & $0$         & $-\delta$ & $\delta$  &           & $0$               \\
+        $r_{n-1}$ & $0$        & $1$         & $\delta$  & $-\delta$ &           & $0$               \\
+        $r_{n}$   & $0$        & $0$         & $\delta$  & $\delta$  & $-\delta$ & $\delta$          \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
