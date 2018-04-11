@@ -19,6 +19,8 @@ are each rewarded with an amount of tokens $\delta$.
 
 % TODO: Problem: how to stop validators from communicating.
 % TODO: Automation for proposers and validators.
+% We recall that a dependency is represented by the tuple $\tuple{D_a, D_b, D_e}$
+% described in~\S~\ref{dependencies}.
 
 A dependency game $G$ is initiated by a proposer $G_p$ and progresses in a
 sequence of rounds $G_r \equiv r_1 \dots r_n$, where $n \geqslant 1$. Each
@@ -27,27 +29,22 @@ either marking it \emph{true} or \emph{false}, and involves two verifiers,
 their votes $r_{v_1}$ and $r_{v_2}$, and their deposits $r_{\delta_1}$ and
 $r_{\delta_2}$. When $r_{v_1} \equiv r_{v_2}$, the game ends.  Formally, we
 have:
-
 \begin{align*}
     G      & \equiv \tuple{G_d, G_p, G_{\delta}, G_r} \\
     G_r    & \equiv \{r_1, \dots, r_n\} \\
     r      & \equiv \tuple{r_{v_1}, r_{v_2}, r_{\delta_1}, r_{\delta_2}} \\
     r_v    & \in \{0, 1\} \\
 \end{align*}
-
-% We recall that a dependency is represented by the tuple $\tuple{D_a, D_b, D_e}$
-% described in~\S~\ref{dependencies}.
-
 The game starts with an initial state $G_0$, where $G_{0_r} = \varnothing$.
 The first round $r_1$ is played as such, where $r \equiv r_1$:
 
 \begin{enumerate}
-    \item Two players with deposits $r_{\delta}$ are selected at random to
-        become verifiers, and presented with $G_d$. Their identities are not
-        revealed to one another.
-    \item The players each cast a vote $r_{v_1}$ and $r_{v_2}$ signaling
-        whether they believe $G_d$ to be \emph{true} or \emph{false}. The votes
-        are not revealed until both players have cast their vote.
+    \item Two players $r_{p_1}$ and $r_{p_2}$ with deposits $r_{\delta_1}$ and
+        $r_{\delta_2}$ are selected at random to become verifiers, and
+        presented with $G_d$. Their identities are not revealed to one another.
+    \item $r_{p_1}$ and $r_{p_2}$ each cast a vote $r_{v_1}$ and $r_{v_2}$
+        signaling whether they believe $G_d$ to be \emph{true} or \emph{false}.
+        The votes are not revealed until both players have cast their vote.
 \end{enumerate}
 
 Now, the system is in either of three states:
@@ -59,15 +56,15 @@ Now, the system is in either of three states:
 \end{enumerate}
 
 If we find ourselves in state (a), all deposits are returned to the
-participants, and $r_{V_1}$ and $r_{V_2}$ are rewarded.  In the case of (b),
-the proposer loses their deposit $G_{\delta}$, and it is split between
-$r_{V_1}$ and $r_{V_2}$.  Finally, in (c), the verifiers have voted
+participants, and $r_{p_1}$, $r_{p_2}$ and $G_p$ are rewarded.  In the case of
+(b), the proposer loses their deposit $G_{\delta}$, and it is split between
+$r_{p_1}$ and $r_{p_2}$.  Finally, in (c), the verifiers have voted
 differently, and there is no way to resolve the round.  Therefore we proceed
 with the following:
 
 \begin{enumerate}
     \item A new round is initiated with the same proposal $G_d$, and two new
-        verifiers $r_{V_3}$ and $r_{V_4}$, which are picked at random:
+        verifiers $r_{p_3}$ and $r_{p_4}$, which are picked at random:
         \begin{equation*}
             r_2 \equiv \tuple{r_{v_3}, r_{v_4}, r_{\delta_3}, r_{\delta_4}}
         \end{equation*}
@@ -97,7 +94,7 @@ with the following:
     \toprule
         \hspace   & \multicolumn{2}{c}{Vote} & \multicolumn{3}{c}{Reward} & Cost                    \\
     \midrule
-        \hspace   & $r_{v_i}$  & $r_{v_j}$   & $r_{v_i}$ & $r_{v_j}$ & $G_p$    &                   \\
+        \hspace   & $r_{v_i}$  & $r_{v_j}$   & $r_{p_i}$ & $r_{p_j}$ & $G_p$    &                   \\
     \addlinespace[0.5em]
         $r_{n-2}$ & $1$        & $0$         & $\delta$  & $-\delta$ &          & $0$               \\
         $r_{n-1}$ & $0$        & $1$         & $-\delta$ & $\delta$  &          & $0$               \\
@@ -112,7 +109,7 @@ with the following:
     \toprule
         \hspace   & \multicolumn{2}{c}{Vote} & \multicolumn{3}{c}{Reward} & Cost                     \\
     \midrule
-        \hspace   & $r_{v_i}$  & $r_{v_j}$   & $r_{v_i}$ & $r_{v_j}$ & $G_p$     &                   \\
+        \hspace   & $r_{v_i}$  & $r_{v_j}$   & $r_{p_i}$ & $r_{p_j}$ & $G_p$     &                   \\
     \addlinespace[0.5em]
         $r_{n-2}$ & $1$        & $0$         & $-\delta$ & $\delta$  &           & $0$               \\
         $r_{n-1}$ & $0$        & $1$         & $\delta$  & $-\delta$ &           & $0$               \\
