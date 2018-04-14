@@ -1,18 +1,10 @@
 \section{Network Protocol and Architecture}
 
 The \oscoin{} network protocol is a realization of the protocol semantics
-described in \S~\ref{sec:protocol-semantics}, into an asynchronous network
+described in \S~\ref{sec:protocol-semantics}, into the asynchronous network
 model.
 
 \subsection{Overview}
-
-% TODO: Talk about BFT, 3f+1.
-% TODO: Talk about the nodes/replicas.
-% TODO: How does this work? Multi-chains etc, transactions, swaps, push/pull, git-remote-helper.
-% TODO: How are patches constructed, how are repos constructed from patches.
-% TODO: Staking and rate-limiting.
-% TODO: Git remote-helper.
-% TODO: Why patch-based systems are better.
 
 The \oscoin{} network is composed of a set of nodes, or \emph{replicas}, which
 execute a protocol $\mathcal{P}$. Together, these nodes form a \emph{Replicated
@@ -20,112 +12,107 @@ State Machine} with a set of states $\State^*$, a transition function $\apply$,
 a starting state $\State_0$, a set of inputs $B_0 \dotso B_n$, and an empty set
 of outputs.
 
+% TODO: Are we using the 'P' variable?
+
 Participation in the network protocol is \emph{open} (\ie ``permissionless''),
 which makes the replica set dynamic. To achieve consensus in the permissionless
-setting, we make use of \emph{blockchains} as the underlying replicated
-data-structure, with the assumption that a greater than $50\%$ majority of
-replicas are honest.  However, unlike other blockchain protocols, we describe a
-``block-lattice'' design in the spirit of~\cite{raiblocks}, with causal
-consistency guarantees~\cite{causal-consistency} and partial ordering across
-chains.
+setting, we make use of \emph{blockchains}~\cite{bitcoin} as the underlying
+replicated data-structure, with the assumption that a greater than $50\%$
+majority of replicas are honest.  However, unlike other blockchain protocols,
+we describe a ``block-lattice'' design (Figure~\ref{block-lattice}.) in the
+spirit of \cite{raiblocks}, with causal consistency guarantees
+\cite{causal-consistency} and partial ordering across chains.
 
 \subsubsection{Block-lattice Architecture}
 
-Block-lattices are a replicated data-structure composed of chains of blocks
-which allow both parallel and synchronized operations to be expressed.  A pair
-of transactions on two chains are either considered \emph{free}, if they may be
-processed in parallel, or \emph{synchronized}, if a dependency (causal or
-acausal) exists between them.
-
-% TODO: Is "dependent" a better word for "synchronized"?
-% TODO: Organize txs according to free/dependent?
-% TODO: Categorize types of transactions and explain them?
-
-Chains hold source code in the form of repositories and patches.  They have
-members, issues and hold the balances to their native token.  Source chains
-function as a unit of governance.  In other words, organizations and
-communities are expected to operate under a single source chain.
-
-\begin{figure}[htp]
+\begin{figure}[hbp]
     \input{figures/block-lattice.tikz}
-    \caption{Block-lattice design.}
+    \caption{Block-lattice design. $B_a$, $B_b$ and $B_c$ are chains partially ordered with respect to one another.\label{block-lattice}}
 \end{figure}
 
-\bigskip
+Block-lattices are a replicated data-structure composed of chains of blocks,
+depicted in Figure~\ref{block-lattice}.  Both parallel and synchronized
+operations are able to be expressed with this design:  a pair of transactions
+on two chains are considered \emph{free}, if they may be processed in parallel,
+or \emph{dependent}, if a causal or acausal dependency exists between them.
 
-The advantages of this multi-chain design are numerous and are as follows.
+Each chain in our design functions as a logical unit of organization,
+governance, and funding. In other words, each user, organization or community
+is expected to operate under their own chain. These individual chains are
+called \emph{accounts}. The block-lattice design has numerous advantages for
+our use case, including parallel transaction processing, logical sharding and
+the ability to fork individual communities or organizations for ``free.''
 
-\begin{enumerate}
-    \item Scales horizontally with the number of communities.
-    \item Clients with limited capacity can choose to support only certain
-        communities at a lower cost, by syncing a subset of the chains.
-    \item There is less centralization risk, since the sub-chains are more or
-        less independent from the root chain.
-    \item Latency on the sub-chains can be fairly low, since they don’t depend
-        on a global consensus and don’t require a fixed block time.
-    \item Security guarantees on the sub-chains can be relaxed compared to the
-        root chain, since a compromised sub-chain cannot affect the root chain,
-        and thus other sub-chains.
-    \item Greater flexibility in chain governance and consensus, since
-        sub-chains can choose a different trust model than the root chain.
-    \item It's possible to mix permissioned and permissionless sub-chains,
-        in the network \eg for hosting private repositories, since the
-        interactions between chains are minimal and well specified.
-    \item Allows forking at the community level, \eg when conflicts cannot be
-        resolved through governance, it's possible to fork the whole source
-        chain.
-    \item The root chain becomes VCS agnostic.
-\end{enumerate}
+\subsection{Threat Model}
+% TODO: Talk about BFT, 3f+1.
+\todo{}
 
 \subsection{Blocks, State and Transactions}
 
 In \S~\ref{operations-and-state}, we saw that the protocol semantics could
 be defined in terms of a global state $\State$ and a sequence of operations
-$\op_1,\dots,\op_n$ applied to $\State$, forming a ledger $\Ledger$. When
+$\op_1 \dotso \op_n$ applied to $\State$, forming a ledger $\Ledger$. When
 describing the network architecture and protocol, a direct mapping between
 these abstract objects and the components of the software architecture exist.
+
+\subsubsection{State}
 
 The state $\State$ is represented by a function $\State : K \to V$ which maps a
 set of keys $K \in \mathbb{B}^{256}$ to a set of values $V \in \mathbb{B}^{*}$,
 where $\mathbb{B}$ is the set of bytes, and $\mathbb{B}^n$ is the set of byte
 strings of length $n$. The initial state $\State_0$ is called the
-\emph{genesis} state. An operation $T$ is represented by a \emph{block}, and
-the ledger $\Ledger$ by a \emph{blockchain}.
+\emph{genesis} state. Since we are working with multiple chains, and each
+chain represents an account's ledger, we define $\mathcal{A}_i$ to be the state
+of account $i$ and $\mathcal{L}_i$ to be $i$'s ledger.
 
-\subsubsection{State}
+\subsubsection{Block}
+
+An operation $\op$ is represented by a \emph{block}, and the ledger $\Ledger$
+of all valid recorded operations, by a \emph{blockchain}. A block $B$ in
+\oscoin{} consists of a block header $B_H$ with a set of fields
+(Table~\ref{block-header-fields}.) and a sequence of transactions $B_T = (t_0 \dotso
+t_n)$.
+
+\begin{table}[hbtp]
+    \caption{Block header fields \label{block-header-fields}}
+    \begin{tabular}{l c p{7.5cm}}
+        \toprule
+        Field                  & Notation & Description \\
+        \midrule
+        \emph{Chain}           & $H_{id}$ & The name or identifier of the chain, \eg ``oscoin.'' \\
+        \emph{Height}          & $H_n$    & The block height. \\
+        \emph{ParentHash}      & $H_p$    & The \hash{} hash of the parent block header. \\
+        \emph{TransactionRoot} & $H_{tr}$ & The root of the transaction hash tree. \\
+        \emph{StateRoot}       & $H_{sr}$ & The \hash{} hash of the root of the state
+                                            tree after all transactions in the block have
+                                            been applied. \\
+        \emph{Author}          & $H_a$    & The author of the block, and address to which
+                                            all transaction fees collected in this block
+                                            should be sent. \\
+        \emph{Timestamp}       & $H_t$    & The local time of the author of this block at
+                                            the time of authorship. \\
+        \emph{ConsensusHash}   & $H_c$    & The \hash{} hash of the consensus parameters
+                                            with which to validate the next block. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 % TODO: $S[a]_n$: account $a$'s nonce.
 % TODO: State transition function.
 % TODO: Sender account has a nonce.
 
-\subsubsection{Root Chain Transactions}
+\subsubsection{``Free'' Transactions}
 
 \begin{description}
-    \item[Register] $\tx{register}{r_{org}}$: Registers a name on the root
-        chain. Note that there is no `unregister' transaction, since
-        withdrawing all existing deposits under the name and waiting a certain
-        amount of blocks accomplishes this. (Figure~\ref{org-registration}.)
-        \begin{figure}
-            \input{figures/org-registration.tikz}
-            \caption{Org Registration. \label{org-registration}}
-        \end{figure}
-    \item[Update] $\tx{update}{u_{org}, u_{digest}, u_{height}, u_{P}}$. Commits
-        a new source chain state to the root chain. The state digest and height
-        are included in the transaction. This transaction is used by source
-        chain validators to notify the root chain on progress.
-    \item[Send] $\tx{send}{a_s, a_r, n}$. Send \oscoin{} to an address.
-\end{description}
-
-\subsubsection{Sub-Chain Transactions} \label{source-chain-transactions}
-
-\begin{description}
-    \item[Account] $\tx{account}{org, name, key}$. Registers a new user account
-        with the given name and public key.
-    \item[Patch] $\tx{patch}{org, repository, branch, p_P}$.  Add patches to a
-        repo and branch. If the branch doesn’t exist, create it. If the
-        repository doesn’t exist, create it. Since everything is managed with
-        code, repository options and governance changes are also handled via
-        this transaction.
+    \item[Open] $\tx{open}{o_{pk}, o_{gen}, o_{addr}}_{\sigma}$.
+        Open a new account chain. This is the first transaction any
+        organization or user must submit to initialize a chain.  $o_{pk}$ is
+        the public key of the user registering the account, $o_{gen}$ is the
+        genesis state of the account, and $o_{addr}$ is its public address.
+        Once processed, this transaction functions as the ``genesis block'' of
+        an account.
+    \item[Fork] $\tx{fork}{k_c, k_{c'}}_\sigma \; \text{where} \; k_c =
+        \mathcal{C}_{\varnothing}$.
     \item[Issue] $\tx{issue}{i_{org}, i_{repository}, i_{id}}$. Open an issue.
     \item[Amend] $\tx{amend}{i_{id}, i_{subject}, i_{body}, i_P}$.
         Update an issue's title, body or patch set.
@@ -135,7 +122,13 @@ the ledger $\Ledger$ by a \emph{blockchain}.
         doesn’t mean the changes (if any) are merged immediately. In the case
         of a benevolent dictator, only their voice would be needed to resolve
         the issue.
-    \item[Send] $\tx{send}{from, to, amount}$. Send org tokens to an address.
+    \item[Bond] $\tx{bond}{b_{s}, b_{r}, b_{v}}_{\sigma}$. Bond
+        $b_v$ tokens from $b_{s}$ to the bonding address $b_r$. The signature
+        $\sigma$ unlocks the address $b_s$.
+    \item[Unbond] $\tx{unbond}{b_{s}, b_{r}, b_{v}}_{\sigma}$. Start unbonding
+        $b_v$ tokens from the bonding address $b_{s}$ and credit $b_r$ when
+        the unbonding period is over. The signature $\sigma$ unlocks the
+        bonded tokens in $b_s$.
     \item[Set] $\tx{set}{org, key, value}$. Orgs wanting to store
         arbitrary metadata which is replicated and tamper-proof have the option
         of using this transaction. An empty value removes the key. This can be
@@ -143,10 +136,12 @@ the ledger $\Ledger$ by a \emph{blockchain}.
         `https://hackage.haskell.org/package/bytestring')}
 \end{description}
 
-\subsubsection{Block}
+\subsubsection{Dependent Transactions}
 
-A block $B$ in \oscoin{} consists of a block header $B_H$ and a sequence of
-transactions $B_T$.
+\begin{figure}[hbp]
+    \input{figures/tx-dependencies.tikz}
+    \caption{Transactions. \label{tx-dependencies}}
+\end{figure}
 
 \begin{table}[hbtp]
     \begin{tabular}{l c p{7.5cm}}
