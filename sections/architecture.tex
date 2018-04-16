@@ -145,11 +145,22 @@ context $a$, to which they are applied.
         $s_v$.
 \end{description}
 
-\subsubsection{Dependent Transactions}
+\subsubsection{``Dependent'' Transactions}
+
+Transactions which appear in pairs accross two accounts are called
+\emph{dependent} (Figure~\ref{tx-dependencies}.), due to only being valid when
+applied in pairs. Typically, these transactions affect both accounts and
+require temporary synchronization for both transactions to be observed and
+processed by a node.
 
 \begin{figure}[hbp]
     \input{figures/tx-dependencies.tikz}
-    \caption{Transactions. \label{tx-dependencies}}
+    \caption{Three accounts, $A$, $B$ and $C$, and their transaction chains.
+        The diagram illustrates free transactions, such as \textsc{open} and
+        \textsc{patch}, as well as dependent transactions such as \textsc{send}
+        and \textsc{receive}.  The dashed lines represent cross-chain
+        synchronizations between dependent transactions.
+    \label{tx-dependencies}}
 \end{figure}
 
 \begin{table}[hbtp]
