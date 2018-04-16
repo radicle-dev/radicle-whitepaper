@@ -86,9 +86,9 @@ block $B$ in \oscoin{} consists of a block header $B_H$ with a set of fields
         \midrule
         \emph{Chain}           & $H_{id}$ & The name or identifier of the chain, \eg ``oscoin.'' \\
         \emph{Height}          & $H_n$    & The block height. \\
-        \emph{ParentHash}      & $H_p$    & The \hash{} hash of the parent block header. \\
+        \emph{ParentHash}      & $H_p$    & The \blake{} hash of the parent block header. \\
         \emph{TransactionRoot} & $H_{tr}$ & The root of the transaction hash tree. \\
-        \emph{StateRoot}       & $H_{sr}$ & The \hash{} hash of the root of the state
+        \emph{StateRoot}       & $H_{sr}$ & The \blake{} hash of the root of the state
                                             tree after all transactions in the block have
                                             been applied. \\
         \emph{Author}          & $H_a$    & The author of the block, and address to which
@@ -96,7 +96,7 @@ block $B$ in \oscoin{} consists of a block header $B_H$ with a set of fields
                                             should be sent. \\
         \emph{Timestamp}       & $H_t$    & The local time of the author of this block at
                                             the time of authorship. \\
-        \emph{ConsensusHash}   & $H_c$    & The \hash{} hash of the consensus parameters
+        \emph{ConsensusHash}   & $H_c$    & The \blake{} hash of the consensus parameters
                                             with which to validate the next block. \\
         \bottomrule
     \end{tabular}
