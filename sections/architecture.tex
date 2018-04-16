@@ -110,40 +110,39 @@ Transactions which can be validated and applied to the state $\State$
 individually are called \emph{free}. Free transactions can always be processed
 in parallel because the resulting state after applying a free transaction does
 not need to be observed by other chains. Formally, if $t$ is a free transaction
-on chain $a$, the resulting state $\State[a]' \equiv \apply(\State[a], t)$
+on chain $a$, the resulting state $\State'[a] \equiv \apply(\State[a], t)$
 is not observable by any chain $c$ where $c \neq a$.
 
+With the exception of \textsc{open}, all transactions carry an implicit account
+context $a$, to which they are applied.
+
 \begin{description}
-    \item[Open] $\tx{open}{o_{pk}, o_{gen}, o_{addr}}_{\sigma}$.
-        Open a new account chain. This is the first transaction any
-        organization or user must submit to initialize a chain.  $o_{pk}$ is
-        the public key of the user registering the account, $o_{gen}$ is the
-        genesis state of the account, and $o_{addr}$ is its public address.
-        Once processed, this transaction functions as the ``genesis block'' of
-        an account.
+    \item[Open] $\tx{open}{a_{pk}, a_{gen}, a_{addr}}_{\sigma}$.  Open a new
+        account. This is the first transaction any organization or user must
+        submit to initialize their account and chain.  $a_{pk}$ is the public
+        key of the user registering the account, $a_{gen}$ is the genesis state
+        of the account, and $a_{addr}$ is its public address.  Once processed,
+        this transaction functions as the ``genesis block'' of an account.
     \item[Fork] $\tx{fork}{k_c, k_{c'}}_\sigma \; \text{where} \; k_c =
-        \mathcal{C}_{\varnothing}$.
-    \item[Issue] $\tx{issue}{i_{org}, i_{repository}, i_{id}}$. Open an issue.
-    \item[Amend] $\tx{amend}{i_{id}, i_{subject}, i_{body}, i_P}$.
-        Update an issue's title, body or patch set.
-    \item[Voice] $\tx{voice}{org, repository, issue, vote \in \{accept, reject\}}$
-        Adds a voice to an issue. When a majority of voices have been heard in
-        favor or against, the issue is accepted or rejected, respectively. This
-        doesn’t mean the changes (if any) are merged immediately. In the case
-        of a benevolent dictator, only their voice would be needed to resolve
-        the issue.
-    \item[Bond] $\tx{bond}{b_{s}, b_{r}, b_{v}}_{\sigma}$. Bond
-        $b_v$ tokens from $b_{s}$ to the bonding address $b_r$. The signature
-        $\sigma$ unlocks the address $b_s$.
+        \mathcal{C}_{\varnothing}$. Create a new context $k_{c'}$ by forking
+        the empty context $\mathcal{C}_{\varnothing}$. This transaction can
+        be used to create new code repositories.
+    \item[Issue] $\tx{issue}{i_{id}, i_{c}}_\sigma$. Open an issue. The $i_{id}$
+        parameter is used to reference the issue in subsequent transactions,
+        while $i_c$ is the context in which to create the issue.
+    \item[Amend] $\tx{amend}{i_{id}, i_{s}, i_{b}, i_P}_\sigma$.
+        Update an issue's subject, body or patchset.
+    \item[Voice] $\tx{voice}{i_{id}, v}_\sigma$.  Adds a voice $v$ to the issue
+        $i$, where $v \in \{accept, reject\}$.
+    \item[Bond] $\tx{bond}{b_{s}, b_{r}, b_{v}}_{\sigma}$. Bond $b_v$ tokens
+        from the source address $b_{s}$ to the bonding address $b_r$. The
+        signature $\sigma$ is used to unlock $b_s$.
     \item[Unbond] $\tx{unbond}{b_{s}, b_{r}, b_{v}}_{\sigma}$. Start unbonding
         $b_v$ tokens from the bonding address $b_{s}$ and credit $b_r$ when
         the unbonding period is over. The signature $\sigma$ unlocks the
         bonded tokens in $b_s$.
-    \item[Set] $\tx{set}{org, key, value}$. Orgs wanting to store
-        arbitrary metadata which is replicated and tamper-proof have the option
-        of using this transaction. An empty value removes the key. This can be
-        used as a package registry for example: \emph{Set(`bytestring',
-        `https://hackage.haskell.org/package/bytestring')}
+    \item[Set] $\tx{set}{s_k, s_v}$. Set an arbitrary key $s_k$ to the value
+        $s_v$.
 \end{description}
 
 \subsubsection{Dependent Transactions}
