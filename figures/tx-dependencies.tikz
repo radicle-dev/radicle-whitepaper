@@ -21,14 +21,14 @@
                                                           & \node[tx] (B-open) {\textsc{open}};               &                                              \\
         \node[tx] (A-1) {\textsc{fork} $\varnothing, k$}; &                                                   &                                              \\
                                                           &                                                   & \node[tx] (C-open) {\textsc{open}};          \\
-                                                          & \node[tx] (B-1) {\textsc{fork} $\varnothing, r$}; &                                              \\
-                                                          &                                                   & \node[tx] (C-1) {\textsc{fork} $B_r, r'$};   \\
+                                                          & \node[tx] (B-1) {\textsc{fork} $\varnothing, c$}; &                                              \\
+                                                          &                                                   & \node[tx] (C-1) {\textsc{fork} $B_c, c'$};   \\
         \node[tx] (A-2) {\textsc{send} $v$};              &                                                   & \node[tx] (C-2) {\textsc{patch} $p'$};       \\
                                                           & \node[tx] (B-2) {\textsc{receive} $v$};           &                                              \\
-                                                          &                                                   & \node[tx] (C-3) {\textsc{record} $p', r'$};  \\
+                                                          &                                                   & \node[tx] (C-3) {\textsc{record} $p', c'$};  \\
                                                           & \node[tx] (B-3) {\textsc{patch} $p$};             &                                              \\
         \node[tx] (A-3) {\textsc{record} $B_p, k$};       &                                                   &                                              \\
-                                                          &                                                   & \node[tx] (C-4) {\textsc{record} $B_p, r'$}; \\
+                                                          &                                                   & \node[tx] (C-4) {\textsc{record} $B_p, c'$}; \\
                                                           &                                                   &                                              \\
                                                           &                                                   &                                              \\
                                                           &                                                   &                                              \\
