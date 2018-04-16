@@ -27,7 +27,7 @@ spirit of \cite{raiblocks}, with causal consistency guarantees
 
 \begin{figure}[hbp]
     \input{figures/block-lattice.tikz}
-    \caption{Block-lattice design. $B_a$, $B_b$ and $B_c$ are chains partially ordered with respect to one another.\label{block-lattice}}
+    \caption{Block-lattice design. $B_a$, $B_b$ and $B_c$ are chains partially ordered in relation to one another.\label{block-lattice}}
 \end{figure}
 
 Block-lattices are a replicated data-structure composed of chains of blocks,
@@ -41,11 +41,13 @@ governance, and funding. In other words, each user, organization or community
 is expected to operate under their own chain. These individual chains are
 called \emph{accounts}. The block-lattice design has numerous advantages for
 our use case, including parallel transaction processing, logical sharding and
-the ability to fork individual communities or organizations for ``free.''
+the ability to trivially fork individual communities or organizations.
 
 \subsection{Threat Model}
-% TODO: Talk about BFT, 3f+1.
-\todo{}
+
+We assume a majority ($> 50\%$) of honest, or \emph{compliant} nodes which follow
+the protocol. In other words, for $f$ non-compliant (faulty) nodes, we assume a
+network of $2f+1$ nodes in total.
 
 \subsection{Blocks, State and Transactions}
 
@@ -67,11 +69,14 @@ of account $i$ and $\mathcal{L}_i$ to be $i$'s ledger.
 
 \subsubsection{Block}
 
-An operation $\op$ is represented by a \emph{block}, and the ledger $\Ledger$
-of all valid recorded operations, by a \emph{blockchain}. A block $B$ in
-\oscoin{} consists of a block header $B_H$ with a set of fields
-(Table~\ref{block-header-fields}.) and a sequence of transactions $B_T = (t_0 \dotso
-t_n)$.
+An operation $\op$ is represented by a sequence of one or more transactions,
+organized in a \emph{block}. A ledger $\Ledger$ of all valid recorded
+operations is represented as a sequence of blocks, or \emph{blockchain}. A
+block $B$ in \oscoin{} consists of a block header $B_H$ with a set of fields
+(Table~\ref{block-header-fields}.) and a sequence of transactions $B_T = (t_0
+\dotso t_n)$.
+
+% TODO: Is it zero or more txns?
 
 \begin{table}[hbtp]
     \caption{Block header fields \label{block-header-fields}}
@@ -97,11 +102,16 @@ t_n)$.
     \end{tabular}
 \end{table}
 
-% TODO: $S[a]_n$: account $a$'s nonce.
-% TODO: State transition function.
 % TODO: Sender account has a nonce.
 
 \subsubsection{``Free'' Transactions}
+
+Transactions which can be validated and applied to the state $\State$
+individually are called \emph{free}. Free transactions can always be processed
+in parallel because the resulting state after applying a free transaction does
+not need to be observed by other chains. Formally, if $t$ is a free transaction
+on chain $a$, the resulting state $\State[a]' \equiv \apply(\State[a], t)$
+is not observable by any chain $c$ where $c \neq a$.
 
 \begin{description}
     \item[Open] $\tx{open}{o_{pk}, o_{gen}, o_{addr}}_{\sigma}$.
