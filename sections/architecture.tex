@@ -163,27 +163,22 @@ processed by a node.
     \label{tx-dependencies}}
 \end{figure}
 
-\begin{table}[hbtp]
-    \begin{tabular}{l c p{7.5cm}}
-        \toprule
-        Field                  & Notation & Description \\
-        \midrule
-        \emph{Chain}           & $H_c$    & The name or identifier of the chain, \eg ``oscoin.'' \\
-        \emph{Height}          & $H_n$    & The block height. \\
-        \emph{ParentHash}      & $H_p$    & The \hash{} hash of the parent block header. \\
-        \emph{TransactionRoot} & $H_{tr}$ & The root of the transaction hash tree. \\
-        \emph{StateRoot}       & $H_{sr}$ & The \hash{} hash of the root of the state
-                                            tree after all transactions in the block have
-                                            been applied. \\
-        \emph{Author}          & $H_a$    & The author of the block, and address to which
-                                            all transaction fees collected in this block
-                                            should be sent. \\
-        \emph{Timestamp}       & $H_t$    & The local time of the author of this block at
-                                            the time of authorship. \\
-        \emph{ConsensusHash}   & $H_c$    & The \hash{} hash of the consensus parameters
-                                            with which to validate the next block. \\
-        \bottomrule
-    \end{tabular}
-    \medskip
-    \caption{Block header fields \label{block-header-fields}}
-\end{table}
+\begin{description}
+    \item[Send/Receive] $\tx{send}{s, r, v}_{\sigma}$ and
+        $\tx{receive}{t_{id}}_{\sigma}$. Send $v$ tokens from $s$ to $r$. In
+        order for the tokens to be claimed on the receiving account, the
+        transaction hash $t_{id} = \hash(t)$ of the \textsc{send} transaction
+        $t$ must be specified by \textsc{receive}.
+    \item[Patch/Record] $\tx{patch}{p}_\sigma$ and $\tx{record}{t_{id},
+        r_c}_{\sigma}$.  Add a patchset $p$ to the context $r_c$. The
+        \textsc{patch} transaction $t$ adds a context-free patch $p$ to an
+        account ledger $a$, without applying it. It can later be applied to a
+        context $r_c$ in any account $a' \in \mathcal{A}$ (including $a$), by
+        the \textsc{record} operation, which must reference the hash $t_{id} =
+        \hash(t)$ of $t$.
+        % TODO: Define patch in detail.
+    \item[Fork] $\tx{fork}{k_c, k_{c'}}_\sigma \; \text{where} \; k_c \neq
+        \mathcal{C}_{\varnothing}$. Create a new context $k_{c'}$ from an
+        existing context $k_c$. Note that $k_c$ and $k_{c'}$ can belong to
+        different accounts.
+\end{description}
