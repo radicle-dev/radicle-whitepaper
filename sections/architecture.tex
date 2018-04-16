@@ -16,19 +16,17 @@ of outputs.
 
 Participation in the network protocol is \emph{open} (\ie ``permissionless''),
 which makes the replica set dynamic. To achieve consensus in the permissionless
-setting, we make use of \emph{blockchains}~\cite{bitcoin} as the underlying
-replicated data-structure, with the assumption that a greater than $50\%$
-majority of replicas are honest.  However, unlike other blockchain protocols,
-we describe a ``block-lattice'' design (Figure~\ref{block-lattice}.) in the
-spirit of \cite{raiblocks}, with causal consistency guarantees
-\cite{causal-consistency} and partial ordering across chains.
+setting, we make use of blockchains~\cite{bitcoin} as the underlying replicated
+data-structure, with a method of Sybil resistance such as proof-of-work or
+proof-of-stake.  However, unlike other blockchain protocols, we describe a
+multi-chain ``block-lattice'' \cite{raiblocks} design with causal consistency
+guarantees \cite{causal-consistency} and partial ordering across chains
+(Figure~\ref{block-lattice}).
 
-\subsubsection{Block-lattice Architecture}
+The \oscoin{} protocol can be paired with any blockchain consensus algorithm,
+given certain requirements discussed in \S~\ref{consensus}.
 
-\begin{figure}[hbp]
-    \input{figures/block-lattice.tikz}
-    \caption{Block-lattice design. $B_a$, $B_b$ and $B_c$ are chains partially ordered in relation to one another.\label{block-lattice}}
-\end{figure}
+\subsection{Block-lattice Architecture}
 
 Block-lattices are a replicated data-structure composed of chains of blocks,
 depicted in Figure~\ref{block-lattice}.  Both parallel and synchronized
@@ -40,8 +38,14 @@ Each chain in our design functions as a logical unit of organization,
 governance, and funding. In other words, each user, organization or community
 is expected to operate under their own chain. These individual chains are
 called \emph{accounts}. The block-lattice design has numerous advantages for
-our use case, including parallel transaction processing, logical sharding and
-the ability to trivially fork individual communities or organizations.
+our use case, including parallel transaction processing, minimal resource
+requirements for light clients, instant finality for certain kinds of
+transactions, and logical sharding at the account level.
+
+\begin{figure}[!ht]
+    \input{figures/block-lattice.tikz}
+    \caption{Block-lattice design. $B_a$, $B_b$ and $B_c$ are chains partially ordered in relation to one another.\label{block-lattice}}
+\end{figure}
 
 \subsection{Threat Model}
 
