@@ -14,7 +14,7 @@
     \tikzstyle{end} = [];
     \tikzstyle{sync} = [-, densely dashed];
 
-    \node [matrix, very thin, column sep=2cm, row sep=0.1cm] (matrix) at (0, 0) {
+    \node [matrix, very thin, column sep=1.3cm, row sep=0.1cm] (matrix) at (0, 0) {
         \node[account] (A) {$A$};                         & \node[account] (B) {$B$};                         & \node[account] (C) {$C$};                    \\
                                                           &                                                   &                                              \\
         \node[tx] (A-open) {\textsc{open}};               &                                                   &                                              \\

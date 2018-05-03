@@ -198,13 +198,14 @@ function, $I_P$ is the patchset attached to the issue, $\sigma$ is the
 signature of $I_a$, $I_s \in \{open, closed, accepted, rejected\}$ is the
 current state of the issue and $I_V$ is the set of votes on the issue. The
 initial value of $I_s$, $I_{s_0} = open$, the initial value of $I_V$, $I_{V_0}
-= \varnothing$ and the initial value of $I_P$, $I_{P_0} = \varnothing$.  A list
-of valid state transitions between any two states $I_s$ and $I_{s'}$ can be
-found in Table \ref{issues-valid-transitions}.
+= \varnothing$ and the initial value of $I_P$, $I_{P_0} = \varnothing$.  The list
+of valid state transitions between any two states $I_s$ and $I_{s'}$ are as
+follows:
 
-\begin{table}[hbt]
-    \caption{Valid state transitions.\label{issues-valid-transitions}}
-    \begin{tabular}{rcl}
+\begin{fig}
+    \centering
+    \captionof{table}{Valid state transitions.\label{issues-valid-transitions}}
+    \begin{tabular}{@{}rcl@{}}
         \toprule
         $I_s$      & $\to$ & $I_{s'}$ \\
         \midrule
@@ -214,7 +215,7 @@ found in Table \ref{issues-valid-transitions}.
         $closed$   & $\to$ & $open$ \\
         \bottomrule
     \end{tabular}
-\end{table}
+\end{fig}
 
 The patchset $I_P$ attached to an issue represents a set of proposed changes to
 some project, while the subject $I_t$ and body $I_b$ of the issue provide a
@@ -243,8 +244,9 @@ defined as:
 \begin{align*}
     I \amend{} \langle I_a, t', b', o', r', P' \rangle_{\sigma} \equiv
     \big<\langle I_a, t', b', o', r', P' \rangle_{\sigma}, I_s, \varnothing
-    \big>, \qquad I_s = open
+    \big>
 \end{align*}
+where $I_s = open$.
 
 % TODO: The amendment should include the issue it is amending.
 
@@ -373,6 +375,9 @@ set of all dependencies at epoch $e$, then:
     \land a \dep b \}
 \]
 
-Dependencies are recorded with the $\tx{depend}{D_a, D_b, D_e, D_{e'}}$
+Dependencies are recorded with the
+\[
+    \tx{depend}{D_a, D_b, D_e, D_{e'}}
+\]
 operation, which records a dependency between $a$ and $b$ for each epoch $x$
 where $e \leqslant x \leqslant e'$.

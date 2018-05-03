@@ -82,7 +82,7 @@ block $B$ in \oscoin{} consists of a block header $B_H$ with a set of fields
 
 % TODO: Is it zero or more txns?
 
-\begin{table*}[hbtp]
+\begin{table*}[htp]
     \caption{Block header fields \label{block-header-fields}}
     \begin{tabular}{l c p{7.5cm}}
         \toprule
@@ -157,15 +157,16 @@ applied in pairs. Typically, these transactions affect both accounts and
 require temporary synchronization for both transactions to be observed and
 processed by a node.
 
-\begin{figure*}[hbp]
+\begin{fig}
+    \centering
     \input{figures/tx-dependencies.tikz}
-    \caption{Three accounts, $A$, $B$ and $C$, and their transaction chains.
+    \captionof{figure}{Three accounts, $A$, $B$ and $C$, and their transaction chains.
         The diagram illustrates free transactions, such as \textsc{open} and
         \textsc{patch}, as well as dependent transactions such as \textsc{send}
         and \textsc{receive}.  The dashed lines represent cross-chain
         synchronizations between dependent transactions.
     \label{tx-dependencies}}
-\end{figure*}
+\end{fig}
 
 \begin{description}
     \item[Send/Receive] $\tx{send}{s, r, v}_{\sigma}$ and

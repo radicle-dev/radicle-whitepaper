@@ -69,6 +69,10 @@
     \addtolength{\belowdisplayshortskip}{2pt}%
 }%
 
+\newenvironment{fig}
+  {\par\bigskip\noindent\minipage{\linewidth}}
+  {\endminipage\par\bigskip}
+
 % No paragraph indentation after section headers.
 \makeatletter
 \let\@afterindenttrue\@afterindentfalse
