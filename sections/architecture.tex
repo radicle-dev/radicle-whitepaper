@@ -42,10 +42,10 @@ our use case, including parallel transaction processing, minimal resource
 requirements for light clients, instant finality for certain kinds of
 transactions, and logical sharding at the account level.
 
-\begin{figure}[!ht]
+\begin{figure*}[!ht]
     \input{figures/block-lattice.tikz}
     \caption{Block-lattice design. $B_a$, $B_b$ and $B_c$ are chains partially ordered in relation to one another.\label{block-lattice}}
-\end{figure}
+\end{figure*}
 
 \subsection{Threat Model}
 
@@ -82,7 +82,7 @@ block $B$ in \oscoin{} consists of a block header $B_H$ with a set of fields
 
 % TODO: Is it zero or more txns?
 
-\begin{table}[hbtp]
+\begin{table*}[hbtp]
     \caption{Block header fields \label{block-header-fields}}
     \begin{tabular}{l c p{7.5cm}}
         \toprule
@@ -104,7 +104,7 @@ block $B$ in \oscoin{} consists of a block header $B_H$ with a set of fields
                                             with which to validate the next block. \\
         \bottomrule
     \end{tabular}
-\end{table}
+\end{table*}
 
 % TODO: Sender account has a nonce.
 
@@ -157,7 +157,7 @@ applied in pairs. Typically, these transactions affect both accounts and
 require temporary synchronization for both transactions to be observed and
 processed by a node.
 
-\begin{figure}[hbp]
+\begin{figure*}[hbp]
     \input{figures/tx-dependencies.tikz}
     \caption{Three accounts, $A$, $B$ and $C$, and their transaction chains.
         The diagram illustrates free transactions, such as \textsc{open} and
@@ -165,7 +165,7 @@ processed by a node.
         and \textsc{receive}.  The dashed lines represent cross-chain
         synchronizations between dependent transactions.
     \label{tx-dependencies}}
-\end{figure}
+\end{figure*}
 
 \begin{description}
     \item[Send/Receive] $\tx{send}{s, r, v}_{\sigma}$ and

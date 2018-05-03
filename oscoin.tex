@@ -1,4 +1,4 @@
-\documentclass[a4paper, 10pt, draft]{amsart}
+\documentclass[a4paper, 9pt, draft]{amsart}
 \usepackage[english]{babel}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -13,6 +13,7 @@
 \usepackage{accents}
 \usepackage{standalone}
 \usepackage{bm}
+\usepackage{multicol}
 \usepackage[font={small,sc}]{caption}
 
 \usetikzlibrary{fit}
@@ -77,12 +78,17 @@
 \DeclareMathOperator{\amend}{\times}
 
 \newenvironment{epigraph}[2][]
-{\leftskip=2.4cm \def\epigraph@author{#2} \smallskip\itshape}
-{\par\vspace{0.5em}\normalfont\hfill---\ \epigraph@author\hspace*{1cm}\par\medskip}
+{\leftskip=1cm \def\epigraph@author{#2} \smallskip\itshape}
+{\par\vspace{0.5em}\normalfont\hfill---\ \epigraph@author\hspace*{0.2cm}\par\medskip}
 \makeatother
 
-\begin{document}
+\setlength{\textwidth}{\paperwidth}
+\addtolength{\textwidth}{-4cm}
+\setlength{\textheight}{\paperheight}
+\addtolength{\textheight}{-5cm}
+\calclayout
 
+\begin{document}
 \begin{abstract}
     Over the last few decades, with the emergence of open-source software,
     we've experienced an unprecedented acceleration in the development of our
@@ -100,13 +106,10 @@
     believe that crypto-economies are a means of creating financially
     sustainable decentralized communities.
 \end{abstract}
-
 \maketitle
 
-\pagebreak
-
-\tableofcontents
-\pagebreak
+\setlength{\columnsep}{20pt}
+\begin{multicols}{2}
 
 \input{sections/introduction.tex}
 \input{sections/background.tex}
@@ -123,6 +126,8 @@
 \input{sections/future-work.tex}
 
 \section{Conclusion}
+
+\end{multicols}
 
 \appendix
 \end{document}
