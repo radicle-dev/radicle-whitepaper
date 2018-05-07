@@ -1,0 +1,168 @@
+\section{New Mechanisms for Funding Open-Source}
+
+\subsection{Overview}
+
+Funding is done in the form of cryptographic tokens. These tokens are tradeable
+within and without the network.
+
+We can distinguish between two forms of funding: continuous and ad hoc. The
+former is carried out automatically by the system, while the latter is carried
+out by individuals on the network.
+
+Continuous funding is specified via smart-contracts external to the protocol.
+These contracts will be up for discussion with the community and subject to
+change as the network evolves.
+
+Ad hoc funding includes donations, bounties and one-time rewards for good work.
+These rewards are defined by project owners via smart-contracts, essentially
+allowing them to incentivize any interaction around their code (bug reports,
+code review, closing issues, etc.)
+
+In the continuous model, projects receive funds and are in charge of
+redistributing them to their contributors. The second part can take place
+automatically, via project-specific smart-contracts, or on an ad hoc basis, via
+per-project funds used by project owners to pay individual contributors.
+
+\subsubsection{Continuous funding}
+
+In this model, tokens are created on every block as part of the \emph{coinbase
+transaction.} These newly-minted tokens supply a network-wide treasury which is
+used to fund projects. As with Bitcoin, the assumption is that the dilution
+creates more value than it takes away from existing token holders. Through this
+model, we create a continuous supply of tokens.
+
+Community-vetted means that projects apply for a certain amount of funding per
+epoch, and go through a vetting process for approval. Once approved, funds are
+dispensed from the treasury to the project’s smart-contract address every
+epoch. This approach is reliable, but difficult to scale. Thankfully, it is
+easy to incentivize users to perform the vetting process by distributing a
+share of the minted tokens to those who do the work.
+
+Community-vetted funding works similarly to existing open-source funds, with an
+application process and jury. The difference being the provenance of the funds.
+
+\subsubsection{Tokenization}
+
+Besides the obvious ability to set bounties on issues and donate to
+projects—features which are available in current systems—we give projects the
+option to tokenize.
+
+Tokenizing a project means exchanging \oscoin{} for project tokens at a fixed
+price. Only the project owner can mint new project tokens. We call these
+shares.
+
+Project shares are only tradeable within the \oscoin{} network, and can be
+compared to ERC20 tokens on the Ethereum network.
+
+Once a project has its own shares, it can use them to incentivize
+contributions. It also becomes possible for users to ‘invest’ in a project by
+buying shares from the owner.
+
+These shares, depending on the project, can have utility attached to them, such
+as voting power. This is up to the project to determine, but users who are very
+invested in certain projects might want to have a ‘say’ in project direction.
+
+Another way to think about shares is as an alternative to donation systems. A
+user is always (subject to liquidity) able to sell their shares and re-invest
+the money in a different project. This isn’t possible with donations.
+
+To conclude, project tokenization allows one-time fundraisers to be carried out
+with minimal setup.
+
+\subsubsection{Bounties and Ad-hoc funding}
+
+\subsubsection{Integration with other crypto-tokens}
+
+In certain cases such as Dash or Cardano, cryptocurrencies already have a
+treasury system from which they can pay contributions.
+
+These projects usually build their own platform for funding proposals and
+paying contributors.
+
+As an alternative, projects such as these could use the \oscoin{} platform to
+manage proposals and contributors, and focus on building their core protocol.
+For this to work, we can imagine treasury funds being sent regularly to an
+exchange to be converted to \oscoin{}. The \oscoin{} would then be deposited in the
+project’s wallet on the \oscoin{} blockchain, and used to pay contributors there.
+
+% TODO: Talk about pegging. Saying one oscoin-ADA can always be exchange for an ADA.
+
+\subsection{The Open-Source Registry}
+
+% A \emph{registry} is part of the state $\mathcal{S}$ kept by the protocol, and
+% provides a canonical list of entities known to the protocol under a certain
+% prefix. Adding an entry to a registry is accomplished with the
+% \textsc{register} operation, defined as:
+% \[
+%     \langle \textsc{register}, r, m, d \rangle
+% \]
+% where $r$ is the registry under which this entry should be added, $m$ is the
+% name being registered and $d$ is the digest of an object $m$ should point to.
+
+\subsubsection{Registration}
+A user wishing to deploy a new organization on \oscoin{} starts by sending a
+$\langle \mathbf{register}, name \rangle$ transaction to the root chain. The
+transaction is processed and an org with the given name is temporarily added
+to the registry, with a new \oscoin{} address $\mathcal{A}$.
+
+For the org to remain in the registry, it has to be backed by a minimum amount
+of \oscoin{}. Any user can back an org by sending \oscoin{} to $\mathcal{A}$.
+Doing so locks the tokens for a minimum amount of time. Tokens deposited and
+locked in this manner are called \emph{bonded tokens}. When enough tokens are
+bonded in $\mathcal{A}$ to clear the minimum, the org is considered registered.
+
+Note that there is no `unregister' transaction for organizations, since
+withdrawing all existing deposits under the name and waiting a certain amount
+of blocks accomplishes this.
+
+\subsubsection{Validation}
+For an org to have its transactions validated and its blocks minted, it needs
+to acquire validators. The process of registration discussed above is all that
+is required to incentivize validators to validate an org chain.
+
+\subsubsection{Block reward and bonded tokens}
+
+Since bonded tokens are illiquid, and the circulating supply of tokens is
+inflated every block through minting, bonded tokens slowly lose their value
+over time as they get dilluted and can't be spent. To componensate for this,
+part of the block reward is payed back in interest, proportional to the bonded
+stake.
+
+\subsubsection{Staking}
+
+The function of bonding however is not only to get organizations registered.
+Bonded tokens generate interest for the orgs and dividends for the token holders.
+
+Let $\phi$ be the inflation per block allocated for interest payments and $s_i$
+be the amount of stake bonded in $Acme$ by user $i$. The total amount bonded in
+$Acme$ is thus $s_1 + s_2 + \cdots + s_n$ where $n$ is the number of user
+deposits.  Let $S$ be the total amount of bonded stake across \emph{all} orgs.
+The share of tokens bonded by $i$ as a proportion of the total is thus
+$\frac{s_i}{S}$. To calculate the amount of interest tokens $Acme$ would
+receive from $i$, we simply multiply the share of bonded tokens with $\phi$, or
+$\phi \frac{s_i}{S}$. Furthermore, the total amount of interest $Acme$ would
+receive is
+
+\begin{equation*}
+\sum_{i=1}^n s_i \cdot \frac{\phi}{S}
+\end{equation*}
+
+{\color{red}
+    The stake behind an org is the total stake validators have to match. So if
+    10 tokens are staked, we can split it as 3-3-2-2. Now a validator can stake
+    either 3 or 2 behind this org. Once four validators have staked, the slots
+    are filled. However, more validators can keep on staking and function as
+    replacements. Validators are selected at random so that a single validator
+    has no incentive to fill all slots.
+
+    How to make sure that an org is validated by multiple physical validators
+    and not a single validator with 4 keys? Perhaps there is a fixed cost to
+    staking of 1, so if you stake 10, you get 9 in reward. But if you stake
+    2-2-2-2-2, you get only 5 in reward. So you're incentivized to bigger and
+    fewer stakes. Is this good for the network? Perhaps it's adjustable. This
+    works if there's too much to stake and not enough places to stake. If there
+    isn't enough to stake, then many orgs will go without stake as validators
+    focus on large stakes only. A way out is to have a max stake for orgs. Ex.
+    you can't create slots > 10, so you're force to split things up a little.
+}
+
