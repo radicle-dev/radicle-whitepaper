@@ -1,8 +1,13 @@
-\section{Protocol Semantics}
+\section{Seed Protocol Semantics}
 \label{sec:protocol-semantics}
 
 % TODO: Distinguish operations from messages, make sure messages aren't signed.
 % TODO: Make sure all operations, ex. around issues are using a message token.
+
+With the core architecture out of the way, we can now describe the \oscoin{}
+seed protocol in terms of $\fold$ and $\state$. Since the protocol is amendable
+due to our definition of $\fold$, we define a \emph{seed} protocol, which has
+the ability to evolve based on its user's needs.
 
 The rules according to which transactions on the \oscoin{} network are
 validated comprise a \emph{protocol}. This protocol has a well defined semantics
@@ -14,26 +19,30 @@ which we shall describe in this section.
 
 \medskip
 
-\begin{figure}[htp]
+\begin{fig}
+\centering
 \begin{tikzpicture}[sibling distance=8em]
-    \node {\emph{registry}}
-        child { node {\emph{accounts}} }
-        child { node {\emph{organizations}}
-            child { node {\emph{members}} }
-            child { node {\emph{projects}}
+    \node {\emph{root}}
+        child { node {\emph{tokens}} }
+        child { node {\emph{accounts}}
+            child { node {\emph{keys}} }
+            child { node {\emph{repositories}}
                 child { node {\emph{patches}} }
-                child { node {\emph{issues}}
-                    child { node {\emph{author}} }
+                child { node {\emph{proposals}}
                     child { node {\emph{patchset}} }
-                    child { node {\emph{votes}} } }
-                child { node {\emph{dependencies}} } }
-            child { node {\emph{account}} } }
-        child { node {\emph{stakes}} };
+                    child { node {\emph{votes}} } } } };
 \end{tikzpicture}
 \bigskip
-\caption{Object relationships in the \oscoin{} protocol.
+\captionof{figure}{Object hierarchy in the \oscoin{} protocol.
 \label{object-relationships}}
-\end{figure}
+\end{fig}
+
+\subsection{The Root}
+In the beginning, we have only one chain, known as the \emph{root}. In its simplest
+form, the genesis of the root chain would be defined as an empty state $\varnothing$
+and a fold function $f$ which allows only one operation called $branch$, which takes
+an identifier, a fold function of its own and creates a branch with the given
+fold function as $\fold$.
 
 \subsection{Operations and State}
 \label{operations-and-state}
