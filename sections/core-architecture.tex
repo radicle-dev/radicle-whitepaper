@@ -27,16 +27,12 @@ thus describe the genesis block of a chain, $C_{gen}$ minimally as
 
 Describing the semantics of a chain $C$ is done via implementing $C_{\fold}$.
 To understand why, we describe the state $\state_{h+1}$ of a chain after
-applying a sequence of transactions $T = t_1 \dots t_n$ as the following equation:
+applying a sequence of transactions $t_1 \dots t_n$ as the the recursive application of $\fold$:
 \[
-    \mathcal{S}_{h+1} \equiv \fold(\mathcal{S}_h, T)
-\]
-or
-\[
-    \mathcal{S}_{h+1} \equiv \apply(\cdots \apply(\apply(\apply(\state_h,
+    (\state_{h+1}, \fold') \equiv \apply(\cdots \apply(\apply(\apply(\state_h,
     t_1), t_2), t_3) \cdots t_n).
 \]
-And since $\fold$ is defined in $\state$, $\fold$ is able to amend itself as
+Since $\fold$ is defined within $\state$, $\fold$ is also able to amend itself as
 part of this state transition.
 
 \subsection{The Root}
