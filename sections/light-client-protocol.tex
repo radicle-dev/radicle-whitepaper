@@ -42,7 +42,7 @@ $\ledger$.
 
 When querying, the prover provides a proof that $\state$ includes a certain key
 $k$ at a given height $h$ and that the value $v$ under it is what it says it
-is. This can be checked against the state hash $\hash(\state_h)$ included in the
+is. This can be checked against the state hash $H_{sr} \equiv \hash(\state_h)$ included in the
 block header at height $h$. We define this operation formally as
 \[
     lookup(k) = \begin{cases}
@@ -51,7 +51,7 @@ block header at height $h$. We define this operation formally as
     \end{cases}
 \]
 where $\Pi$ returns a merkle proof of existence or absence of a key or
-key/value pair.
+key/value pair in $\state$.
 
 \subsubsection{Submitting transactions}
 
@@ -61,8 +61,12 @@ works identically to verifying key inclusion in $\state$, but with a different
 underlying data-structure. The hash the client is interested in here is the
 transaction root hash $H_{tr}$. We define this operation formally as
 \[
-    submit(tx) = \Pi(tx, h)
+    submit(t) = \begin{cases}
+        \Pi(t)        & \text{if} \quad t \in \mathcal{T}_v \\
+        \varnothing   & \text{otherwise}
+    \end{cases}
 \]
+where $\Pi$ returns a merkle proof of existence of a transaction in $H_{tr}$.
 
 \subsection{The AVL+ tree}
 
