@@ -1,0 +1,43 @@
+\section{VCS Integration}
+
+One of the fundamental goals of \oscoin{} is to build an open platform that
+works for everyone. A key aspect of this is how the protocol integrates VCSs.
+If \oscoin{} is to remain relevant in the future, it has to be designed in a
+VCS-agnostic way. Thisw means that the core protocol should not be built
+with any assumptions about the kind of VCS that will be used for a given project.
+
+To achieve this, we build a `common core' which operates with patches, and a
+set of adpaters for different VCSs.
+
+\subsection{The Common Core}
+
+Distributed VCS software today can be divided into two categories: \emph{patch}-
+based and \emph{snapshot}-based. Examples of the former include darcs~\ref{darcs}
+and examples of the latter include git~\ref{git} and mercurial~\ref{mercurial}.
+The common core we build is based on the work by Samuel Mimram and Cinzia Di
+Giusto in A Categorical Theory of Patches~\ref{categorical-theory-of-patches} --
+a formulation of patch theory~\ref{patch-theory} which gives us a reliable
+foundation on which to build our common core.
+
+It's important that we be able to support both types of DVCSs, and patch theory
+is stricly more powerful than snapshot based systems. This means we can support
+snapshot-based systems with a patch-based one, but not the other way around.
+
+\subsection{Adapters}
+
+The adapters for VCSs perform one crucial operation: they translate the native
+VCS information into the common core format when pushing changes upstream, and
+do the inverse when pulling changes downstream.
+
+For \texttt{git}, this takes the form of a \emph{git-remote-helper}~
+\ref{git-remote-helper}.  When a \texttt{git} command is issued with an address
+belonging to the \texttt{oscoin://} protocol scheme, \texttt{git} calls into
+our remote helper instead of using the default one. This means git users
+do not need to change their workflow when using \oscoin{}, they simply need
+to point their client to a different remote.
+
+% TODO: Push and then update chain?
+% TODO: Client signs the tx with the push? Or push and tx are separate?
+% TODO: Local blockchain?
+% TODO: Is pushing decoupled from updating the chain?
+% TODO: Merges/conflicts?
