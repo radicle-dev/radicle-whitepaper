@@ -77,3 +77,12 @@ which can be altered without recomputing the entire data-structure. Traditional
 merkle trees as used in Bitcoin~\ref{bitcoin-merkle-tree} satisfy the first
 criteria, but not the second, while Particia Tries~\ref{patricia-trie} as used
 in Ethereum fulfill the second criteria but not the first.
+
+\subsection{Light client synchronization}
+
+When we talk about scalability in the context of blockchains -- we often think
+of throughput -- but another aspect of scalability that is just as important is
+how does the size of the blockchain affect the average network client. With the
+blocktree design, we are able to selectively synchronize the blocks that we are
+interested in. This means synchronization as well as storage requirements scale
+nicely in relation to network size and usage.
