@@ -1,0 +1,78 @@
+\subsection{Issues \& Proposals}
+
+Collaboration around open-source in \oscoin{} can be seen as a three step
+process.  First, an issue is identified and discussed, second, a proposal is
+made to resolve this issue, and finally the proposal is accepted by a
+maintainer and the changes proposed are merged into the codebase.
+
+It's important to note that there can be at most three unique parties involved
+in this collaborative effort: the author of the issue, the author of the
+proposal, and the maintainer of the repository to which the issue and proposal
+pertain.
+
+Therefore, it's advantageous to decouple these three phases as much as
+possible, in order to reduce friction between the parties, and reduce
+incidental coordination costs to the process -- in other words, we try to
+postpone agreement to the latest phase, when it is really needed, to allow as
+much work to be done independently.
+
+Practically, this means that issues and proposals can be created independent of
+any maintainer, and only when the time comes to accept or reject a proposal, is
+the maintainer called to action. This is in contrast to more centralized
+systems that gate the issue creation process by having a single, canonical list
+of issues per project. In \oscoin{}, anyone can maintain a personal issue or
+proposal list for a project, without consent from the owner. The goal here is
+to reduce friction between the different parties, and embrace the decentralized
+nature of the protocol.
+
+We shall now formally define issues and proposals, and explore a few different
+examples of the system in practice.
+
+\subsubsection{Issues}
+
+An issue in essence is a state modification function, or ``smart contract'',
+attached to a repository. An issue $I$ is define as
+\[
+    I \equiv \tuple{I_{id}, I_s, I_f, I_r, I_m}_{\sigma},
+\]
+where $I_{id}$ is the \blake{} hash of the issue, $I_s \in \{open, closed,
+resolved\}$ is the current state of the issue, $I_f : (I, \state) \to (I,
+\state)$ is a function that is called when $I_s$ changes, and can modify the
+state $C_\state$ of the chain. $I_m$ is the hash of some off-chain metadata
+related to the issue (title, body, tags, etc.), and $I_r$ is the \blake{} hash
+of the repository the issue pertains to.
+
+The function $I_f$ can be used to implement incentivization schemes such as
+bounties (\S \ref{bounties}), [...] etc.
+
+The metadata hash $I_m$ is used to relate the issue with for example a subject,
+description or set of tags that may be useful at the application layer, but
+isn't crucial to the functioning of the chain.
+
+\subsubsection{Proposals}
+
+Issues on their own have very little to offer -- it's with proposals that they
+become powerful and that their purpose becomes clear. A proposal, defined as
+\[
+    P \equiv \tuple{P_p, P_I, P_s, P_r, P_V}_{\sigma}
+\]
+is a set of patches $P_p$ relating to zero or more issues $P_I$, that proposes
+a change to some repository $P_r$. The relationship between a proposal and
+an issue is as follows: if a proposal $P$ is accepted as the solution to
+some issue $i$, then the contract $i_f$ will be run with $P$ as input. Thus,
+$i_f$ is able to do such things as merge code from $P$ and unlock bounties
+for the author of $P$.
+
+% \subsubsection{Operations on issues and proposals}
+
+% On issues:
+% amend   : Hashed Meta -> Script -> Issue s -> Issue s
+% close   : Issue Open -> Issue Closed
+% open    : Issue Closed -> Issue Open
+% resolve : Issue Open -> Maybe Proposal -> Issue Resolved
+
+% On proposals:
+% vote    : Vote -> Proposal Open -> Proposal (Open | Accepted | Rejected)
+% amend   : Set (Hashed Issue) -> Set Patch -> Proposal Open -> Proposal Open
+% close   : Proposal Open -> Proposal Closed
+% open    : Proposal Closed -> Proposal Open
