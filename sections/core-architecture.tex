@@ -68,7 +68,51 @@ $\fold$ also has the ability to add a new chain $C$ to the set $\tree$, by
 specifying its genesis $C_{gen}$. This is called \emph{branching}, and is
 formally defined as
 \[
-    f : C_{gen} \to \tree \cup \{C\},
+    \mathsc{branch} \equiv \tree \mapsto \tree \cup \{\tuple{C_{id}, C_{gen}}\}.
 \]
-where $C = (C_{gen})$. Thus, via $C_{gen}$, $\fold$ is able to specify new
-semantics that branch off its parent chain.
+Thus, via $C_{gen}$, $\fold$ is able to specify new semantics that branch off
+its parent chain.
+
+\begin{verbatim}
+  (branch "alice" `(set-fold! folds/account))
+\end{verbatim}
+
+The branch function is given a name $C_{id}$ for the new chain $C$ and an
+optional list of operations to include in the genesis block $C_{gen}$. In this
+case, $C_{gen}$ will contain one operation:
+
+\begin{verbatim}
+  `(set-fold! folds/account)
+\end{verbatim}
+which, when interpreted by $\fold_{gen}$, will evaluate \verb|(set-fold! folds/account)|
+as an expression, which in turn will set the fold function for $C$ to the fold stored
+under the \texttt{folds/account} key in $\state$.
+
+\subsection{Homoiconicity}
+
+Thanks to homoiconicity~\ref{homoiconicity}, block-trees can change their
+behavior at runtime. Since the state $\state$ defines the fold function $\fold$
+in $\state_{[\fold]}$, and the fold function can set any key in $\state$,
+$\fold$ can modify itself based on some transaction input or code stored in
+$\state$.
+
+For instance, let's say a community wants to install a new rule, which only
+allows transactions from users with a positive account balance. This particular
+community has a repository under \texttt{acme/fold}} which defines its fold
+function under \texttt{acme/fold/$\fold$}. By creating a proposal on
+\texttt{acme/fold} which patches the fold function, the community can propose
+change to its chain's behavior. Once the proposal is accepted, and the code is
+merged, the patched fold function is picked up by the replicas and the behavior
+of the chain is altered starting from the next block.
+
+\subsection{Genesis}
+
+The genesis $C_{gen}$ of any chain $C$ is special in that it is applied to the
+state $C_{\state}$ by the genesis fold $\fold_{gen} : (\state, t) \to \state$.
+This particular fold function is defined as
+\[
+    \fold_{gen}\;\equiv\;t \mapsto \eval t,
+\]
+where $\eval$ is the \emph{eval} function of our language. Thus, at genesis,
+$t$ can be any valid scheme expression, \eg \code{(+ 3 2)}, or in the case of a
+repository chain, \code{(set-fold!~folds/repo)}.
