@@ -197,6 +197,13 @@ processed by a node.
 \subsection{Consensus}
 \label{consensus}
 
+One key aspect of the block-tree architecture is that consensus is pushed up
+the tree, towards the root -- the reason being that the ledgers held at the
+leaves are less likely to be shared amongst users, while the root chain ledger
+is shared amongst all users.  We call chains that are written to be a single
+user only \emph{single-writer chains} and those that are shared
+\emph{multi-writer chains}.
+
 \subsubsection{Finality}
 \label{finality}
 
