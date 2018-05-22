@@ -1,12 +1,12 @@
 \section{Core Architecture}
 
 In order to represent partial as well as totally ordered operations over the
-network, \oscoin{} employs a treelike data-structure which we shall refer to as
+network, \oscoin{} employs a DAG-like data-structure which we shall refer to as
 the ``block-tree''.  Our block-tree starts from a \emph{root} chain and splits
-into sub-chains we refer to as \emph{branches}.  Operations on the tree are
-represented by cryptographically linked blocks of transactions
-(``blockchains''), with the most recent block in any given branch known as the
-tip of the branch, or \emph{leaf}.
+into sub-chains via a branching operation. We thus refer to the sub-chains as
+\emph{branches}.  Operations on the tree are represented by cryptographically
+linked blocks of transactions (``blockchains''), with the most recent block in
+any given branch known as the tip of the branch, or \emph{leaf}.
 
 This design affords us several advantages over traditional blockchains, namely
 the freedom to incorporate partially-ordered transactions within the semantics
@@ -17,40 +17,53 @@ basis, as we shall see in \S~\ref{fold-function}.
 
 \subsection{Genesis}
 
-The first block of any chain $C$ is called the \emph{genesis}. Within the
-genesis, the semantics of the chain are defined by a fold function $\fold$ and
-an initial state $\state_0$ known as the genesis state. Though $\fold$ is part
-of $\state$, we shall sometimes refer to them separately for emphasis.  We can
-thus describe the genesis block of a chain $C$, minimally as
+The first block of any chain $C$ is called the \emph{genesis}. We represent
+chains as a sequence of blocks $C \equiv B_0 \dots B_h$ where $B_0$ is the
+genesis, $B_h$ is the leaf, and $h$ is the height of $C$. Within the
+genesis, the semantics of the chain are defined by an initial state $\state_0$
+known as the genesis state.
+
+\subsection{State}
+
+The state $s$ of any chain $C$ can be defined as a function $K \to V$ from
+a key $k \in K$ to a value $v \in V$. We define the special form $s[k]$ which
+can be described as
 \[
-    C_{gen} \equiv \tuple{C_{\fold}, C_{\state_0}}.
+    s[k] \equiv \begin{cases}
+        v                   & \text{if} \quad k \in K \\
+        \bot                & \text{otherwise}
+    \end{cases}
 \]
+Amongst its elements, $s$ contains a function $s[\fold]$ or more succinctly
+$\fold$ which describes how $s$ is interpreted.
 
 \subsection{The $\fold$ Function} \label{fold-function}
 
-Describing the semantics of a chain $C$ is done via implementing $C_{\fold}$.
-To understand why, we describe the state $\state_{h+1}$ of a chain after
-applying a sequence of transactions $t_1 \dots t_n$ as the the recursive application of $\fold$ in
+The semantics of a chain $C$ are defined by a special function $\fold$ and an
+execution context or environment $\env$. Formally, we can say
+\[
+    \fold \equiv (\env, t) \mapsto \env'
+\]
+where $\env$ is a given execution context, $t$ is an operation to be evaluated
+within that context, and $\env'$ is the resulting context after applying
+$\fold$.  In the context of our chain $C$, we can say that $\env \equiv \state$
+and describe the state $\state_{h+1}$ of $C$ after applying a sequence of
+transactions $t_1 \dots t_n$ as the recursive application:
 \[
     \state_{h+1} \equiv \apply(\cdots \apply(\apply(\apply(\state_h,
     t_1), t_2), t_3) \cdots t_n).
 \]
-Since $\fold$ is defined within $\state$, $\fold$ is also able to amend itself as
-part of this state transition, and so we can say that
+
+Since $\fold$ is defined within $\state$ as $\state[\fold]$, $\fold$ is also
+able to amend itself as part of this state transition, and so we can say that
+\emph{in some cases},
 \[
-    \fold(\state, t) \mapsto (\state', \fold').
+    \fold(\state, t)[\fold] \neq \fold.
 \]
 Note that $t$ is not defined as part of the core architecture. Instead $t$ is
 interpreted by the fold function $\fold$, and its semantics entirely determined
-by it, giving the high-level protocol implementation on top of the block-tree
+by it. This gives the high-level protocol implementation on top of the block-tree
 complete flexibility.
-
-\subsubsection{The Representation of $\fold$}
-
-It should be obvious by now that $\fold$ has to be defined in such a way that
-it may be part of $\state$. In other words, $\fold$ needs a representation
-that is serializable over the network, and interpretable from its serialized
-form. For this, we choose a subset of Scheme~\ref{scheme}.
 
 \subsection{The Block-Tree}
 
@@ -60,6 +73,14 @@ via a \emph{branching} operation. This ``block-tree'' is represented formally
 as a set $\tree$ of chains, where every chain $C \in \tree$ is either the
 parent of a chain, its descendant, or a sibling. When a chain $C'$ branches off
 its parent chain $C$, we denote this as $C \prec C'$.
+
+Though there is a clear hierarchy between the branches, blocks are allowed to
+refer to an arbitrary number of parents, making the ``block-tree'' exhibit the
+properties of a DAG.
+
+% TODO: Is it just a DAG actually? If you just think of all parent pointers
+% as equal, ie. even the ones pointing to the immediate chain, then it becomes
+% a real DAG.
 
 \subsection{Branching}
 
@@ -90,6 +111,13 @@ under the \texttt{folds/account} key in $\state$.
 
 \subsection{Homoiconicity}
 
+\subsubsection{The Representation of $\fold$}
+
+It should be obvious by now that $\fold$ has to be defined in such a way that
+it may be part of $\state$. In other words, $\fold$ needs a representation
+that is serializable over the network, and interpretable from its serialized
+form. For this, we choose a subset of Scheme~\ref{scheme}.
+
 Thanks to homoiconicity~\ref{homoiconicity}, block-trees can change their
 behavior at runtime. Since the state $\state$ defines the fold function $\fold$
 in $\state_{[\fold]}$, and the fold function can set any key in $\state$,
@@ -114,5 +142,5 @@ This particular fold function is defined as
     \fold_{gen}\;\equiv\;t \mapsto \eval t,
 \]
 where $\eval$ is the \emph{eval} function of our language. Thus, at genesis,
-$t$ can be any valid scheme expression, \eg \code{(+ 3 2)}, or in the case of a
-repository chain, \code{(set-fold!~folds/repo)}.
+$t$ can be any valid scheme expression, \eg \verb|(+ 3 2)|, or in the case of a
+repository chain, \verb|(set-fold! folds/repo)|.
