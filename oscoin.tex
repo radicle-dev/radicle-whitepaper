@@ -53,7 +53,8 @@
 \newcommand{\cvdots}{\multicolumn{1}{c}{\small{\vdots}}}
 \newcommand{\dep}{\xrightharpoondown[e]{d}}
 \newcommand{\notice}[1]{{\color{red}#1}}
-\newcommand{\todo}{\notice{\texttt{TODO}}}
+\newcommand{\comment}[1]{{\color{gray}#1}}
+\newcommand{\todo}[1]{\comment{\noindent\texttt{\small\emph{TODO: #1}}}}
 
 \newcommand{\rootchain}{\gamma}
 \newcommand{\State}{\mathcal{S}}

@@ -101,12 +101,10 @@ Though there is a clear hierarchy between the branches, blocks are allowed to
 refer to an arbitrary number of parents, making the ``block-tree'' exhibit the
 properties of a DAG.
 
-% TODO: What's this mini-intro for?
+\todo{Transition.}
 
 \subsubsection{The Root and Radicle}
 \label{s:root}
-
-% TODO: Doesn't flow here.
 
 In the beginning, we have only one chain, known as the \emph{root}, with a
 single block, the \emph{radicle}. This initial state, which is effectively the
@@ -128,11 +126,9 @@ Thus, at genesis, $t$ can be any valid expression in $L$, effectively giving
 the root chain the properties of a read-eval loop, where the resulting
 environment after evaluation is carried to the next block.
 
-% TODO: Something about "This programming paradigm/environment can be used to..."
-% TODO: Reference lisp/scheme.
-
-% read-eval-apply loop?
-% read-eval-commit loop?
+\todo{Something about "This programming environment can be used to..."} \\
+\todo{Reference lisp/scheme?} \\
+\todo{read-eval-commit loop?}
 
 \subsubsection{Branching}
 
@@ -162,9 +158,10 @@ This simple rule means that the only difference between a chain and its branches
 is the chain-id, and to create a branch, one needs only to submit a block with
 a unique chain-id.
 
-% TODO: Talk about following chains, and about how to read the full chain you
-% have to go all the way to the radicle, and how as you go up, the chain-id changes
-% because in the end, all chains except the root is a branch.
+\todo{Talk about following chains.} \\
+\todo{Talk about having to read chains all the way up to the ancestor's genesis.} \\
+\todo{As you go up, the chain-id changes because all chains except the root are branches.} \\
+\todo{Another way to follow a chain is to start from a leaf and follow it up to its genesis.}
 
 % TODO: Diagram for this ^
 
