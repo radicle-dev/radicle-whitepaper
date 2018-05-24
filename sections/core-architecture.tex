@@ -78,12 +78,12 @@ sequence of transactions $t_1 \dots t_n$ as the recursive application of $\fold$
 \]
 
 Since $\fold$ is defined within $S$ as $S[\fold]$, $\fold$ is also
-able to amend itself as part of this state transition, and so we can say that
-\emph{in some cases},
+able to amend itself as part of this state transition, and so we can say that:
 \[
-    \fold(S, t)[\fold] \neq \fold.
+    \exists t \in \mathcal{T} : \fold(S, t)[\fold] \neq \fold,
 \]
-Note that $t$ is not defined as part of the base protocol. Instead $t$ is
+where $\mathcal{T}$ is the set of transactions recognized by $\fold$.  Note
+that $t$ is not defined as part of the base protocol. Instead $t$ is
 interpreted by the fold function $\fold$, and its semantics entirely determined
 by it. This gives $\fold$ complete flexibility, and we shall see in
 \S~\ref{s:root}.
