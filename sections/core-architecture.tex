@@ -150,14 +150,14 @@ that come to play assuming only valid blocks.
         in \S~\ref{consensus} to decide which block to build upon.
     \item If $b \neq a$ or $b' \neq a$, then we have a \emph{branch}. The block
         or blocks which do not have a matching chain-id with their parent $A$
-        will consistute a new chain with new chain-id. This new chain will
+        will consistute a new chain with a new chain-id. This new chain will
         exist alongside $A$'s chain, and will share an ancestry or ``prefix''
         with $A$.
 \end{enumerate}
 
-This simple rule means that the only difference between a chain and its branches
-is the chain-id, and to create a branch, one needs only to submit a block with
-a unique chain-id.
+This simple rule means that the only difference between a chain and its
+descendant branches is the chain-id, and to create a branch, one needs only to
+submit a block with a unique chain-id.
 
 \todo{Talk about following chains.} \\
 \todo{Talk about having to read chains all the way up to the ancestor's genesis.} \\
