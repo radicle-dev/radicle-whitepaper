@@ -1,6 +1,112 @@
-\section{Language Semantics}
+\section{Language Syntax and Semantics}
 
-In section \S~\ref{s:core-architecture}, we introduced a fold function
-$\fold_0$ and defined it as the \emph{eval} function $\eval$ of some language
-$L$. In this section we shall define the semantics of $L$ and $\eval$, with
-respect to...
+\rad is a a Lisp dialect. It uses prefix parenthesized function application,
+has first-class functions, is dynamically typed, and homoiconic. It differs
+from most Lisps in a few aspects, described below.
+
+Like most Lisps, binding is lexical. Unlike most Lisps, \rad has a
+\textit{hyperstatic} global environment, meaning that the resolution of free
+variables takes place at the definition site rather than call-site. Thus:
+
+\begin{lstlisting}[language=Lisp, basicstyle=\small\ttfamily]
+(define (foo) x) ;; error - "x" is not defined
+(define x 3)
+(foo) ;; 3
+(define x 5)
+(foo) ;; still 3
+\end{lstlisting}
+
+Usually \rad programs are an interleaving of code written by multiple people,
+and each developer cannot in general be certain of what code will end up in the
+program between the text that she knows about and her new submission. A
+hyperstatic environment ameliorates the resulting unpredictability by making
+function calls by default (i.e., modulo the usage of mutable references)
+independent of intermediate submissions.
+
+\rad does not have macros. Instead, it allows for a complete redefinition of
+the intepreter via redefinitions of \texttt{eval}.
+
+\begin{lstlisting}[basicstyle=\small\ttfamily]
+(define (eval expr) 3) ;;
+5 ;; --> 3
+\end{lstlisting}
+
+This enables users to very easily define sublanguages for new chains, or amend
+the language running in the current one.
+
+% TODO: maybe move to Related Work section
+\subsection{Connection to Reflective Towers} The \texttt{eval}-redefinition
+mechanism resembles prior work on \textit{reflective towers}. A reflective
+tower is an infinite series of levels of interpreters, $L_0$, $L_1$, ..., where
+a level $L_n$ is interpreted by $L_{n+1}$. Reflective towers allow both
+\textit{reification} - the ability to inspect a computation via constructs of a
+higher level - and \textit{reflection} - the ability to define and enter new,
+lower levels. Conceptually, \rad differs from reflective towers by only
+allowing reflection. You can dig a hole, but don't expect to find an elevator
+out of it.
+
+\subsection{Effects} In order to maintain determinism and safety in on-chain
+computations, and at the same time be a useful language for scripting
+interactions with chains, \rad keeps a separate, \textit{impure} environment,
+$\rho_{!}$ (these are by convention textually distinguished by identifiers
+ending with an exclamation mark). Expressions on chain therefore cannot have
+side-effects; instead, they may evaluate to a value that describes an effect,
+but the decision of whether or how to actually carry on that effect happens at
+effect-handling layer. This architecture, with a central authority
+administering effects received via messages, resembles work following
+\cite{Cartwright1994}.
+
+Exception-handling constructs belong to the impure environment; thus,
+exceptions may not be caught on chain. Thus any expression of a chain
+which is in fact evaluated is valid - \ie, does not throw an exception. This in
+turn makes it possible to use exceptions to mark updates to an environment as
+having reliably occured.
+
+% TODO: Think about what this means for smart contracts that throw exceptions
+
+% TODO: (transfer from to amount) example
+
+\subsection{Data types} \rad's data types are: booleans (\texttt{\#t} and
+\texttt{\#f}); strings (a sequence of characters within double quotes, with
+\texttt{\textbackslash} as the escape character), symbols, lists, and numbers
+(currently only arbitrary-precision decimals).
+
+\subsection{Syntax}
+
+
+\subsection{Formal Semantics} We define the denotational semantics of \rad
+recursively. The base case, $\mathcal{E}_{0}$, describes the denotation of a
+term prior to any modification of \texttt{eval}. It's definition is given in
+Figure \ref{f:denotationalsem0}.
+
+
+\begin{figure}[H]
+\begin{align*}
+  \denotationdesc{0}{\variable}{\env \variable} \\
+  \denotationdesc{0}{(\lam (\variable *) \rho^{+})}{} \\
+  \denotationdesc{0}{(\define \variable \pi )}{} \\
+  \denotationdesc{0}{(\deref \variable  )}{} \\
+  \denotationdesc{0}{(\mkref \variable \pi)}{} \\
+  \denotationdesc{0}{(\set \variable \pi)}{} \\
+  \denotationdesc{0}{(\ifm \pi_0 \pi_1 \pi_2)}{}
+\end{align*}
+\caption{Denotational semantics for $\mathcal{E}_{0}$}
+\label{f:denotationalsem0}
+\end{figure}
+
+After a redefinition of \texttt{eval}, the denotation of an expression is the
+denotation of \texttt{eval} prior to the redefinition, applied to the
+\textit{quoted} expression, as show in Figure \ref{f:denotationalsemn}.
+
+\begin{figure}[H]
+\begin{align*}
+  \denotationdesc{n}{\pi}{(\denotation{n-1}{\evalm} (\quotem \pi))\rho}
+\end{align*}
+\caption{Denotational semantics for $\mathcal{E}_{n}$}
+\label{f:denotationalsemn}
+\end{figure}
+
+Besides the forms described so far, additional forms exist which may be
+implemented via \texttt{eval} redefinitions. They may also be implemented as
+primitives; in either case, these forms must not be shadowable via
+\texttt{define}s.

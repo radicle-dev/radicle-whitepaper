@@ -1,60 +1,52 @@
 \section{Introduction}
+\label{s:introduction}
 
-\begin{epigraph}{The Open-Source Everything Manifesto}
-    \noindent It is in this light that we must recognize that only a restoration of
-    open-source culture, and all that enables across the full spectrum of
-    open-source possibilities, can allow humanity to harness the distributed
-    intelligence of the collective and create the equivalent of heaven on Earth
-    -- in other words, a world that works for all.
-\end{epigraph}
-\medskip
+Blockchains are being used with increasing frequency, and for increasingly
+diverse purposes. This had led to scaling concerns, as clients must keep
+abreast of a large number of transactions, many of which are will not be
+directly relevant to them. Many exciting protocol-level efforts to assuage
+these concerns. The \oscoin{} architecture, however, emphasizes an additional,
+\textit{semantic} level of sharding. Rather than a single chain, \oscoin{}
+allows for an indefinite number of different chains, each serving different
+purposes -- such as keeping track of a particular repository, of the outcome of
+a vote, or of global financial transactions. In general, participants need not
+sync chains which are not of interest to them, saving considerable space,
+computation, and network usage.
 
-\noindent \oscoin{} is a protocol and token that attempts to provide a decentralized
-hosting solution for open-source code with the means to collaborate on, govern
-and fund open-source software projects sustainably, with no intermediary.
+Since the purpose of chains may be quite specific, we would like to be
+able to precisely specify what sorts of transactions are allowed on it,
+optimizing syntax for those use-cases. In essence, we want
+\textit{domain-specific languages for domain-specific chains}. At the same
+time, the interpretation of these domain-specific languages (DSLs) should be
+accesible to anyone.
 
-\subsection{Core Components}
+We propose a programming model, embodied in the language \rad, for defining the
+semantics of, expressing transactions in, and scripting, chains.
 
-\oscoin{} introduces a few components that, taken together, constitute the core
-of the proposed solution.
+\subsection{Context}
 
-\begin{description}
-    \item[Registry] The registry, formally $\mathcal{R}$, is a
-        decentralized service which provides a canonical record of projects and
-        organizations known to the network.
-    \item[Treasury] The treasury, formally $\mathcal{T}$, is a
-        decentralized service with the purpose of funding open-source projects
-        of value on the network.
-    \item[Network] A decentralized code hosting network, formally
-        $\mathcal{N}$, which hosts all the source code known to the network
-        in a way that is available and censor-proof.
-    \item[Dependency Graph] The dependency graph $\mathcal{D}$, is a global
-        graph of all dependencies known to the network, whether these
-        dependencies are hosted on the network or hosted externally.
-    \item[Oscoin] The \oscoin{} token is a cryptographic token used for value
-        exchange in the network.
-\end{description}
+\subsection{Desiderata}
 
-\subsection{Protocol Overview}
+In order for consensus to be achievable, there must be agreement among
+participants on the meaning and validity of blocks and transactions. Seen from
+the perspective of programming languages, the meaning of an expression or
+declaration must be the same for all users. This leads naturally to a
+\textit{pure} programming language - one which side-effects are disallowed.
 
-\begin{itemize}
-    \item The \oscoin{} network is a decentralized code hosting network
-        composed of different kinds of participants, including
-        \emph{maintainers}, \emph{contributors} and \emph{operators}.
-    \item Maintainers and contributors collaborate around software projects
-        organized in code repositories hosted by the network.
-    \item Through the registry $\mathcal{R}$, participants discover, support
-        and join open-source projects.
-    \item Funds available for distribution are first sent to the treasury
-        $\mathcal{T}$, before being distributed to chosen organizations.
-    \item Token holders are able to pledge a certain amount of tokens towards
-        an organization. This has the effect of signaling the treasury that a
-        given organization has value to them, influencing the distribution of
-        funds.
-    \item Organizations are able to use the funds allocated to them for
-        whichever purpose they see fit. \emph{Issues} and \emph{smart
-        contracts} are used as a means for smart distribution of tokens from
-        within an organization, to its constituent members.
-    \item Code is attached to issues in the form of \emph{patches}. Issues act
-        as the epicenter of change and collaboration around a project.
-\end{itemize}
+The chains on
+
+
+\begin{figure}[H]
+\begin{tabular}{| l | l | l |}
+\hline
+Version Control & Blockchain     & Language  \\ \hline
+    Patch/Diff  & Transaction    & Declaration\footnote{\rad makes no
+    distinctions between declarations and expressions, and so for the purposes
+    of this paper one may consider this cell to be filled with ``Expression''}\\
+Branch/Fork     & Fork           & ...  \\
+Snapshot        & State          & Memory + Env \\
+\hline
+\end{tabular}
+\label{correspondences}
+\caption{Correspondences ...}
+\end{figure}

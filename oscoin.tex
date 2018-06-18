@@ -14,6 +14,11 @@
 \usepackage{standalone}
 \usepackage{bm}
 \usepackage{multicol}
+\usepackage{stmaryrd}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{syntax}
+\usepackage[final]{listings}
 \usepackage[font={small,sc}]{caption}
 
 \usetikzlibrary{fit}
@@ -66,7 +71,28 @@
 \newcommand{\fold}{\Upsilon}
 \newcommand{\tree}{\mathcal{C}}
 \newcommand{\op}{T}
-\newcommand{\env}{\varepsilon}
+\newcommand{\env}{\rho}
+\newcommand{\denotation}[2]{
+    \ensuremath{\mathcal{E}_{#1} \llbracket #2 \rrbracket }}
+\newcommand{\denotationdesc}[3]{
+    \ensuremath{\mathcal{E}_{#1} \llbracket #2 \rrbracket \env &= #3  }}
+\newcommand{\variable}{\nu}
+\newcommand{\prog}{\pi}
+\newcommand{\rad}{\textsc{Radicle} }
+\newcommand{\lam}{\text{\texttt{lambda }}}
+\newcommand{\define}{\text{\texttt{define}}}
+\newcommand{\deref}{\text{\texttt{deref!}}}
+\newcommand{\mkref}{\text{\texttt{ref!}}}
+\newcommand{\set}{\text{\texttt{set!}}}
+\newcommand{\quotem}{\text{\texttt{quote}}}
+\newcommand{\evalm}{\text{\texttt{eval}}}
+\newcommand{\ifm}{\text{\texttt{if}}}
+\newcommand{\stdfn}[2]{
+    \texttt{#1}
+    #2
+    }
+
+
 
 \DeclareMathOperator{\eval}{\Xi}
 
@@ -111,10 +137,16 @@
 \setlength{\columnsep}{20pt}
 \begin{multicols}{2}
 
+\input{sections/introduction.tex}
 \input{sections/core-architecture.tex}
 \input{sections/language-semantics.tex}
 
+\bibliographystyle{plain}
+\bibliography{bibliography}
 \end{multicols}
 
+
 \appendix
+\input{sections/appendix-syntax.tex}
+\input{sections/appendix-derived-forms.tex}
 \end{document}

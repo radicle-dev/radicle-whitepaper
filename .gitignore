@@ -7,3 +7,4 @@
 *.aux
 *.gz
 *.fdb_latexmk
+out/*
