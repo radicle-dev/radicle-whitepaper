@@ -19,7 +19,7 @@ optimize syntax and semantics for those use-cases. In essence, we want
 \textit{domain-specific languages for domain-specific chains}. The language
 described in this paper, \rad, is designed to easily allow the definition of
 such domain-specific languages (DSLs). Moreover, the very same mechanism used to
-facilitate such definitions - the notion of \textit{reflective towers} - also
+facilitate such definitions - a \textit{reflective tower} - also
 allows for redefining the semantics of a single chain, enabling a more
 principled and first-class version of the self-amendment pioneered by
 Tezos.\cite{Goodman2014}
@@ -33,6 +33,44 @@ chain, so that redeployments to that server become as simple as submitting new
 transactions to the server-chain.
 
 \subsection{Context}
+
+Satoshi Nakamoto's Bitcoin introduced a practical digital currency with no
+centralized backing.\cite{Nakamoto2008} This was enabled by a system for
+distributed consensus. Already with Bitcoin Script - the stack-based language
+defined by Bitcoin's protocol for describing ownership rights to a Bitcoin -
+programming languages were seen to be the means of establishing what consensus
+was \textit{about}; not, that is, just a semantically opaque list of strings,
+but as a list of string that determined in an agreed-upon way a semantically
+significant \textit{state}. Since mostly blockchain technology has been used as
+a digital currency, this state usually represents the ownership of designated
+coins, or in an alternative formulation, the balances of individual accounts.
+
+As part of the consensus process, \textit{validators} evaluate the transactions
+(subprograms of the relevant programming language) in order to calculate the
+resulting state and determine if both the transactions, and the \textit{blocks}
+into which they are organized, are valid.\footnote{There is no fundamental
+reason that evaluation and validation need be so intertwined. In theory,
+validation could be simply succesful typechecking of a total language, for
+example; evaluation would then be an extra step not influencing validity.
+However, it is hard to see what the benefits of such a system would be.} Blocks
+relate to one another by explicitly declaring their predecessor; if
+multiple valid blocks exist with the same predecessor (this constitutes a
+\textit{fork}, clients such as validators adopt by convention a rule for
+determining which set of blocks to consider canonical. These rules are designed
+to ensure that, with a high degree of probability, clients will converge on the
+same set of canonical blocks. Seen from another perspective, clients will
+converge on what \textit{program} they run.
+
+Later cryptocurrencies such as Ethereum emphasized more powerful programming
+languages. This in turn made clear that distributed consensus about program
+source had applications that were much broader than simple exchanges. Still,
+such applications were built on top of a model that focused on accounts,
+balances, and transactions.
+
+A natural extension of this trend is to free blockchain programming from the
+notion of ownership completely, and see it for what it is: a distributed and
+interactive program.
+
 
 \subsection{Desiderata}
 
