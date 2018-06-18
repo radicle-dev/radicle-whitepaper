@@ -4,7 +4,7 @@
 Blockchains are being used with increasing frequency, and for increasingly
 diverse purposes. This had led to scaling concerns, as clients must keep
 abreast of a large number of transactions, many of which are will not be
-directly relevant to them. Many exciting protocol-level efforts to assuage
+directly relevant to them. There are several protocol-level efforts to assuage
 these concerns. The \oscoin{} architecture, however, emphasizes an additional,
 \textit{semantic} level of sharding. Rather than a single chain, \oscoin{}
 allows for an indefinite number of different chains, each serving different
@@ -13,15 +13,24 @@ a vote, or of global financial transactions. In general, participants need not
 sync chains which are not of interest to them, saving considerable space,
 computation, and network usage.
 
-Since the purpose of chains may be quite specific, we would like to be
-able to precisely specify what sorts of transactions are allowed on it,
-optimizing syntax for those use-cases. In essence, we want
-\textit{domain-specific languages for domain-specific chains}. At the same
-time, the interpretation of these domain-specific languages (DSLs) should be
-accesible to anyone.
+Since the purpose of chains may thus be quite specific, we would like to be
+able to precisely specify what sorts of transactions are allowed on it, and to
+optimize syntax and semantics for those use-cases. In essence, we want
+\textit{domain-specific languages for domain-specific chains}. The language
+described in this paper, \rad, is designed to easily allow the definition of
+such domain-specific languages (DSLs). Moreover, the very same mechanism used to
+facilitate such definitions - the notion of \textit{reflective towers} - also
+allows for redefining the semantics of a single chain, enabling a more
+principled and first-class version of the self-amendment pioneered by
+Tezos.\cite{Goodman2014}
 
-We propose a programming model, embodied in the language \rad, for defining the
-semantics of, expressing transactions in, and scripting, chains.
+In addition to being a language for on-chain programming, \rad is also a
+scripting language that can be used to script local interactions with the
+chain. Indeed, chains, scripts, and REPL interactions are conceived of
+uniformly. This in turn allows quite novel new possibilities; one can for
+example describe on one chain how a server should respond to updates of another
+chain, so that redeployments to that server become as simple as submitting new
+transactions to the server-chain.
 
 \subsection{Context}
 
