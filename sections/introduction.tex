@@ -36,14 +36,15 @@ transactions to the server-chain.
 
 Satoshi Nakamoto's Bitcoin introduced a practical digital currency with no
 centralized backing.\cite{Nakamoto2008} This was enabled by a system for
-distributed consensus. Already with Bitcoin Script - the stack-based language
-defined by Bitcoin's protocol for describing ownership rights to a Bitcoin -
-programming languages were seen to be the means of establishing what consensus
-was \textit{about}; not, that is, just a semantically opaque list of strings,
-but as a list of string that determined in an agreed-upon way a semantically
-significant \textit{state}. Since mostly blockchain technology has been used as
-a digital currency, this state usually represents the ownership of designated
-coins, or in an alternative formulation, the balances of individual accounts.
+distributed consensus. Already with Bitcoin Script--the stack-based language
+defined by Bitcoin's protocol for describing ownership rights to a
+Bitcoin--programming languages were seen to be the means of establishing what
+consensus was \textit{about}; not, that is, just a semantically opaque list of
+strings which consistute the ledger, but as a list of string that determined in
+an agreed-upon way a semantically significant \textit{state}. Since mostly
+blockchain technology has been used as a digital currency, this state usually
+represents the ownership of designated coins, or in an alternative formulation,
+the balances of individual accounts.
 
 As part of the consensus process, \textit{validators} evaluate the transactions
 (subprograms of the relevant programming language) in order to calculate the
@@ -65,22 +66,27 @@ Later cryptocurrencies such as Ethereum emphasized more powerful programming
 languages. This in turn made clear that distributed consensus about program
 source had applications that were much broader than simple exchanges. Still,
 such applications were built on top of a model that focused on accounts,
-balances, and transactions.
+balances, and transactions, limiting the ease with which such alternative
+applications could be developed.
+
+
+
+\subsection{\rad: Motivation and Desiderata}
 
 A natural extension of this trend is to free blockchain programming from the
 notion of ownership completely, and see it for what it is: a distributed and
 interactive program.
 
+Even if we make no assumption about the application of such a program (such as
+ownership and transaction), certain considerations about the nature of
+blockchain programming are important for the design of a general-purpose
+blockchain language.
 
-\subsection{Desiderata}
-
-In order for consensus to be achievable, there must be agreement among
+First, in order for consensus to be achievable, there must be agreement among
 participants on the meaning and validity of blocks and transactions. Seen from
 the perspective of programming languages, the meaning of an expression or
 declaration must be the same for all users. This leads naturally to a
 \textit{pure} programming language - one which side-effects are disallowed.
-
-The chains on
 
 
 \begin{figure}[H]
