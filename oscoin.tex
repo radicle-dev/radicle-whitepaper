@@ -27,6 +27,10 @@
 \usetikzlibrary{decorations}
 \usetikzlibrary{decorations.pathmorphing}
 \usetikzlibrary{arrows.meta}
+\usetikzlibrary{chains}
+\usetikzlibrary{shapes}
+\usetikzlibrary{scopes}
+\usetikzlibrary{arrows}
 
 \hyphenation{block-chain block-chains}
 \hyphenation{crypto-graphically}
@@ -121,6 +125,12 @@
 {\leftskip=1cm \def\epigraph@author{#2} \smallskip\itshape}
 {\par\vspace{0.5em}\normalfont\hfill---\ \epigraph@author\hspace*{0.2cm}\par\medskip}
 \makeatother
+
+% Tikz stuff
+
+\tikzstyle{block} = [rectangle, draw,
+    text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
 
 \setlength{\textwidth}{\paperwidth}
 \addtolength{\textwidth}{-4cm}

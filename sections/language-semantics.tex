@@ -1,8 +1,8 @@
 \section{Language Syntax and Semantics}
 
 \rad is a a Lisp dialect. It uses prefix parenthesized function application,
-has first-class functions, is dynamically typed, and homoiconic. It differs
-from most Lisps in a few aspects, described below.
+supports recursion, has first-class functions, is dynamically typed, and
+homoiconic. It differs from most Lisps in a few aspects, described below.
 
 Like most Lisps, binding is lexical. Unlike most Lisps, \rad has a
 \textit{hyperstatic} global environment, meaning that the resolution of free
@@ -54,14 +54,52 @@ side-effects; instead, they may evaluate to a value that describes an effect,
 but the decision of whether or how to actually carry on that effect happens at
 effect-handling layer. This architecture, with a central authority
 administering effects received via messages, resembles work following
-\cite{Cartwright1994}.
+\cite{Cartwright1994} and \cite{Bauer2003}.
+
+\begin{figure}[H]
+\begin{tikzpicture}[node distance = 4cm, auto]
+  \node [block] (net) {Network};
+  \node [block, below of=net] (repl) {REPL};
+  \node [block, left of=repl] (impure) {impure central authority};
+  \node [block, below of=impure] (pure) {pure evaluation};
+
+    \path [line, transform canvas={yshift=0.2cm}]
+    (net) -- node {\texttt{gossip!} [$B_n$]} (impure);
+    \path [line, transform canvas={yshift=-0.2cm}]
+    (impure) -- node {\texttt{hear-gossip!} $V_{n+1}$} (net);
+
+    \path [line, transform canvas={yshift=0.2cm}]
+    (repl) -- node [above] {\texttt{get-line!} [$B_n$]} (impure);
+    \path [line, transform canvas={yshift=-0.2cm}]
+    (impure) -- node [below] {\texttt{print!} $V_{n+1}$} (repl);
+
+  \path [line, transform canvas={xshift=0.2cm}]
+    (impure) -- node {$S_n$, $B_n$} (pure);
+  \path [line, transform canvas={xshift=-0.2cm}]
+    (pure) -- node {$S_{n+1}$, $V_{n+1}$} (impure);
+
+\end{tikzpicture}
+\caption{Effect system}
+\label{f:effects}
+\end{figure}
+
+A further advantage of this approach is that, since on many blockchain
+protocols new blocks have a low initial probability of being final (given the
+possibility of forks), effects may be easily and programmatically delayed until
+sufficiently many child blocks have been seen by simply buffering the
+description of effects before passing them to the effect-handling layer.
 
 \subsection{Data types} \rad's data types are: booleans (\texttt{\#t} and
 \texttt{\#f}); strings (a sequence of characters within double quotes, with
 \texttt{\textbackslash} as the escape character), symbols, lists, and numbers
 (currently only arbitrary-precision decimals). These datatypes are all
 immutable; additionally \rad supports \textit{refs} - mutable references - that
-can hold any other datatype.
+can hold any other datatype. Refs support a similar set of operations to
+Clojure's atoms; however, they are not shareable across threads, and can be
+interpreted as a pure state transformer.\footnote{The reference implementation
+of \rad in fact uses Haskell's \texttt{STRef}s to implement refs, which in turn
+use a by now well-known rank-2 type encapsulation to guarantee the property of
+not being shareable across threads.\cite{lazy-functional-state-threads}}
 
 \subsection{Syntax}
 
