@@ -6,7 +6,7 @@ diverse purposes. This had led to scaling concerns, as clients must keep
 abreast of a large number of transactions, many of which are will not be
 directly relevant to them. There are several protocol-level efforts to assuage
 these concerns. The \oscoin{} architecture, however, emphasizes an additional,
-\textit{semantic} level of sharding. Rather than a single chain, \oscoin{}
+\textit{semantic} level of separation. Rather than a single chain, \oscoin{}
 allows for an indefinite number of different chains, each serving different
 purposes -- such as keeping track of a particular repository, of the outcome of
 a vote, or of global financial transactions. In general, participants need not
@@ -59,12 +59,14 @@ example; evaluation would then be an extra step not influencing validity.
 However, it is hard to see what the benefits of such a system would be.} Blocks
 relate to one another by explicitly declaring their predecessor, thus
 constituting a \textit{chain}; if
-multiple valid blocks exist with the same predecessor (this constitutes a
-\textit{fork}, clients such as validators adopt by convention a rule for
+multiple valid blocks exist with the same predecessor or parent (this constitutes a
+\textit{fork}), clients such as validators adopt by convention a rule for
 determining which set of blocks to consider canonical. These rules are designed
 to ensure that, with a high degree of probability, clients will converge on the
-same set of canonical blocks. Seen from another perspective, clients will
+same chain. Seen from another perspective, clients will
 converge on what \textit{program} they run.
+
+% TODO: The ordering of these paragraphs isn't great.
 
 Later cryptocurrencies such as Ethereum emphasized more powerful programming
 languages. This in turn made clear that distributed consensus about program
