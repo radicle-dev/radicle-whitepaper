@@ -39,32 +39,44 @@ transactions to the server-chain.
 
 Satoshi Nakamoto's Bitcoin introduced a practical digital currency with no
 centralized backing.\cite{Nakamoto2008} This was enabled by a system for
-distributed consensus. Already with Bitcoin Script--the stack-based language
+distributed consensus known as a blockchain. In essence, a blockchain is a
+distributed log of \textit{transactions}. Transactions are grouped into
+\textit{blocks}, which in addition to the ordered list of transactions
+contain an identifiers for their parent block (as well as other metadata). Each
+client maintains a set of blocks it knows about, which need not form a chain
+(i.e., there may be multiple blocks with the same parent, constituting a
+\textit{fork}). A \textit{scoring function} is used to select the best chain.
+The nature of this scoring function is such as to ensure that, with a high
+degree of probability, participants will converge on the same chain, even in
+the presence of (some amount of) network latency, network partitions, and
+malicious behaviour.
+
+Already with Bitcoin Script--the stack-based language
 defined by Bitcoin's protocol for describing ownership rights to a
 Bitcoin--programming languages were seen to be the means of establishing what
 consensus was \textit{about}; not, that is, just a semantically opaque list of
-strings which consistute the ledger, but as a list of string that determined in
-an agreed-upon way a semantically significant \textit{state}. Since mostly
-blockchain technology has been used as a digital currency, this state usually
-represents the ownership of designated coins, or in an alternative formulation,
-the balances of individual accounts.
+strings which consistute the log or ledger, but as a list of string that
+determined in an agreed-upon way a semantically significant \textit{state}.
+Since mostly blockchain technology has been used as a digital currency, this
+state usually represents the ownership of designated coins, or in an
+alternative formulation, the balances of individual accounts.
 
-As part of the consensus process, \textit{validators} evaluate the transactions
-(subprograms of the relevant programming language) in order to calculate the
-resulting state and determine if both the transactions, and the \textit{blocks}
-into which they are organized, are valid.\footnote{There is no fundamental
-reason that evaluation and validation need be so intertwined. In theory,
-validation could be simply succesful typechecking of a total language, for
-example; evaluation would then be an extra step not influencing validity.
-However, it is hard to see what the benefits of such a system would be.} Blocks
-relate to one another by explicitly declaring their predecessor, thus
-constituting a \textit{chain}; if
-multiple valid blocks exist with the same predecessor or parent (this constitutes a
-\textit{fork}), clients such as validators adopt by convention a rule for
-determining which set of blocks to consider canonical. These rules are designed
-to ensure that, with a high degree of probability, clients will converge on the
-same chain. Seen from another perspective, clients will
-converge on what \textit{program} they run.
+% As part of the consensus process, \textit{validators} evaluate the transactions
+% (subprograms of the relevant programming language) in order to calculate the
+% resulting state and determine if both the transactions, and the \textit{blocks}
+% into which they are organized, are valid.\footnote{There is no fundamental
+% reason that evaluation and validation need be so intertwined. In theory,
+% validation could be simply succesful typechecking of a total language, for
+% example; evaluation would then be an extra step not influencing validity.
+% However, it is hard to see what the benefits of such a system would be.} Blocks
+% relate to one another by explicitly declaring their predecessor, thus
+% constituting a \textit{chain}; if
+% multiple valid blocks exist with the same predecessor or parent (this constitutes a
+% \textit{fork}), clients such as validators adopt by convention a rule for
+% determining which set of blocks to consider canonical. These rules are designed
+% to ensure that, with a high degree of probability, clients will converge on the
+% same chain. Seen from another perspective, clients will
+% converge on what \textit{program} they run.
 
 % TODO: The ordering of these paragraphs isn't great.
 

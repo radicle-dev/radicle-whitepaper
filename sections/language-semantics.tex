@@ -62,6 +62,10 @@ administering effects received via messages, resembles work following
   \node [block, below of=net] (repl) {REPL};
   \node [block, left of=repl] (impure) {impure central authority};
   \node [block, below of=impure] (pure) {pure evaluation};
+  \node [block, above of=impure] (file) {File};
+
+    \path [line]
+    (file) -- node [left] {\texttt{read-line!} $V_{n+1}$} (impure);
 
     \path [line, transform canvas={yshift=0.2cm}]
     (net) -- node {\texttt{gossip!} [$B_n$]} (impure);
