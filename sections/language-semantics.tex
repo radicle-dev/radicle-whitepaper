@@ -56,20 +56,12 @@ effect-handling layer. This architecture, with a central authority
 administering effects received via messages, resembles work following
 \cite{Cartwright1994}.
 
-Exception-handling constructs belong to the impure environment; thus,
-exceptions may not be caught on chain. Thus any expression of a chain
-which is in fact evaluated is valid - \ie, does not throw an exception. This in
-turn makes it possible to use exceptions to mark updates to an environment as
-having reliably occured.
-
-% TODO: Think about what this means for smart contracts that throw exceptions
-
-% TODO: (transfer from to amount) example
-
 \subsection{Data types} \rad's data types are: booleans (\texttt{\#t} and
 \texttt{\#f}); strings (a sequence of characters within double quotes, with
 \texttt{\textbackslash} as the escape character), symbols, lists, and numbers
-(currently only arbitrary-precision decimals).
+(currently only arbitrary-precision decimals). These datatypes are all
+immutable; additionally \rad supports \textit{refs} - mutable references - that
+can hold any other datatype.
 
 \subsection{Syntax}
 

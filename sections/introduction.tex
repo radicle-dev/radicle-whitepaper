@@ -22,12 +22,15 @@ such domain-specific languages (DSLs). Moreover, the very same mechanism used to
 facilitate such definitions - a \textit{reflective tower} - also
 allows for redefining the semantics of a single chain, enabling a more
 principled and first-class version of the self-amendment pioneered by
-Tezos.\cite{Goodman2014}
+Tezos.\cite{Goodman2014} The existence of a single language in which such DSLs
+are defined \textit{on-chain} also ensures that there is no need for
+out-of-band communication, making it trivial to agree upon the semantics of
+these DSLs.
 
 In addition to being a language for on-chain programming, \rad is also a
 scripting language that can be used to script local interactions with the
 chain. Indeed, chains, scripts, and REPL interactions are conceived of
-uniformly. This in turn allows quite novel new possibilities; one can for
+uniformly. This in turn allows quite novel possibilities; one can for
 example describe on one chain how a server should respond to updates of another
 chain, so that redeployments to that server become as simple as submitting new
 transactions to the server-chain.
@@ -54,7 +57,8 @@ reason that evaluation and validation need be so intertwined. In theory,
 validation could be simply succesful typechecking of a total language, for
 example; evaluation would then be an extra step not influencing validity.
 However, it is hard to see what the benefits of such a system would be.} Blocks
-relate to one another by explicitly declaring their predecessor; if
+relate to one another by explicitly declaring their predecessor, thus
+constituting a \textit{chain}; if
 multiple valid blocks exist with the same predecessor (this constitutes a
 \textit{fork}, clients such as validators adopt by convention a rule for
 determining which set of blocks to consider canonical. These rules are designed
@@ -82,11 +86,22 @@ ownership and transaction), certain considerations about the nature of
 blockchain programming are important for the design of a general-purpose
 blockchain language.
 
-First, in order for consensus to be achievable, there must be agreement among
-participants on the meaning and validity of blocks and transactions. Seen from
-the perspective of programming languages, the meaning of an expression or
-declaration must be the same for all users. This leads naturally to a
-\textit{pure} programming language - one which side-effects are disallowed.
+\begin{description}
+  \item [Purity] First, in order for consensus to be achievable, there must be
+      agreement among participants on the meaning and validity of blocks and
+        transactions. Seen from the perspective of programming languages, the
+        meaning of an expression or declaration must be the same for all users.
+        This leads naturally to a \textit{pure} programming language - one
+        which side-effects are disallowed.
+
+  \item [Constrainability] Since anyone may submit an expression or transaction
+      to the chain, and all validators evaluate it, both Bitcoin and Ethereum
+        have mechanisms to prevent expressions requiring too much (even
+        infinite) computation, which would represent a denial-of-service like
+        attack on validators. This avoid limiting or \textit{constraining} the
+        language.
+
+\end{description}
 
 
 \begin{figure}[H]
