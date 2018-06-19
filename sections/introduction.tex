@@ -46,10 +46,11 @@ contain an identifiers for their parent block (as well as other metadata). Each
 client maintains a set of blocks it knows about, which need not form a chain
 (i.e., there may be multiple blocks with the same parent, constituting a
 \textit{fork}). A \textit{scoring function} is used to select the best chain.
-The nature of this scoring function is such as to ensure that, with a high
-degree of probability, participants will converge on the same chain, even in
-the presence of (some amount of) network latency, network partitions, and
-malicious behaviour.
+Separately or as part of the scoring function, chains containing invalid
+transactions are removed. The nature of this scoring function is such as to
+ensure that, with a high degree of probability, participants will converge on
+the same chain, even in the presence of (some amount of) network latency,
+network partitions, and malicious behaviour.
 
 Already with Bitcoin Script--the stack-based language
 defined by Bitcoin's protocol for describing ownership rights to a
@@ -59,7 +60,11 @@ strings which consistute the log or ledger, but as a list of string that
 determined in an agreed-upon way a semantically significant \textit{state}.
 Since mostly blockchain technology has been used as a digital currency, this
 state usually represents the ownership of designated coins, or in an
-alternative formulation, the balances of individual accounts.
+alternative formulation, the balances of individual accounts. Accordingly,
+transactions usually represent transfers from one account to another, and are
+considered invalid if the person making the transfer is not authorized to do so
+(e.g. if she does not own the account, or if the transfer amount is greater
+than the amount in the account).
 
 % As part of the consensus process, \textit{validators} evaluate the transactions
 % (subprograms of the relevant programming language) in order to calculate the
