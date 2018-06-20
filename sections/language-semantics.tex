@@ -1,4 +1,5 @@
 \section{Language Syntax and Semantics}
+\label{s:language}
 
 \rad is a a Lisp dialect. It uses prefix parenthesized function application,
 supports recursion, has first-class functions, is dynamically typed, and
@@ -8,13 +9,13 @@ Like most Lisps, binding is lexical. Unlike most Lisps, \rad has a
 \textit{hyperstatic} global environment, meaning that the resolution of free
 variables takes place at the definition site rather than call-site. Thus:
 
-\begin{lstlisting}[language=Lisp, basicstyle=\small\ttfamily]
+\begin{verbatim}
 (define (foo) x) ;; error - "x" is not defined
 (define x 3)
 (foo) ;; 3
 (define x 5)
 (foo) ;; still 3
-\end{lstlisting}
+\end{verbatim}
 
 Usually \rad programs are an interleaving of code written by multiple people,
 and each developer cannot in general be certain of what code will end up in the
@@ -26,10 +27,10 @@ independent of intermediate submissions.
 \rad does not have macros. Instead, it allows for a complete redefinition of
 the intepreter via redefinitions of \texttt{eval}.
 
-\begin{lstlisting}[basicstyle=\small\ttfamily]
+\begin{verbatim}
 (define (eval expr) 3) ;;
 5 ;; --> 3
-\end{lstlisting}
+\end{verbatim}
 
 This enables users to very easily define sublanguages for new chains, or amend
 the language running in the current one.
