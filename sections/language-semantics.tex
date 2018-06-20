@@ -50,17 +50,18 @@ computations, and at the same time be a useful language for scripting
 interactions with chains, \rad keeps a separate, \textit{impure} environment,
 $\rho_{!}$ (these are by convention textually distinguished by identifiers
 ending with an exclamation mark). Expressions on chain therefore cannot have
-side-effects; instead, they may evaluate to a value that describes an effect,
+side-effects; instead, they may evaluate to a value that \textit{describes} an effect,
 but the decision of whether or how to actually carry on that effect happens at
 effect-handling layer. This architecture, with a central authority
 administering effects received via messages, resembles work following
 \cite{Cartwright1994} and \cite{Bauer2003}.
 
+
 \begin{figure}[H]
 \begin{tikzpicture}[node distance = 4cm, auto]
   \node [block] (net) {Network};
   \node [block, below of=net] (repl) {REPL};
-  \node [block, left of=repl] (impure) {impure central authority};
+  \node [block, left of=repl] (impure) {effect handler};
   \node [block, below of=impure] (pure) {pure evaluation};
   \node [block, above of=impure] (file) {File};
 
@@ -85,6 +86,35 @@ administering effects received via messages, resembles work following
 \end{tikzpicture}
 \caption{Effect system}
 \label{f:effects}
+\end{figure}
+
+The value that results from evaluating an expression purely may, in addition to
+\textit{describing} an effect, pass a continuation with the result of that
+effect (if any). The effect-handling layer can chose to only call continuations
+without arguments. This in turn means the continuation will not have access to
+the result of effectful computations, though it may (at the discretion of the
+effect-handling layers) have output effects.
+
+\begin{figure}[H]
+\begin{verbatim}
+
+(define repl
+  (sorted-map
+    name "repl"
+    getter (quote (get-line!))))
+
+(subscribe-to! repl
+  (lambda (x)
+    (print! (default-impure-handler! x))))
+
+\end{verbatim}
+    \caption{A simple effect handler. The function \texttt{subscribe-to!}
+    repeatedly calls the \texttt{getter} key of its first argument, handling
+    effects with its second argument. \texttt{default-impure-handler!} handles
+    effects by calling the impure function corresponding to the effect tag. If
+    we remove it, keeping only \texttt{(print! x)}, we would see printed in the
+    console the value that describes an effect only.}
+\label{f:eff-handler}
 \end{figure}
 
 A further advantage of this approach is that, since on many blockchain

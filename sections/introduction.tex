@@ -52,6 +52,71 @@ ensure that, with a high degree of probability, participants will converge on
 the same chain, even in the presence of (some amount of) network latency,
 network partitions, and malicious behaviour.
 
+
+\begin{figure}[H]
+    \begin{tikzpicture}[node distance = 3cm]
+    \node[rectangle split, rectangle split parts=3, draw](block1){
+        Block $n$
+        \nodepart{two}
+        \begin{tabular}{c}
+        parent: block $n-1$ \\
+        hash: e742b...
+        \end{tabular}
+        \nodepart{three}
+        \begin{tabular}{c}
+        $tx_1$ \\
+        $tx_2$
+        \end{tabular}
+    };
+    \node[rectangle split, rectangle split parts=3, draw, below of=block1](block2){
+        Block $n+1$
+        \nodepart{two}
+        \begin{tabular}{c}
+        parent: e742b... \\
+        hash: 9df3e...
+        \end{tabular}
+        \nodepart{three}
+        \begin{tabular}{c}
+        $tx_{3a}$ \\
+        $tx_{4a}$
+        \end{tabular}
+    };
+    \node[rectangle split, rectangle split parts=3, draw, right of=block2](block3){
+        Block $n+1$
+        \nodepart{two}
+        \begin{tabular}{c}
+        parent: e742b... \\
+        hash: a7de82...
+        \end{tabular}
+        \nodepart{three}
+        \begin{tabular}{c}
+        $tx_{3b}$ \\
+        $tx_{4b}$
+        \end{tabular}
+    };
+    \node[rectangle split, rectangle split parts=3, draw, below of=block3](block4){
+        Block $n+2$
+        \nodepart{two}
+        \begin{tabular}{c}
+        parent: a7de82.. \\
+        hash: 29fe11..
+        \end{tabular}
+        \nodepart{three}
+        \begin{tabular}{c}
+        $tx_5$ \\
+        $tx_6$
+        \end{tabular}
+    };
+
+    \path[line] (block2) -- (block1);
+    \path[line] (block3) -- (block1);
+    \path[line] (block4) -- (block3);
+\end{tikzpicture}
+\caption{Scoring function selects longest chain. Program is thus $tx_1$,
+    $tx_2$, $tx_3b$, $tx_4b$, $tx_5$, $tx_6$ }
+\label{f:denotationalsem0}
+\end{figure}
+
 Already with Bitcoin Script--the stack-based language
 defined by Bitcoin's protocol for describing ownership rights to a
 Bitcoin--programming languages were seen to be the means of establishing what
@@ -100,6 +165,25 @@ A natural extension of this trend is to free blockchain programming from the
 notion of ownership completely, and see it for what it is: a distributed and
 interactive program.
 
+
+\begin{figure}[H]
+\begin{tabular}{| l | l | l |}
+\hline
+Version Control & Blockchain     & Language  \\ \hline
+    Patch/Diff  & Transaction    & Declaration\footnote{\rad makes no
+    distinctions between declarations and expressions, and so for the purposes
+    of this paper one may consider this cell to be filled with ``Expression''}\\
+Branch/Fork     & Fork           & ...  \\
+Snapshot        & State          & Memory + Env \\
+\hline
+\end{tabular}
+\label{f:correspondences}
+\caption{Correspondences ...}
+\end{figure}
+
+Doing so allows a wide variety of applications to be seen as particular types
+of programs. Figure \ref{f:correspondences} shows some examples.
+
 Even if we make no assumption about the application of such a program (such as
 ownership and transaction), certain considerations about the nature of
 blockchain programming are important for the design of a general-purpose
@@ -117,23 +201,12 @@ blockchain language.
       to the chain, and all validators evaluate it, both Bitcoin and Ethereum
         have mechanisms to prevent expressions requiring too much (even
         infinite) computation, which would represent a denial-of-service like
-        attack on validators. This avoid limiting or \textit{constraining} the
-        language.
+        attack on validators. This aspect of both langugages--namely, Turing
+        incompleteness--is important in a permisionless setting. However,
+        predictable and limited computational cost is only one of the possible
+        guarantees we may want from a blockchain programming language. (Indeed,
+        both languages also enforce another constraint: that no one spend coins
+        they do not have.) Others might include: only allowing expressions
+        signed by certain people; ... .
 
 \end{description}
-
-
-\begin{figure}[H]
-\begin{tabular}{| l | l | l |}
-\hline
-Version Control & Blockchain     & Language  \\ \hline
-    Patch/Diff  & Transaction    & Declaration\footnote{\rad makes no
-    distinctions between declarations and expressions, and so for the purposes
-    of this paper one may consider this cell to be filled with ``Expression''}\\
-Branch/Fork     & Fork           & ...  \\
-Snapshot        & State          & Memory + Env \\
-\hline
-\end{tabular}
-\label{correspondences}
-\caption{Correspondences ...}
-\end{figure}
