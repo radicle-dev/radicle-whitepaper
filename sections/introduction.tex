@@ -1,14 +1,63 @@
 \section{Introduction}
 \label{s:introduction}
 
+% Replicated state machines. Examples (Paxos, blockchains, etc.). It's purpose
+% and constraints
+
+% Variety of applications. Is there a unifying abstraction? Needs to be
+% deterministic, but aside from that, a DSL-language.
+
+% Mention radicle.
+
+% Allows for updates that benefit from the same consistency guarantees as the
+% operations themselves. Helps solve the problem of software updates in Paxos
+% etc, and a more powerful form of self-amendment in blockchains. [Note that
+% perfomance gains in the compiler/interpreter must happen differently, though
+% separating changes that can be semantic from those that are not helps.]
+
+% Effect system. Separating out impurity. In the case of blockchains, clients
+% are *also* programmable, without sacrificing consensus.
+
+% outline.
+% Section 2) Some examples: an upgradable key-value store. A version of nomic.
+% Section 3) Formal description of language.
+
+Replicated state machines are a widely used paradigm to program fault-tolerant
+systems. The paradigm involves deploying a deterministic state machine across
+multiple nodes (servers); these nodes can respond to client requests, and by
+agreeing on the order of these requests (consensus), ensure agreement on their
+state and output. If some fraction of nodes is unavailable (or in the looser
+requirement of blockchains, if they are malicious), the overall system can
+still function correctly.
+
+The service these systems replicate may be key-value stores, file-systems,
+append-only logs, account balances, code repositories, etc. Each of these
+services is often re-implemented anew, leading to substantial development
+costs, as well as to subtle bugs in the interim state of the system during the
+inevitable software upgrades. In this paper, we describe a language, \rad, for
+defining the behaviour of replicated state machines independently of the
+underlying consensus. The language is designed to easily allow definition of
+new domain-specific languages (DSLs) for the services provided by the system.
+
+Additionally, using the same mechanism for DSL-definition (namely, a
+\textit{reflective tower}), we provide a way for upgrading the DSL itself
+\textit{with the same guarantees of agreement} between nodes as the underlying
+consensus, dramatically reducing the coordination difficulty of an upgrade.
+
+
 Blockchains are being used with increasing frequency, and for increasingly
 diverse purposes. This had led to scaling concerns, as clients must keep
-abreast of a large number of transactions, many of which are will not be
-directly relevant to them. There are several protocol-level efforts to assuage
-these concerns. The \oscoin{} architecture, however, emphasizes an additional,
-\textit{semantic} level of separation. Rather than a single chain, \oscoin{}
+abreast of (download and verify) all transactions, many of which are will not be
+directly relevant to them.  There are several protocol-level efforts to assuage
+these concerns. Sharding, channels, side-chains, three examples of such
+efforts, work by (in restricted contexts) loosening the requirement that all
+transactions must take place in a single chain.
+
+\oscoin{}, an on-going effort to develop a community-owned
+platform for open-source collaboration and incentivization, has a more
+distinctly \textit{semantic} approach to splitting blockchains.  \oscoin{}
 allows for an indefinite number of different chains, each serving different
-purposes -- such as keeping track of a particular repository, of the outcome of
+purposes--such as keeping track of a particular repository, of the outcome of
 a vote, or of global financial transactions. In general, participants need not
 sync chains which are not of interest to them, saving considerable space,
 computation, and network usage.
@@ -19,7 +68,7 @@ optimize syntax and semantics for those use-cases. In essence, we want
 \textit{domain-specific languages for domain-specific chains}. The language
 described in this paper, \rad, is designed to easily allow the definition of
 such domain-specific languages (DSLs). Moreover, the very same mechanism used to
-facilitate such definitions - a \textit{reflective tower} - also
+facilitate such definitions--a \textit{reflective tower}--also
 allows for redefining the semantics of a single chain, enabling a more
 principled and first-class version of the self-amendment pioneered by
 Tezos.\cite{Goodman2014} The existence of a single language in which such DSLs
@@ -178,7 +227,7 @@ Snapshot        & State          & Memory + Env \\
 \hline
 \end{tabular}
 \label{f:correspondences}
-\caption{Correspondences ...}
+\caption{}
 \end{figure}
 
 Doing so allows a wide variety of applications to be seen as particular types
@@ -207,10 +256,24 @@ blockchain language.
         guarantees we may want from a blockchain programming language. (Indeed,
         both languages also enforce another constraint: that no one spend coins
         they do not have.) Others might include: only allowing expressions
-        signed by certain people; ... .
+        signed by certain people (permissioned chain); only allowing
+        expressions that correspond to valid patches to a code repository
+        (DVCS); only allowing one expression per person (for voting), etc.
+
+  \item [Amendability] Since chains are programs that are
+      incrementally evaluated over a possibly quite long period of time, during
+        which time the limitations of the programming language may become
+        apparent, we would like to be able to update the programming language
+        itself \textit{within a running program, and without threatening
+        consensus}.
 
 \end{description}
 
+\rad addresses the constrainability and amendability desiderata uniformly, by
+\textit{reifying evaluation}. That is, changes to the language can be expressed
+in the language itself, allowing it to both be constrained for special
+purpose chains, and updated in a chain (whenever the conditions expressed in
+the program itself for doing so--such as a majority vote--are met).
 
 Section \ref{s:language} describes in more detail \rad the language. Section
 \ref{s:examples} demonstrates how \rad may be used to define domain-specific
