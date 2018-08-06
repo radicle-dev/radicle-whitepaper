@@ -31,250 +31,40 @@ requirement of blockchains, if they are malicious), the overall system can
 still function correctly.
 
 The service these systems replicate may be key-value stores, file-systems,
-append-only logs, account balances, code repositories, etc. Each of these
+append-only logs, account balances, etc. Each of these
 services is often re-implemented anew, leading to substantial development
 costs, as well as to subtle bugs in the interim state of the system during the
 inevitable software upgrades. In this paper, we describe a language, \rad, for
-defining the behaviour of replicated state machines independently of the
+defining the behaviour of replicated state machines (RSMs) independently of the
 underlying consensus. The language is designed to easily allow definition of
 new domain-specific languages (DSLs) for the services provided by the system.
+Each such DSL is the definition of an RSM. The expressions of the DSL
+are the RSMs inputs; the value such an expression evaluates to its outputs; and
+the changes in the environment its state changes.
 
 Additionally, using the same mechanism for DSL-definition (namely, a
 \textit{reflective tower}), we provide a way for upgrading the DSL itself
 \textit{with the same guarantees of agreement} between nodes as the underlying
-consensus, dramatically reducing the coordination difficulty of an upgrade.
+consensus, reducing the coordination difficulty of an upgrade. DSL
+\textit{re}-definitions are themselves just another input to the RSM; thus
+nodes will agree on the ordering of the upgrade with respect to other inputs,
+and will not go out of sync as a consequence of update.
 
+While (crucially for the purpose of ensuring consensus) the core of language is
+deterministic, \rad also possesses an additional set of primitive operations
+that allow side-effect. We show how a publish-subscribe model for side-effects
+(or in the formalism of \cite{Cartwright1994}, a effect-handling central which
+is never provided continuations) allows responding to outputs of the state
+machine or state changes in a non-deterministic way, without endangering the
+determism of the state machine itself. This in turn makes the separation
+between reads and writes correct by construction.
 
-Blockchains are being used with increasing frequency, and for increasingly
-diverse purposes. This had led to scaling concerns, as clients must keep
-abreast of (download and verify) all transactions, many of which are will not be
-directly relevant to them.  There are several protocol-level efforts to assuage
-these concerns. Sharding, channels, side-chains, three examples of such
-efforts, work by (in restricted contexts) loosening the requirement that all
-transactions must take place in a single chain.
+\rad has been developed in the context of a broader effort to create a
+community-owned platform for open-source development (\oscoin{}), which
+includes a consensus algorithm and a networking component. We do not in this
+paper further discuss this broader system.
 
-\oscoin{}, an on-going effort to develop a community-owned
-platform for open-source collaboration and incentivization, has a more
-distinctly \textit{semantic} approach to splitting blockchains.  \oscoin{}
-allows for an indefinite number of different chains, each serving different
-purposes--such as keeping track of a particular repository, of the outcome of
-a vote, or of global financial transactions. In general, participants need not
-sync chains which are not of interest to them, saving considerable space,
-computation, and network usage.
-
-Since the purpose of chains may thus be quite specific, we would like to be
-able to precisely specify what sorts of transactions are allowed on it, and to
-optimize syntax and semantics for those use-cases. In essence, we want
-\textit{domain-specific languages for domain-specific chains}. The language
-described in this paper, \rad, is designed to easily allow the definition of
-such domain-specific languages (DSLs). Moreover, the very same mechanism used to
-facilitate such definitions--a \textit{reflective tower}--also
-allows for redefining the semantics of a single chain, enabling a more
-principled and first-class version of the self-amendment pioneered by
-Tezos.\cite{Goodman2014} The existence of a single language in which such DSLs
-are defined \textit{on-chain} also ensures that there is no need for
-out-of-band communication, making it trivial to agree upon the semantics of
-these DSLs.
-
-In addition to being a language for on-chain programming, \rad is also a
-scripting language that can be used to script local interactions with the
-chain. Indeed, chains, scripts, and REPL interactions are conceived of
-uniformly. This in turn allows quite novel possibilities; one can for
-example describe on one chain how a server should respond to updates of another
-chain, so that redeployments to that server become as simple as submitting new
-transactions to the server-chain.
-
-\subsection{Context}
-
-Satoshi Nakamoto's Bitcoin introduced a practical digital currency with no
-centralized backing.\cite{Nakamoto2008} This was enabled by a system for
-distributed consensus known as a blockchain. In essence, a blockchain is a
-distributed log of \textit{transactions}. Transactions are grouped into
-\textit{blocks}, which in addition to the ordered list of transactions
-contain an identifiers for their parent block (as well as other metadata). Each
-client maintains a set of blocks it knows about, which need not form a chain
-(i.e., there may be multiple blocks with the same parent, constituting a
-\textit{fork}). A \textit{scoring function} is used to select the best chain.
-Separately or as part of the scoring function, chains containing invalid
-transactions are removed. The nature of this scoring function is such as to
-ensure that, with a high degree of probability, participants will converge on
-the same chain, even in the presence of (some amount of) network latency,
-network partitions, and malicious behaviour.
-
-
-\begin{figure}[H]
-    \begin{tikzpicture}[node distance = 3cm]
-    \node[rectangle split, rectangle split parts=3, draw](block1){
-        Block $n$
-        \nodepart{two}
-        \begin{tabular}{c}
-        parent: block $n-1$ \\
-        hash: e742b...
-        \end{tabular}
-        \nodepart{three}
-        \begin{tabular}{c}
-        $tx_1$ \\
-        $tx_2$
-        \end{tabular}
-    };
-    \node[rectangle split, rectangle split parts=3, draw, below of=block1](block2){
-        Block $n+1$
-        \nodepart{two}
-        \begin{tabular}{c}
-        parent: e742b... \\
-        hash: 9df3e...
-        \end{tabular}
-        \nodepart{three}
-        \begin{tabular}{c}
-        $tx_{3a}$ \\
-        $tx_{4a}$
-        \end{tabular}
-    };
-    \node[rectangle split, rectangle split parts=3, draw, right of=block2](block3){
-        Block $n+1$
-        \nodepart{two}
-        \begin{tabular}{c}
-        parent: e742b... \\
-        hash: a7de82...
-        \end{tabular}
-        \nodepart{three}
-        \begin{tabular}{c}
-        $tx_{3b}$ \\
-        $tx_{4b}$
-        \end{tabular}
-    };
-    \node[rectangle split, rectangle split parts=3, draw, below of=block3](block4){
-        Block $n+2$
-        \nodepart{two}
-        \begin{tabular}{c}
-        parent: a7de82.. \\
-        hash: 29fe11..
-        \end{tabular}
-        \nodepart{three}
-        \begin{tabular}{c}
-        $tx_5$ \\
-        $tx_6$
-        \end{tabular}
-    };
-
-    \path[line] (block2) -- (block1);
-    \path[line] (block3) -- (block1);
-    \path[line] (block4) -- (block3);
-\end{tikzpicture}
-\caption{Scoring function selects longest chain. Program is thus $tx_1$,
-    $tx_2$, $tx_{3b}$, $tx_{4b}$, $tx_5$, $tx_6$ }
-\label{f:denotationalsem0}
-\end{figure}
-
-Already with Bitcoin Script--the stack-based language
-defined by Bitcoin's protocol for describing ownership rights to a
-Bitcoin--programming languages were seen to be the means of establishing what
-consensus was \textit{about}; not, that is, just a semantically opaque list of
-strings which consistute the log or ledger, but as a list of string that
-determined in an agreed-upon way a semantically significant \textit{state}.
-Since mostly blockchain technology has been used as a digital currency, this
-state usually represents the ownership of designated coins, or in an
-alternative formulation, the balances of individual accounts. Accordingly,
-transactions usually represent transfers from one account to another, and are
-considered invalid if the person making the transfer is not authorized to do so
-(e.g. if she does not own the account, or if the transfer amount is greater
-than the amount in the account).
-
-% As part of the consensus process, \textit{validators} evaluate the transactions
-% (subprograms of the relevant programming language) in order to calculate the
-% resulting state and determine if both the transactions, and the \textit{blocks}
-% into which they are organized, are valid.\footnote{There is no fundamental
-% reason that evaluation and validation need be so intertwined. In theory,
-% validation could be simply succesful typechecking of a total language, for
-% example; evaluation would then be an extra step not influencing validity.
-% However, it is hard to see what the benefits of such a system would be.} Blocks
-% relate to one another by explicitly declaring their predecessor, thus
-% constituting a \textit{chain}; if
-% multiple valid blocks exist with the same predecessor or parent (this constitutes a
-% \textit{fork}), clients such as validators adopt by convention a rule for
-% determining which set of blocks to consider canonical. These rules are designed
-% to ensure that, with a high degree of probability, clients will converge on the
-% same chain. Seen from another perspective, clients will
-% converge on what \textit{program} they run.
-
-% TODO: The ordering of these paragraphs isn't great.
-
-Later cryptocurrencies such as Ethereum emphasized more powerful programming
-languages. This in turn made clear that distributed consensus about program
-source had applications that were much broader than simple exchanges. Still,
-such applications were built on top of a model that focused on accounts,
-balances, and transactions, limiting the ease with which such alternative
-applications could be developed.
-
-
-
-\subsection{\rad: Motivation and Desiderata}
-
-A natural extension of this trend is to free blockchain programming from the
-notion of ownership completely, and see it for what it is: a distributed and
-interactive program.
-
-
-\begin{figure}[H]
-\begin{tabular}{| l | l | l |}
-\hline
-Version Control & Blockchain     & Language  \\ \hline
-    Patch/Diff  & Transaction    & Declaration\footnote{\rad makes no
-    distinctions between declarations and expressions, and so for the purposes
-    of this paper one may consider this cell to be filled with ``Expression''}\\
-Branch/Fork     & Fork           & ...  \\
-Snapshot        & State          & Memory + Env \\
-\hline
-\end{tabular}
-\label{f:correspondences}
-\caption{}
-\end{figure}
-
-Doing so allows a wide variety of applications to be seen as particular types
-of programs. Figure \ref{f:correspondences} shows some examples.
-
-Even if we make no assumption about the application of such a program (such as
-ownership and transaction), certain considerations about the nature of
-blockchain programming are important for the design of a general-purpose
-blockchain language.
-
-\begin{description}
-  \item [Purity] First, in order for consensus to be achievable, there must be
-      agreement among participants on the meaning and validity of blocks and
-        transactions. Seen from the perspective of programming languages, the
-        meaning of an expression or declaration must be the same for all users.
-        This leads naturally to a \textit{pure} programming language - one
-        which side-effects are disallowed.
-
-  \item [Constrainability] Since anyone may submit an expression or transaction
-      to the chain, and all validators evaluate it, both Bitcoin and Ethereum
-        have mechanisms to prevent expressions requiring too much (even
-        infinite) computation, which would represent a denial-of-service like
-        attack on validators. This aspect of both langugages--namely, Turing
-        incompleteness--is important in a permisionless setting. However,
-        predictable and limited computational cost is only one of the possible
-        guarantees we may want from a blockchain programming language. (Indeed,
-        both languages also enforce another constraint: that no one spend coins
-        they do not have.) Others might include: only allowing expressions
-        signed by certain people (permissioned chain); only allowing
-        expressions that correspond to valid patches to a code repository
-        (DVCS); only allowing one expression per person (for voting), etc.
-
-  \item [Amendability] Since chains are programs that are
-      incrementally evaluated over a possibly quite long period of time, during
-        which time the limitations of the programming language may become
-        apparent, we would like to be able to update the programming language
-        itself \textit{within a running program, and without threatening
-        consensus}.
-
-\end{description}
-
-\rad addresses the constrainability and amendability desiderata uniformly, by
-\textit{reifying evaluation}. That is, changes to the language can be expressed
-in the language itself, allowing it to both be constrained for special
-purpose chains, and updated in a chain (whenever the conditions expressed in
-the program itself for doing so--such as a majority vote--are met).
-
-Section \ref{s:language} describes in more detail \rad the language. Section
-\ref{s:examples} demonstrates how \rad may be used to define domain-specific
-chains and in interactions with these chains.
+In the rest of the paper, we show some example applications built with
+\rad--first, an upgradable key-value store, and then more ambitiously, a game
+of Nomic (Section \ref{s:examples}). We then describe the language in more
+detail (Section \ref{s:language}), and compare it to other technologies.

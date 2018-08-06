@@ -10,17 +10,18 @@ Like most Lisps, binding is lexical. Unlike most Lisps, \rad has a
 variables takes place at the definition site rather than call-site. Thus:
 
 \begin{verbatim}
-(define (foo) x) ;; error - "x" is not defined
+(define foo x) ;; error - "x" is not defined
 (define x 3)
 (foo) ;; 3
 (define x 5)
 (foo) ;; still 3
 \end{verbatim}
 
-Usually \rad programs are an interleaving of code written by multiple people,
-and each developer cannot in general be certain of what code will end up in the
-program between the text that she knows about and her new submission. A
-hyperstatic environment ameliorates the resulting unpredictability by making
+Programs can be viewed as the ledger of inputs to the replicate state machine.
+Thus, \rad programs are usually an interleaving of code written by multiple
+people, and each developer cannot in general be certain of what code will end
+up in the program between the text that she knows about and her new submission.
+A hyperstatic environment ameliorates the resulting unpredictability by making
 function calls by default (i.e., modulo the usage of mutable references)
 independent of intermediate submissions.
 
@@ -28,12 +29,37 @@ independent of intermediate submissions.
 the intepreter via redefinitions of \texttt{eval}.
 
 \begin{verbatim}
-(define (eval expr) 3) ;;
+(define eval (lambda (expr) 3)) ;;
 5 ;; --> 3
 \end{verbatim}
 
 This enables users to very easily define sublanguages for new chains, or amend
-the language running in the current one.
+the language running in the current one. A simplistic key-value store may thus
+be defined in only a few lines of code:
+
+\begin{verbatim}
+(define eval (lambda (expr)
+  (define store (dict))
+  (if (eq? (head expr) 'get)
+      (lookup (head (tail expr)) store)
+  (if (eq? (head expr) 'set)
+      (insert (head (tail expr))
+              (head (tail (tail expr))) store)
+      'invalid-command))))
+
+\end{verbatim}
+
+After which we have:
+
+\begin{verbatim}
+(set key1 3) ;; => ()
+(get key1) ;; => 3
+(+ 3 2) ;; => 'invalid-command
+
+;; Nested expressions are not evaluated:
+(set key2 (+ 3 2)) ;; => ()
+(get key2) ;; => '(+ 3 2)
+\end{verbatim}
 
 % TODO: maybe move to Related Work section
 \subsection{Connection to Reflective Towers} The \texttt{eval}-redefinition
@@ -43,8 +69,18 @@ a level $L_n$ is interpreted by $L_{n+1}$. Reflective towers allow both
 \textit{reification} - the ability to inspect a computation via constructs of a
 higher level - and \textit{reflection} - the ability to define and enter new,
 lower levels. Conceptually, \rad differs from reflective towers by only
-allowing reflection. You can dig a hole, but don't expect to find an elevator
-out of it.
+allowing reflection. Thus, the only levels that exist are the ones programs
+create. Queinnec has quipped that reflective languages ``plunge us into a world
+with few laws, and hardly any gravity''\cite{Queinnec1994}; the more disciplined approach to
+reflection that \rad takes does not possess the semantic fragility as modifying
+meta-meta-intepreters.
+
+The techniques that have been developed for reducing the interpretive overhead
+of such towers of interpreters, however, still
+apply (see, for example, \cite{Amin2017}, \cite{Asai2014}), as do simpler
+partial-evaluation-based approaches such as \cite{Brown2017}.
+
+
 
 \subsection{Effects} In order to maintain determinism and safety in on-chain
 computations, and at the same time be a useful language for scripting
@@ -126,15 +162,10 @@ description of effects before passing them to the effect-handling layer.
 
 \subsection{Data types} \rad's data types are: booleans (\texttt{\#t} and
 \texttt{\#f}); strings (a sequence of characters within double quotes, with
-\texttt{\textbackslash} as the escape character), symbols, lists, and numbers
-(currently only arbitrary-precision decimals). These datatypes are all
-immutable; additionally \rad supports \textit{refs} - mutable references - that
-can hold any other datatype. Refs support a similar set of operations to
-Clojure's atoms; however, they are not shareable across threads, and can be
-interpreted as a pure state transformer.\footnote{The reference implementation
-of \rad in fact uses Haskell's \texttt{STRef}s to implement refs, which in turn
-use a by now well-known rank-2 type encapsulation to guarantee the property of
-not being shareable across threads.\cite{lazy-functional-state-threads}}
+\texttt{\textbackslash} as the escape character), symbols, lists, dictionaries
+(maps), and numbers (currently only arbitrary-precision decimals). These
+datatypes are all immutable; additionally \rad supports \textit{refs}--mutable
+references--that can hold any other datatype.
 
 \subsection{Syntax}
 
@@ -144,16 +175,30 @@ recursively. The base case, $\mathcal{E}_{0}$, describes the denotation of a
 term prior to any modification of \texttt{eval}. It's definition is given in
 Figure \ref{f:denotationalsem0}.
 
+\begin{figure}[H]
+\begin{align*}
+    Environment [\env] &= Identifier \rightarrow Value \\
+    Memory [\mem] &= Value \rightarrow Value \\
+    Value [\val] &= Address + Function + Boolean ... \\
+    Continuation [\cont] &= Value \times Memory \rightarrow Value \\
+    Function [\phi] &= Value* \times Continuation \times Memory \rightarrow Value
+\end{align*}
+\label{f:denotationalsemleged}
+\end{figure}
 
 \begin{figure}[H]
 \begin{align*}
-  \denotationdesc{0}{\variable}{\env \variable} \\
+    \denotationdesc{0}{\variable}{(\cont (\env \variable) \mem)} \\
   \denotationdesc{0}{(\lam (\variable *) \rho^{+})}{} \\
-  \denotationdesc{0}{(\define \variable \pi )}{} \\
-  \denotationdesc{0}{(\deref \variable  )}{} \\
+    \denotationdesc{0}{(\define \variable \pi )}{} \\
+    \denotationdesc{0}{(\deref \variable  )}{\cont (\mem (\texttt{toAddress}(\env \variable)))) \mem} \\
   \denotationdesc{0}{(\mkref \variable \pi)}{} \\
   \denotationdesc{0}{(\set \variable \pi)}{} \\
-  \denotationdesc{0}{(\ifm \pi_0 \pi_1 \pi_2)}{}
+  \denotationdesc{0}{(\ifm \pi_0 \pi_1 \pi_2)}{\denotation{0}{\pi_0}\env
+    \lambda \val \mem_1 .(\text{if } \val  \\
+    \text{then } \denotation{0}{\pi_1}  \\
+    \text{else } \denotation{0}{\pi_2} \\
+    \text{endif } \env \cont \mem_1)  \mem ) }
 \end{align*}
 \caption{Denotational semantics for $\mathcal{E}_{0}$}
 \label{f:denotationalsem0}
@@ -165,7 +210,7 @@ denotation of \texttt{eval} prior to the redefinition, applied to the
 
 \begin{figure}[H]
 \begin{align*}
-  \denotationdesc{n}{\pi}{(\denotation{n-1}{\evalm} (\quotem \pi))\rho}
+  \denotationdesc{n}{\pi}{(\denotation{n-1}{\evalm} (\quotem \pi))\env\cont\mem}
 \end{align*}
 \caption{Denotational semantics for $\mathcal{E}_{n}$}
 \label{f:denotationalsemn}

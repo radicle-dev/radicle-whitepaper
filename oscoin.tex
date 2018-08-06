@@ -77,10 +77,13 @@
 \newcommand{\tree}{\mathcal{C}}
 \newcommand{\op}{T}
 \newcommand{\env}{\rho}
+\newcommand{\cont}{\kappa}
+\newcommand{\mem}{\sigma}
+\newcommand{\val}{\epsilon}
 \newcommand{\denotation}[2]{
     \ensuremath{\mathcal{E}_{#1} \llbracket #2 \rrbracket }}
 \newcommand{\denotationdesc}[3]{
-    \ensuremath{\mathcal{E}_{#1} \llbracket #2 \rrbracket \env &= #3  }}
+    \ensuremath{\mathcal{E}_{#1} \llbracket #2 \rrbracket \env \cont \mem &= #3  }}
 \newcommand{\variable}{\nu}
 \newcommand{\prog}{\pi}
 \newcommand{\rad}{\textsc{Radicle} }
@@ -149,7 +152,6 @@
 \begin{multicols}{2}
 
 \input{sections/introduction.tex}
-\input{sections/core-architecture.tex}
 \input{sections/language-semantics.tex}
 \input{sections/radicle-examples.tex}
 
