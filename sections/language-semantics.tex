@@ -12,6 +12,7 @@ variables takes place at the definition site rather than call-site. Thus:
 \begin{verbatim}
 (define foo x) ;; error - "x" is not defined
 (define x 3)
+(define foo x)
 (foo) ;; 3
 (define x 5)
 (foo) ;; still 3
@@ -37,17 +38,22 @@ This enables users to very easily define sublanguages for new chains, or amend
 the language running in the current one. A simplistic key-value store may thus
 be defined in only a few lines of code:
 
-\begin{verbatim}
-(define eval (lambda (expr)
-  (define store (dict))
-  (if (eq? (head expr) 'get)
-      (lookup (head (tail expr)) store)
-  (if (eq? (head expr) 'set)
-      (insert (head (tail expr))
-              (head (tail (tail expr))) store)
-      'invalid-command))))
+\begin{lstlisting}
+(define store (ref dict))
 
-\end{verbatim}
+(define eval (lambda (expr)
+  (define s (read-ref store))
+  (if (eq? (head expr) 'get)
+      (lookup (head (tail expr)) s)
+      (if (eq? (head expr) 'set)
+          (modify-map
+            (head (tail expr))
+            (lambda (st)
+                    (head (tail (tail expr))))
+            store)
+          'invalid-command))))
+
+\end{lstlisting}
 
 After which we have:
 
@@ -133,8 +139,7 @@ the result of effectful computations, though it may (at the discretion of the
 effect-handling layers) have output effects.
 
 \begin{figure}[H]
-\begin{verbatim}
-
+\begin{lstlisting}
 (define repl
   (sorted-map
     name "repl"
@@ -143,8 +148,7 @@ effect-handling layers) have output effects.
 (subscribe-to! repl
   (lambda (x)
     (print! (default-impure-handler! x))))
-
-\end{verbatim}
+\end{lstlisting}
     \caption{A simple effect handler. The function \texttt{subscribe-to!}
     repeatedly calls the \texttt{getter} key of its first argument, handling
     effects with its second argument. \texttt{default-impure-handler!} handles

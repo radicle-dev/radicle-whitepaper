@@ -40,7 +40,11 @@ underlying consensus. The language is designed to easily allow definition of
 new domain-specific languages (DSLs) for the services provided by the system.
 Each such DSL is the definition of an RSM. The expressions of the DSL
 are the RSMs inputs; the value such an expression evaluates to its outputs; and
-the changes in the environment its state changes.
+the changes in the environment its state changes. If the RSM we are interested
+in is a ledger of accounts, expressions or inputs may be transfers, the
+state may be the balance and ownership of accounts, and outputs may be the new
+balances of affected accounts or an error message if the transfers are not
+allowed (due to insufficient funds or incorrect permissions).
 
 Additionally, using the same mechanism for DSL-definition (namely, a
 \textit{reflective tower}), we provide a way for upgrading the DSL itself
@@ -61,8 +65,12 @@ between reads and writes correct by construction.
 
 \rad has been developed in the context of a broader effort to create a
 community-owned platform for open-source development (\oscoin{}), which
-includes a consensus algorithm and a networking component. We do not in this
-paper further discuss this broader system.
+includes a consensus algorithm and a networking component. The \oscoin{}
+platform allows users and communities to create permissioned and permissionless
+RSMs with their own semantics, be it to maintain decentralized
+version-controled code, issues, pull requests, or decision-making. \rad is
+oriented towards making that process and simple and clear as possible. We do
+not in this paper further discuss the broader \oscoin{} system.
 
 In the rest of the paper, we show some example applications built with
 \rad--first, an upgradable key-value store, and then more ambitiously, a game
