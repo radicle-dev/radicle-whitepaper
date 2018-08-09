@@ -182,7 +182,7 @@ Figure \ref{f:denotationalsem0}.
 \begin{figure}[H]
 \begin{align*}
     Environment [\env] &= Identifier \rightarrow Value \\
-    Memory [\mem] &= Value \rightarrow Value \\
+    Memory [\mem] &= Address \rightarrow Value \\
     Value [\val] &= Address + Function + Boolean ... \\
     Continuation [\cont] &= Value \times Memory \rightarrow Value \\
     Function [\phi] &= Value* \times Continuation \times Memory \rightarrow Value
@@ -190,19 +190,33 @@ Figure \ref{f:denotationalsem0}.
 \label{f:denotationalsemleged}
 \end{figure}
 
+
 \begin{figure}[H]
 \begin{align*}
     \denotationdesc{0}{\variable}{(\cont (\env \variable) \mem)} \\
-  \denotationdesc{0}{(\lam (\variable *) \rho^{+})}{} \\
-    \denotationdesc{0}{(\define \variable \pi )}{} \\
-    \denotationdesc{0}{(\deref \variable  )}{\cont (\mem (\texttt{toAddress}(\env \variable)))) \mem} \\
-  \denotationdesc{0}{(\mkref \variable \pi)}{} \\
-  \denotationdesc{0}{(\set \variable \pi)}{} \\
-  \denotationdesc{0}{(\ifm \pi_0 \pi_1 \pi_2)}{\denotation{0}{\pi_0}\env
+    \denotationdesc{0}{(\lam (\variable *)\: \pi^{+})}{
+      \cont (\lambda \val * \cont_1 \mem_1 . \\
+        \text{if } (\text{length } \variable *) = (\text{length } \val *) \\
+        \text{then } \denotation{0}{\pi^{+}}\env[\variable * \rightarrow} \val * ] \cont_1 \mem_1 \\
+        \text{else } \text{error "Wrong arity"} \\
+        \text{endif } ) \mem ) \\
+    \denotationdesc{0}{(\define \: \variable \: \pi )}{
+      \denotation{0}{\pi}\env \lambda \val
+    } \\
+    \denotationdesc{0}{(\deref \: \variable  )}{\cont (\mem (\texttt{projAddr}(\env \variable)))) \mem} \\
+  \denotationdesc{0}{(\mkref \: \variable \: \pi)}{} \\
+  \denotationdesc{0}{(\writeref \: \variable \: \pi)}{
+      \denotation{0}{\pi} \lambda \val \mem_1 . (\cont \val \mem_1 [(\env
+      \variable) \rightarrow \val]) \mem } \\
+  \denotationdesc{0}{(\ifm \: \pi_0 \: \pi_1 \: \pi_2)}{\denotation{0}{\pi_0}\env
     \lambda \val \mem_1 .(\text{if } \val  \\
     \text{then } \denotation{0}{\pi_1}  \\
     \text{else } \denotation{0}{\pi_2} \\
-    \text{endif } \env \cont \mem_1)  \mem ) }
+    \text{endif } \env \cont \mem_1)  \mem ) } \\
+  \denotationdesc{0}{(\pi \pi+ )}{
+      \denotation{0}{\pi_0}\env \lambda \val \mem_1 . (\denotation{0}{\pi+}
+      \env \cont \mem_1) \mem
+  }
 \end{align*}
 \caption{Denotational semantics for $\mathcal{E}_{0}$}
 \label{f:denotationalsem0}
