@@ -33,11 +33,11 @@ still function correctly.
 The service these systems replicate may be key-value stores, file-systems,
 append-only logs, account balances, etc. Each of these
 services is often re-implemented anew, leading to substantial development
-costs, as well as to subtle bugs in the interim state of the system during the
+costs, as well as subtle bugs in the interim state of the system during the
 inevitable software upgrades. In this paper, we describe a language, \rad, for
 defining the behaviour of replicated state machines (RSMs) independently of the
-underlying consensus. The language is designed to easily allow definition of
-new domain-specific languages (DSLs) for the services provided by the system.
+underlying consensus. The language is designed so that new domain-specific
+languages (DSLs) can easily be defined for each service provided by the system.
 Each such DSL is the definition of an RSM. The expressions of the DSL
 are the RSMs inputs; the value such an expression evaluates to its outputs; and
 the changes in the environment its state changes.
@@ -48,22 +48,23 @@ state may be the balance and ownership of accounts, and outputs may be the new
 balances of affected accounts or an error message if the transfers are not
 allowed (due to insufficient funds or incorrect permissions).
 
-Additionally, using the same mechanism for DSL-definition (namely, a
-\textit{reflective tower}), we provide a way for upgrading the DSL itself
-\textit{with the same guarantees of agreement} between nodes as the underlying
-consensus, reducing the coordination difficulty of an upgrade. DSL
-\textit{re}-definitions are themselves just another input to the RSM; thus
-nodes will agree on the ordering of the upgrade with respect to other inputs,
-and will not go out of sync as a consequence of update.
+Additionally, using the same mechanism as for DSL-definition (namely, a
+\emph{reflective tower}), we provide a way for upgrading the DSL itself
+\emph{with the same guarantees of agreement} between nodes as the underlying
+consensus, reducing the coordination difficulty of an upgrade. DSLs can be
+defined in such a way that \emph{re}-definitions are themselves just one of the
+sorts of inputs RSM accepts; thus nodes will agree on the ordering of the
+upgrade with respect to other inputs, and will not go out of sync as a
+consequence of update.
 
-While (crucially for the purpose of ensuring consensus) the core of language is
-deterministic, \rad also possesses an additional set of primitive operations
-that allow side-effect. We show how a publish-subscribe model for side-effects
-(or in the formalism of \cite{Cartwright1994}, a effect-handling central which
+While (crucially for the purpose of ensuring consensus) the core of the language
+is deterministic, \rad also possesses an additional set of primitive operations
+that allow side-effects. We show how a publish-subscribe model for side-effects
+(or in the formalism of \cite{Cartwright1994}, an effect-handling central which
 is never provided continuations) allows responding to outputs of the state
 machine or state changes in a non-deterministic way, without endangering the
-determism of the state machine itself. This in turn makes the separation
-between reads and writes correct by construction.
+determism of the state machine itself. This in turn makes the separation between
+reads and writes correct by construction.
 
 \rad has been developed in the context of a broader effort to create a
 community-owned platform for open-source development (\oscoin{}), which
@@ -71,10 +72,10 @@ includes a consensus algorithm and a networking component. The \oscoin{}
 platform allows users and communities to create permissioned and permissionless
 RSMs with their own semantics, be it to maintain decentralized
 version-controled code, issues, pull requests, or collective decision-making. \rad is
-oriented towards making that process and simple and clear as possible. We do
+oriented towards making that process as simple and clear as possible. We do
 not in this paper further discuss the broader \oscoin{} system.
 
 In the rest of the paper, we show some example applications built with
-\rad--first, an upgradable key-value store, and then more ambitiously, a game
+\rad---first, an upgradable key-value store, and then more ambitiously, a game
 of Nomic (Section \ref{s:examples}). We then describe the language in more
 detail (Section \ref{s:language}), and compare it to other technologies.
