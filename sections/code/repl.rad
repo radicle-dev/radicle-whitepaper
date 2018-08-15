@@ -1,0 +1,8 @@
+(define repl
+  (sorted-map
+    name "repl"
+    getter (quote (get-line!))))
+
+(subscribe-to! repl
+  (lambda (x)
+    (print! (default-impure-handler! x))))

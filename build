@@ -1,4 +1,0 @@
-#!/bin/sh
-
-mkdir -p out
-latexmk -pdf -jobname=./out/oscoin -interaction=errorstopmode -halt-on-error oscoin.tex

@@ -1,0 +1,13 @@
+(define store (ref dict))
+
+(define eval (lambda (expr)
+  (define s (read-ref store))
+  (if (eq? (head expr) 'get)
+      (lookup (head (tail expr)) s)
+      (if (eq? (head expr) 'set)
+          (modify-map
+            (head (tail expr))
+            (lambda (st)
+                    (head (tail (tail expr))))
+            store)
+          'invalid-command))))

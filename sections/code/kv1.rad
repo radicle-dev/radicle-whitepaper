@@ -1,0 +1,23 @@
+(define password "very secret")
+
+(define eval-ref (ref #f))
+
+(define store (dict))
+
+(define starting-eval (lambda (expr)
+  (define command (head expr))
+
+  (if (eq? command 'get)
+      (lookup (nth 1) store)
+      (if (eq? command 'set)
+          (insert (nth 1 expr))
+                  (nth 2 expr)
+                  store)
+          (if (eq? command 'update)
+              (if (eq? (nth 1 expr) password)
+                  (write-ref eval-ref
+                             (nth 2 expr)))
+                  'invalid-command))))
+
+(define eval (lambda (expr)
+  ((read-ref eval-ref) expr)))
