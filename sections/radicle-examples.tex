@@ -27,5 +27,50 @@ expression with the original \texttt{eval} function, because of the hyperstatic
 environments. Thus, in this case, no tower of interpreters is formed. Instead,
 we are swapping out one eval for another.
 
+\subsection{Updatable state-machine}
+
+Most chains will operate simple state machines with state $S$, inputs $I$ and
+transitions governed by a function
+\[
+t \colon S \times I \to S.
+\]
+
+During the lifetime of the chain, participants may decide to modify the
+state-machine in some way. The target state machine they have in mind is
+specified by states $S'$, inputs $I'$ and transition function $t' \colon S'
+\times I' \to S'$. In order for the old-state to be preserved they must also
+choose a way to map the old state into the new format, with a function $f \colon
+S \to S'$.
+
+In order to acheive this, we define a chain that accepts two sorts of inputs:
+\emph{basic inputs}:
+\[
+\mathtt{(basic} \ s), \quad s \in S
+\]
+and \emph{meta-inputs}:
+\[
+\mathtt{(meta} \ s), \quad s \in S
+\]
+which are messages the participants use to coordinate in choosing a new
+transition function. All basic-inputs are simply handled by $t$ to update the
+current state. The meta-inputs $\bar I$ are handled by a function
+\[
+m \colon \bar S \times S \times \bar I \to \bar S + V
+\]
+which modifies the meta-state $\bar S$ of the chain, while also having read-only
+access to the state $S$. When $m$ produces a value in the right summand, this is
+an expression which is evaluated to a dictionary containing $f$, $t'$ and
+possibly $m'$. If only $f$ and $t'$ are present, the state is translated to the
+new format with $f$, and the new state machine operated by $t'$ starts accepting
+new basic inputs. If $m'$ is also provided, then the protocol for redefinition
+of the state-machine is also updated.
+
+Using this higher-order function we can now demonstrate several interesting examples of chains:
+\begin{itemize}
+\item Issue chain, only person who opened issue and maintainers can close, only maintainers can update the transition function.
+\item Ultimate example: chain managing a repo. The set of maintainers is maintained in a config file in master branch. only maintainers can accept PRs to master. Only maintainers can vote on new transition functions. This means that the function $m$ reads not only from the vote state $\bar S$ but also the basic state $S$ (i.e. the source code under version control).
+\item etc.
+\end{itemize}
+
 \subsection{Nomic}
 \label{s:examples}
