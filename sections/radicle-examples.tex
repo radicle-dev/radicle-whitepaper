@@ -5,11 +5,27 @@ applications by considering sample programs.
 
 \subsection{Self-amending key-value store}
 
-In Section \ref{s:language}, we have already defined a simple key-value store
-language. It was not, however, an \textit{amendable} one--once defined, it was
-impossible to change the semantics of the running system.
+In Section \ref{s:language}, we defined a simple key-value store language. It
+was not, however, an \emph{amendable} one---once defined, it was impossible to
+change the semantics of the running system. For short-lived chains with a narrow
+purpose, this might be satisfactory. For long-lived chains, the participants
+ideas on the purpose of the chain may morph over time. Forking to a new chain is
+an option, but this is not ideal for two reasons:
+\begin{itemize}
+  \item Concensus on the purpose and semantics of the new chain must be acheived
+    ``of chain''.
+  \item Participants must agree on the process and logistics of migrating to a
+    new chain, how to decide from which block this takes place, etc.
+\end{itemize}
+In radicle this can all take place in-chain, by updating the eval function.
 
 \input{out/kv1.rad-tex}
+
+Note that in this case, the new evaluation function that is instantiated as a
+result of a an \texttt{update} command, is the result of evaluating an
+expression with the original \texttt{eval} function, because of the hyperstatic
+environments. Thus, in this case, no tower of interpreters is formed. Instead,
+we are swapping out one eval for another.
 
 \subsection{Nomic}
 \label{s:examples}

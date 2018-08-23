@@ -1,23 +1,19 @@
 (define password "very secret")
+(define store (ref (dict)))
+(define eval-ref (ref eval))
 
-(define eval-ref (ref #f))
+;; self-amending key-val store
+(define starting-eval
+  (lambda (expr)
+    (define command (head expr))
+    (cond
+     (eq? command 'get) (lookup (nth 1 expr) (read-ref store))
+     (eq? command 'set) (modify-ref store (lambda (s) (insert (nth 1 expr) (nth 2 expr) s)))
+     (and (eq? command 'update)
+          (eq? (nth 1 expr)
+               password))
+     (write-ref eval-ref (eval (nth 2 expr)))
+     :else (throw 'invalid-command "Valid commands are: 'get', 'set' and 'update'."))))
 
-(define store (dict))
-
-(define starting-eval (lambda (expr)
-  (define command (head expr))
-
-  (if (eq? command 'get)
-      (lookup (nth 1) store)
-      (if (eq? command 'set)
-          (insert (nth 1 expr))
-                  (nth 2 expr)
-                  store)
-          (if (eq? command 'update)
-              (if (eq? (nth 1 expr) password)
-                  (write-ref eval-ref
-                             (nth 2 expr)))
-                  'invalid-command))))
-
-(define eval (lambda (expr)
-  ((read-ref eval-ref) expr)))
+(define eval (lambda (e) ((read-ref eval-ref) e)))
+(write-ref eval-ref starting-eval)
