@@ -65,10 +65,16 @@ new format with $f$, and the new state machine operated by $t'$ starts accepting
 new basic inputs. If $m'$ is also provided, then the protocol for redefinition
 of the state-machine is also updated.
 
-Using this higher-order function we can now demonstrate several interesting examples of chains:
+Using this higher-order function we can now demonstrate several interesting
+examples of chains:
 \begin{itemize}
-\item Issue chain, only person who opened issue and maintainers can close, only maintainers can update the transition function.
-\item Ultimate example: chain managing a repo. The set of maintainers is maintained in a config file in master branch. only maintainers can accept PRs to master. Only maintainers can vote on new transition functions. This means that the function $m$ reads not only from the vote state $\bar S$ but also the basic state $S$ (i.e. the source code under version control).
+\item Issue chain, only person who opened issue and maintainers can close, only
+  maintainers can update the transition function.
+\item Ultimate example: chain managing a repo. The set of maintainers is
+  maintained in a config file in master branch. only maintainers can accept PRs
+  to master. Only maintainers can vote on new transition functions. This means
+  that the function $m$ reads not only from the vote state $\bar S$ but also the
+  basic state $S$ (i.e. the source code under version control).
 \item etc.
 \end{itemize}
 
