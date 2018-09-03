@@ -1,26 +1,117 @@
 \section{Language Syntax and Semantics}
 \label{s:language}
 
-\rad is a a Lisp dialect. It uses prefix parenthesized function application,
-supports recursion, has first-class functions, is dynamically typed, and
-homoiconic. It differs from most Lisps in a few aspects, described below.
+Technologically speaking, \rad doesn't bring anything new to programming
+language design. It is essentially a specific point in the design-space (and
+related tooling) optimized for the following goals:
+\begin{itemize}
+\item[(1)] To be deterministic, so that \rad programs specifiy deterministic
+  state machines.
+\item[(2)] To be powerful enough to be a `universal state-machine'.
+\item[(3)] To be able to restrict this power appropirately, so that malicious
+  inputs can be rejected.
+\item[(4)] To be concise, expressive and emphesize correctness, so that new
+  chains, with new semantics can be created cheaply (in terms of development
+  time), be easily understood by all participants, and hopefully be bug-free.
+\item[(5')] To work well in a collaborative setting, which code being submitted
+  by multiple parties in a potentially unspecified order.
+\item[(5)] To have as simple as possible underlying underlying semantics, so
+  that \rad interpreters are well specified, and so that \rad can be used in
+  security sensitive situations.
+\item[(6)] To have the ability to interpret itself, to allow chain semantics to
+  be modified on-the-fly, on-the-chain.
+\end{itemize}
 
-Like most Lisps, binding is lexical. Unlike most Lisps, \rad has a
-\emph{hyperstatic} global environment, meaning that the resolution of free
-variables takes place at the definition site rather than call-site (see Section
-\ref{s:hyperstatic}). Like Clojure, \rad emphasises immutability, and mutable
-values must be created, read, or written with specific functions (\texttt{ref},
-\texttt{read-ref}, and \texttt{write-ref}, respectively).
+The design-choices we made with \rad are:
+\begin{itemize}
+\item[(a)] It's a high-level, homoiconic LISP dialect.
+\item[(b)] It has the ability to redefine a special function \texttt{eval}, which
+  is used as part of its own evaluation.
+\item[(c)] It has first-class functions.
+\item[(d)] It's dynamically typed.
+\item[(e)] It's lexically scoped with a `hyperstatic' global environment.
+\item[(f)] It only has immutable values.
+\item[(g)] It's has deterministic effect system for managing state (references).
+\end{itemize}
+
+LISP is well-known for being a high-level language having very concise
+interpreters of itself, and the Scheme specification have boiled down the
+semantics to a small core. Choosing a LISP helps with (2), (4) and (6), and in
+particular basing the design on Scheme helps with (5).
+
+The redefinition of \texttt{eval} is what enables (3).
+
+Languages with first-class functions are particularly expressive, so (c) helps
+with (4).
+
+Point (d) is a compromise: it is hard to satisfy the other points (escpecially
+(6)) with strong static types, even though this would help with (4). We might
+try to add types in the future, but this would also inhibit the ability to
+compile other-languages into \rad.
+
+The \emph{hyperstatic} global environment means that the resolution of free
+variables takes place at the definition site rather than call-site. See Section
+\ref{s:hyperstatic} for explanations for how this helps with (5').
+
+The language is kept as pure and immutable as possible, which limits
+expressivity but emphasizes clarity and correctness (goal (4)). The abundance of
+mutability would also probably hinder (5').
+
+Since chains are inherantly stateful, we felt that the inclusion of a reference
+type for managing state would help in the specification of chain semantics.
+However we will discuss the alternatives.
+
+The rest of this section goes into the details of these goals and
+design-choices.
+
+%% \rad is a a Lisp dialect. It uses prefix parenthesized function application,
+%% supports recursion, has first-class functions, is dynamically typed, and
+%% homoiconic. It differs from most Lisps in a few aspects, described below.
+
+%% Like most Lisps, binding is lexical. Unlike most Lisps, Like Clojure, \rad
+%% emphasises immutability, and mutable values must be created, read, or written
+%% with specific functions (\texttt{ref}, \texttt{read-ref}, and
+%% \texttt{write-ref}, respectively).
+
+\subsection{LISP}
+
+A minimal Scheme has the particularity that a minimal interpreter of itself can
+be implemented in a few lines of code. This is acheived by:
+\begin{itemize}
+  \item Code being represented by the core data-structures of the language.
+  \item The language being built up by a very small set of primitives: a few
+    special forms and some primitive functions.
+\end{itemize}
+Let's consider a basic example of a chain which might want to change a part of
+its semantics. In chain $C$ participants may \texttt{boot} certain other
+participants, if some condition is met, which is defined by a predicate
+\texttt{bootable?}. For example, \texttt{bootable?} might be defined as:
+\begin{verbatim}
+(define bootable?
+  (lambda (a p)
+    (and (admin? a) (not (admin? b)))))
+\end{verbatim}
+That is, admins may boot non-admins. At some point the participants may decide
+that this is too crude, and that a participant should only be booted if the
+majority of participants agree. For the change to take place, most likely one of
+the inputs to the system will contain code for a redefintion of
+\texttt{bootable?} (the semantics of when such a message is to be accepted would
+probably be defined by yet another predicate). This code must be transmited and
+interpreted in the most simple and transparent way possible. By choosing a LISP,
+this code is carried by simple data-structures and the interpretation process is
+very direct (skipping parsers, complicated abstract syntax trees, etc.). This
+gives the participants better confidence in understanding what the current and
+proposed semantics are.
 
 \subsection{Hyperstatic Environments}
 \label{s:hyperstatic}
 
 Most scripting languages are intended for programs where the developer can
 decide exactly where code should be placed, and be fully aware of the context
-that precedes it. One can always add a line \texttt{y = bar(x)} immediately \textit{after}
-\texttt{x = foo(3)}, and not worry that perhaps something else was added in
-between that changes what \texttt{x} is (excepting pathological cases of
-distributed code collaboration).
+that precedes it. One can always add a line \texttt{y = bar(x)} immediately
+\textit{after} \texttt{x = foo(3)}, and not worry that perhaps something else
+was added in between that changes what \texttt{x} is (excepting pathological
+cases of distributed code collaboration).
 
 This is not true in the environment \rad is intended to run. In that
 environment, users submit individual expressions or declarations to a running
