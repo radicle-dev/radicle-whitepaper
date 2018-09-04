@@ -73,6 +73,7 @@ design-choices.
 %% with specific functions (\texttt{ref}, \texttt{read-ref}, and
 %% \texttt{write-ref}, respectively).
 
+
 \subsection{LISP}
 
 A minimal Scheme has the particularity that a minimal interpreter of itself can
@@ -94,7 +95,7 @@ participants, if some condition is met, which is defined by a predicate
 That is, admins may boot non-admins. At some point the participants may decide
 that this is too crude, and that a participant should only be booted if the
 majority of participants agree. For the change to take place, most likely one of
-the inputs to the system will contain code for a redefintion of
+the inputs to the system will contain code for a new version of
 \texttt{bootable?} (the semantics of when such a message is to be accepted would
 probably be defined by yet another predicate). This code must be transmited and
 interpreted in the most simple and transparent way possible. By choosing a LISP,
@@ -109,9 +110,9 @@ proposed semantics are.
 Most scripting languages are intended for programs where the developer can
 decide exactly where code should be placed, and be fully aware of the context
 that precedes it. One can always add a line \texttt{y = bar(x)} immediately
-\textit{after} \texttt{x = foo(3)}, and not worry that perhaps something else
-was added in between that changes what \texttt{x} is (excepting pathological
-cases of distributed code collaboration).
+\emph{after} \texttt{x = foo(3)}, and not worry that perhaps something else was
+added in between that changes what \texttt{x} is (excepting pathological cases
+of distributed code collaboration).
 
 This is not true in the environment \rad is intended to run. In that
 environment, users submit individual expressions or declarations to a running
@@ -136,22 +137,21 @@ A user now wants to transfer some amount to Alice. However, in a language such
 as Scheme the function call \texttt{(transfer-to-alice account-bob 10)} may
 behave differently than this snippet alone indicates in two ways. First,
 \texttt{transfer-to-alice} and \texttt{account-bob}, which explicitly appear in
-the expression being submitted, may be shadowed by a new definition. Second,
-the variables \texttt{transfer}, \texttt{account-alice}, and \emph{any other}
-variables used in the body of \texttt{transfer} or transitively, in the
-function bodies of the functions \texttt{transfer} calls, may have been
-redefined.
+the expression being submitted, may be shadowed by a new definition. Second, the
+variables \texttt{transfer}, \texttt{account-alice}, and \emph{any other} free
+variables used in the body of \texttt{transfer} or transitively, in the function
+bodies of the functions \texttt{transfer} calls, may have been redefined.
 
 One solution is to not allow the redefinition of variables at all. This is
-indeed what some smart contract languages do, and can easily be implemented in \rad
-as well (see Section \ref{s:reflective-towers}). But this comes with its own
-problems; one cannot define a improved version of a function that shadows the
-old one, and must instead accept a more and more polluted environment (which
+indeed what some smart contract languages do, and can easily be implemented in
+\rad as well (see Section \ref{s:reflective-towers}). But this comes with its
+own problems; one cannot define an improved version of a function that shadows
+the old one, and must instead accept a more and more polluted environment (which
 additionally may impact memory usage).
 
-An alternative is to have a mechanism to make expressions invalid if any of
+An alternative is to have a mechanism to make expressions invalid if any of the
 variables they rely on have been redefined since a specified line of code.
-However, this option comes with its own problems. Consider:
+However this option is quite severe. Consider:
 
 \begin{verbatim}
 (define x 3) ;; line 1
@@ -166,10 +166,11 @@ perfectly reasonable interpretation - namely, \texttt{(foo)} \emph{with}
 this problem becomes more significant.
 
 This reasonable interpretation is in fact precisely what hyperstatic
-environments provide. \texttt{(foo)} in line 4 would, in this model, still
-evaluate to \texttt{3}. The free variables of a function refer to the values of
-variables \emph{when they were defined}. This is the semantics \rad adopts in
-general (and can be found in some other languages, such as Forth).
+environments provide. The function call \texttt{(foo)} in line 4 would, in this
+model, still evaluate to \texttt{3}. The free variables of a function refer to
+the values of variables \emph{when they were defined}. This is the semantics
+\rad adopts in general (and can be found in some other languages, such as
+Forth).
 
 Now \texttt{(protect-at-line (foo))} may be given a much simpler definition:
 \texttt{(foo)} if \texttt{foo} \emph{alone} has not been redefined, and otherwise
@@ -179,6 +180,56 @@ anyhow does not change the meaning of \texttt{foo}.
 %%% End section
 
 \subsection{\texttt{eval} redefinition}
+
+\rad should be able to emulate any state machine. Of course most state-machines
+don't accept arbitrary inputs, and certainly not inputs which change the
+semantics of the state-machine. Thus \rad should have some built in mechanism
+for controlling how inputs get interpreted. At the start inputs are sent
+directly for evaluation by the `base' evaluator, so it's natural to associate
+modifying this process with redefining evaluation itself. When taken to the
+extreme, \emph{all} evaluation is done with a call to the special function
+\texttt{eval}, and this creates a reflective tower of interpreters. In \rad,
+redefinition of \textt{eval} only comes into effect on the next input.
+
+Consider for example the following code for the Black programming language:
+\begin{verbatim}
+(exec-at-metalevel
+  (let ((old-eval base-eval))
+    (set! base-eval
+          (lambda (exp env cont)
+            (write exp) (newline) (old-eval exp env cont)))))
+\end{verbatim}
+After this code the Black REPL will behave as follows:
+\begin{verbatim}
+> (+ 1 2)
+(+ 1 2)
++
+1
+2
+=> 3
+\end{verbatim}
+Note in particular that the new evaluation function is used recursively, at all
+levels of the expression \texttt{(+ 1 2)}.
+
+Compare this to the following \rad session:
+\begin{verbatim}
+rad> (define eval (lambda (e) (do (print! e) (eval e))))
+=> ()
+rad> (+ 1 2)
+(+ 1.0 2.0)
+=> 3.0
+\end{verbatim}
+First of all note that we do not need to create a binding to the previous
+version of eval; because of the hyperstatic environment the symbol \texttt{eval}
+in the new definition of always refers to the old version of the evaluation
+function. Second, in Black, \texttt{old-eval} calls out to \texttt{base-eval},
+and in subsequent evaluation this will refer to the new definition. This is what
+makes the new evalution behaviour take effect at all levels of evaluation. In
+\rad, the new evaluation only gets invoked at the topmost level, on new inputs.
+If one wants to make the evaluation behaviour recursive this has to be coded
+explicitely.
+
+% old stuff starts here
 
 \rad does not have macros. Instead, it allows for a complete redefinition of
 the intepreter via redefinitions of \texttt{eval}.
