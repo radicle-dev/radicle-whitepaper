@@ -186,12 +186,19 @@ don't accept arbitrary inputs, and certainly not inputs which change the
 semantics of the state-machine. Thus \rad should have some built in mechanism
 for controlling how inputs get interpreted. At the start inputs are sent
 directly for evaluation by the `base' evaluator, so it's natural to associate
-modifying this process with redefining evaluation itself. When taken to the
-extreme, \emph{all} evaluation is done with a call to the special function
-\texttt{eval}, and this creates a reflective tower of interpreters. In \rad,
-redefinition of \textt{eval} only comes into effect on the next input.
+modifying this process with redefining a function which represents evaluation.
+When taken to the extreme, \emph{all} evaluation is done with a call to the
+special function \texttt{eval}, and this creates a reflective tower of
+interpreters. In \rad, a more limited form of \texttt{eval}-redefinition is
+available, which only takes effect on the next input. As an example:
+\begin{verbatim}
+> (define eval (lambda (expr) 3))
+=> ()
+> 5
+=> 3
+\end{verbatim}
 
-Consider for example the following code for the Black programming language:
+Contrast this with the sort of \texttt{eval}-redefinition that is available in the language Black:
 \begin{verbatim}
 (exec-at-metalevel
   (let ((old-eval base-eval))
@@ -199,7 +206,7 @@ Consider for example the following code for the Black programming language:
           (lambda (exp env cont)
             (write exp) (newline) (old-eval exp env cont)))))
 \end{verbatim}
-After this code the Black REPL will behave as follows:
+After this the Black REPL will behave as follows:
 \begin{verbatim}
 > (+ 1 2)
 (+ 1 2)
@@ -221,56 +228,72 @@ rad> (+ 1 2)
 \end{verbatim}
 First of all note that we do not need to create a binding to the previous
 version of eval; because of the hyperstatic environment the symbol \texttt{eval}
-in the new definition of always refers to the old version of the evaluation
-function. Second, in Black, \texttt{old-eval} calls out to \texttt{base-eval},
-and in subsequent evaluation this will refer to the new definition. This is what
-makes the new evalution behaviour take effect at all levels of evaluation. In
-\rad, the new evaluation only gets invoked at the topmost level, on new inputs.
-If one wants to make the evaluation behaviour recursive this has to be coded
-explicitely.
+in the new definition of \texttt{eval} always refers to the old version of the
+evaluation function. Second, in Black, \texttt{old-eval} calls out to
+\texttt{base-eval}, and in subsequent evaluation this will refer to the new
+definition. This is what makes the new evalution behaviour take effect at all
+levels of evaluation. In \rad, the new evaluation only gets invoked at the
+topmost level, on new inputs. If one wants to make the evaluation behaviour
+recursive this has to be coded explicitely.
 
-% old stuff starts here
+In most cases chains will define a domain-specific language to be interpreted in
+some narrow way, with only some calls to the base eval to reify function
+definitions, in case one wants to modify the behaviour of the state-machine in
+some way. Furthermore, this form of evaluation redefinition doesn't (by default)
+create a tower of interpreters. Evaluating in a towers requires advanced
+interpretation methods otherwise performance suffers greatly, and this is all
+the more important in \rad's case where chains may be very long-lived. Such
+methods are still the subject of active reasearch, and may interfere with other
+requirements of the language. For these reasons we beleive that this limited
+form of eval-redefinition suits the needs of \rad better than the sort of
+reflection that can be found in languages such as black.
 
-\rad does not have macros. Instead, it allows for a complete redefinition of
-the intepreter via redefinitions of \texttt{eval}.
+%% \rad does not have macros. Instead, it allows for a complete redefinition of
+%% the intepreter via redefinitions of \texttt{eval}.
 
-\begin{verbatim}
-(define eval (lambda (expr) 3)) ;;
-5 ;; => 3
-\end{verbatim}
+%% \begin{verbatim}
+%% (define eval (lambda (expr) 3)) ;;
+%% 5 ;; => 3
+%% \end{verbatim}
 
-This enables users to very easily define sublanguages for new chains, or amend
-the language running in the current one. A simplistic key-value store may thus
-be defined in only a few lines of code:
+%% This enables users to very easily define sublanguages for new chains, or amend
+%% the language running in the current one.
+
+For a more involved example, consider a simplistic key-value store:
 
 \input{out/kv0.rad-tex}
 
 After which we have:
 
 \begin{verbatim}
-(set key1 3) ;; => ()
-(get key1) ;; => 3
-(+ 3 2) ;; => 'invalid-command
+> (set key1 3)
+=> ()
+> (get key1)
+=> 3
+> (+ 3 2)
+=> 'invalid-command
 
-;; Nested expressions are not evaluated:
-(set key2 (+ 3 2)) ;; => ()
-(get key2) ;; => '(+ 3 2)
+;; Note that nested expressions are not evaluated:
+> (set key2 (+ 3 2))
+=> ()
+> (get key2)
+=> '(+ 3 2)
 \end{verbatim}
 
 % TODO: maybe move to Related Work section
 \subsection{Connection to Reflective Towers}
 \label{s:reflective-towers}
 
-The \texttt{eval}-redefinition
-mechanism resembles prior work on \emph{reflective towers}. A reflective
-tower is an infinite sequence of interpreters (called `levels') $L_0$, $L_1$, ..., where
-level $L_n$ is interpreted by $L_{n+1}$. Reflective towers allow both
-\emph{reification}---the ability to inspect a computation via constructs of a
-higher level---and \emph{reflection}, that is, the ability to define and enter new,
-lower levels. Conceptually, \rad differs from reflective towers by only
-allowing reflection. Thus, the only levels that exist are the ones programs
-create. Queinnec has quipped that reflective languages ``plunge us into a world
-with few laws, and hardly any gravity''\cite{Queinnec1994}; the more disciplined approach to
+The \texttt{eval}-redefinition mechanism resembles prior work on
+\emph{reflective towers}. A reflective tower is an infinite sequence of
+interpreters (called `levels') $L_0$, $L_1$, ..., where level $L_n$ is
+interpreted by $L_{n+1}$. Reflective towers allow both \emph{reification}---the
+ability to inspect a computation via constructs of a higher level---and
+\emph{reflection}, that is, the ability to define and enter new, lower levels.
+Conceptually, \rad differs from reflective towers by only allowing reflection.
+Thus, the only levels that exist are the ones programs create. Queinnec has
+quipped that reflective languages ``plunge us into a world with few laws, and
+hardly any gravity''\cite{Queinnec1994}; the more disciplined approach to
 reflection that \rad takes does not possess the semantic fragility of modifying
 meta-meta-intepreters.
 
@@ -279,6 +302,26 @@ of such towers of interpreters, however, still
 apply (see, for example, \cite{Amin2017}, \cite{Asai2014}), as do simpler
 partial-evaluation-based approaches such as \cite{Brown2017}.
 
+\subsection{Immutable values and refs}
+In \rad all values are immutable: once created they cannot be modified in any
+way. This follows in the footsteps of languages such as functional programming
+languages such as Haskell, Clojure, Erlang, etc.
+
+TODO: talk about how this leads to more correctness, and also how mutation would
+be all the more confusing in a collaborative coding environment (same sort of
+arguments as why mutation is hard in multi-threaded code).
+
+However state-machines are inherantly stateful, so a reference type is included
+in the language.
+
+TODO: explain
+
+Other things we might have consider, or might consider in the future: Another
+possibility is to have an single implicit global state (essentially a single
+predefined ref), and for computations with this state to be formulated using a
+state-monad. Having only a single location for holding state might encumber the
+developer, but providing a nice interface to state manipulation using lenses
+might make this a viable option.
 
 
 \subsection{Effects} In order to maintain determinism and safety in on-chain
