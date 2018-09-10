@@ -400,6 +400,24 @@ references--that can hold any other datatype.
 
 \subsection{Syntax}
 
+% new semantics
+
+The base semantics of \rad is easy to define and is similar like that of a normal
+scheme.
+
+TODO: insert normal scheme semantics here, but with hyperstatic, etc. Note that
+sequences will be defined by the auxilary semantics $E^+$. This is
+not how \emph{toplevel} sequences are processed.
+
+For a sequence of toplevel inputs, we define a new sequence denotation
+$E_n^I$ where $E_0^I = E$.
+
+Then:
+\[
+E_n(\pi) = E_{n-1} (\mathtt{( eval (quote \pi))}) \env\cont\mem
+\]
+
+% old semantics
 
 \subsection{Formal Semantics} We define the denotational semantics of \rad
 recursively. The base case, $\mathcal{E}_{0}$, describes the denotation of a
@@ -420,7 +438,7 @@ Figure \ref{f:denotationalsem0}.
 
 \begin{figure}[H]
 \begin{align*}
-    \denotationdesc{0}{\variable}{(\cont (\env \variable) \mem)} \\
+    E_desc{0}{\variable}{(\cont (\env \variable) \mem)} \\
     \denotationdesc{0}{(\lam (\variable *)\: \pi^{+})}{
       \cont (\lambda \val * \cont_1 \mem_1 . \\
         \text{if } (\text{length } \variable *) = (\text{length } \val *) \\
