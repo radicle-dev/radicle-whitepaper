@@ -10,7 +10,7 @@ related tooling) optimized for the following goals:
 \item[(2)] To be powerful enough to be a `universal state-machine'.
 \item[(3)] To be able to restrict this power appropirately, so that malicious
   inputs can be rejected.
-\item[(4)] To be concise, expressive and emphesize correctness, so that new
+\item[(4)] To be concise, expressive and emphasize correctness, so that new
   chains, with new semantics can be created cheaply (in terms of development
   time), be easily understood by all participants, and hopefully be bug-free.
 \item[(5')] To work well in a collaborative setting, which code being submitted
@@ -34,8 +34,8 @@ The design-choices we made with \rad are:
 \item[(g)] It's has deterministic effect system for managing state (references).
 \end{itemize}
 
-LISP is well-known for being a high-level language having very concise
-interpreters of itself, and the Scheme specification have boiled down the
+LISP is well-known for being a high-level family of languages having very concise
+self-interpreters, and the Scheme specification have boiled down the
 semantics to a small core. Choosing a LISP helps with (2), (4) and (6), and in
 particular basing the design on Scheme helps with (5).
 
@@ -57,7 +57,7 @@ The language is kept as pure and immutable as possible, which limits
 expressivity but emphasizes clarity and correctness (goal (4)). The abundance of
 mutability would also probably hinder (5').
 
-Since chains are inherantly stateful, we felt that the inclusion of a reference
+Since chains are inherently stateful, we felt that the inclusion of a reference
 type for managing state would help in the specification of chain semantics.
 However we will discuss the alternatives.
 
@@ -77,7 +77,7 @@ design-choices.
 \subsection{LISP}
 
 A minimal Scheme has the particularity that a minimal interpreter of itself can
-be implemented in a few lines of code. This is acheived by:
+be implemented in a few lines of code. This is achieved by:
 \begin{itemize}
   \item Code being represented by the core data-structures of the language.
   \item The language being built up by a very small set of primitives: a few
@@ -98,7 +98,7 @@ majority of participants agree. For the change to take place, most likely one of
 the inputs to the system will contain code for a new version of
 \texttt{bootable?} (the semantics of when such a message is to be accepted would
 probably be defined by yet another predicate). This code must be transmited and
-interpreted in the most simple and transparent way possible. By choosing a LISP,
+interpreted in the simplest and and most transparent way possible. By choosing a LISP,
 this code is carried by simple data-structures and the interpretation process is
 very direct (skipping parsers, complicated abstract syntax trees, etc.). This
 gives the participants better confidence in understanding what the current and
