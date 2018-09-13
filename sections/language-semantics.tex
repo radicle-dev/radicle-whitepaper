@@ -398,88 +398,116 @@ description of effects before passing them to the effect-handling layer.
 datatypes are all immutable; additionally \rad supports \emph{refs}--mutable
 references--that can hold any other datatype.
 
-\subsection{Syntax}
+\subsection{Semantics}
 
-% new semantics
+\def\S{\mathcal{S}}
+\def\B{\mathcal{B}}
+\def\E{\mathcal{E}}
+\def\Prog{\mathrm{Prog}}
+\def\Func{\mathrm{Func}}
 
-The base semantics of \rad is easy to define and is similar like that of a normal
-scheme.
+When defining the semantics of \rad, we have to take into account that \rad has
+special behaviour with respect to consecutive \emph{inputs}; that is, an input
+can change the way subsequent inputs are processed. \rad is a universal
+state-machine capable of simulating any other; in this section we define exactly
+which state-machine \rad is.
 
-TODO: insert normal scheme semantics here, but with hyperstatic, etc. Note that
-sequences will be defined by the auxilary semantics $E^+$. This is
-not how \emph{toplevel} sequences are processed.
+We define the semantics of \rad in two steps. First we define the \emph{base
+  semantics} $\B$, and then the state-machine semantics $\S$. Both will be
+defined in terms of transformations of \emph{state} $S$ in response to inputs
+which are elements of $P$, that is, syntactically valid programs.
 
-For a sequence of toplevel inputs, we define a new sequence denotation
-$E_n^I$ where $E_0^I = E$.
-
-Then:
+The state is composed of the \emph{environment}, which associates identifiers to
+values, and the \emph{memory} which tracks the values of refs:
 \[
-E_n(\pi) = E_{n-1} (\mathtt{( eval (quote \pi))}) \env\cont\mem
+S := E \times M
+\]
+with
+\[
+E := I \to 1 + V \quad \text{and} \quad M := A \to 1 + V,
+\]
+where $I$ is the set of valid identifiers and $A$ is the set of memory addresses.
+
+If the image of $i \in I$ via $e \in E$ is in the left component, this means the
+identifier has not been defined, and looking up that identifier is considered an
+error. Similarly for memory accesses.
+
+\subsubsection{Base semantics $\B$}
+
+The base semantics is defined as a function
+\[
+\B \colon P \times S \to 1 + S \times V.
+\]
+Given $(p,s) \in (P,S)$ we shall define $B(p,s)$ as an element of $S \times V$,
+letting failures (that is, landing in the left component $1$) propagate
+naturally.
+\begin{itemize}
+\item Identifiers: If $i \in I$ is an identifier then $B(i,(e,m)) = ((e,m),
+  e(i))$, unless $e(i)$ is undefined in which case $B(i, (e,m))$ results in an
+  error.
+\item Conditionals: For $c,t,f \in P$,
+  \[
+    \B( (\mathtt{if} \ c \ t \ f), (e,m)) :=
+    \begin{cases}
+      \B(t, (e', m')) & \text{if $c' = \mathtt{\#t}$,}\\
+      \B(f, (e', m')) & \text{otherwise}
+    \end{cases}
+  \]
+  where $\B(c, (e,m)) = ((e',m'), c')$
+\item
+  \def\defe{\mathrm{def}}
+  \def\calle{\mathrm{call}}
+  \def\rete{\mathrm{rete}}
+  Lambdas: If $p^+ \in P^*$, and $x$ is an identifier, then
+  \[
+    \B((\mathtt{lambda} (x) \ p^+), (e_\defe,m_\defe)) :=
+    ((e_\defe,m_\defe), f)
+  \]
+  where $f$ is the function:
+  \[
+    (v, (e_\calle,m_\calle)) \mapsto \B^+(p^+, (e_\defe, m_\calle)).
+  \]
+\item Define: When $x \in I$ and $p \in P$,
+\[
+\B((\mathtt{define} \ x \ p), (e,m)) := ((e'[x \mapsto v], m'), ???)
+\]
+where $\B(p, (e,m)) = ((e', m'), v)$.
+\item Application: When $p,q \in P$,
+  \[
+\B((p \ q), (e,m)) := f(v, (e'',m''))
+\]
+where (assuming no errors and that $f$ is a function):
+\begin{align*}
+  \B(p, (e,m)) &= ((e',m'), f)\\
+  \B(q, (e',m')) &= ((e'',m''), v).
+\end{align*}
+\item
+  Eval:
+  If $p \in P$, then
+  \[
+    \B((\mathtt{base-eval} \ p), ) = \B(p', s')
+  \]
+  where $\B(p,s) = (s', p')$.
+\end{itemize}
+
+\subsubsection{State-machine semantics}
+The \rad state machine is given by an \emph{initial state} $s_0$ and a
+transition function
+\[
+  \S \colon P \times S \to S.
 \]
 
-% old semantics
+The initial state is defined to be $(e_0,m_0)$ where $m_0 = \iota_L \circ !_A$
+is the empty memory, and
+\[
+  e_0 := (\iota_L \circ !_I)[\mathtt{eval} \mapsto f]
+\]
+where $f$ is the identity function:
+\[
+  (v,s) \mapsto (s,v).
+\]
 
-\subsection{Formal Semantics} We define the denotational semantics of \rad
-recursively. The base case, $\mathcal{E}_{0}$, describes the denotation of a
-term prior to any modification of \texttt{eval}. It's definition is given in
-Figure \ref{f:denotationalsem0}.
-
-\begin{figure}[H]
-\begin{align*}
-    Environment [\env] &= Identifier \rightarrow Value \\
-    Memory [\mem] &= Address \rightarrow Value \\
-    Value [\val] &= Address + Function + Boolean ... \\
-    Continuation [\cont] &= Value \times Memory \rightarrow Value \\
-    Function [\phi] &= Value* \times Continuation \times Memory \rightarrow Value
-\end{align*}
-\label{f:denotationalsemleged}
-\end{figure}
-
-
-\begin{figure}[H]
-\begin{align*}
-    E_desc{0}{\variable}{(\cont (\env \variable) \mem)} \\
-    \denotationdesc{0}{(\lam (\variable *)\: \pi^{+})}{
-      \cont (\lambda \val * \cont_1 \mem_1 . \\
-        \text{if } (\text{length } \variable *) = (\text{length } \val *) \\
-        \text{then } \denotation{0}{\pi^{+}}\env[\variable * \rightarrow} \val * ] \cont_1 \mem_1 \\
-        \text{else } \text{error "Wrong arity"} \\
-        \text{endif } ) \mem ) \\
-    \denotationdesc{0}{(\define \: \variable \: \pi )}{
-      \denotation{0}{\pi}\env \lambda \val
-    } \\
-    \denotationdesc{0}{(\deref \: \variable  )}{\cont (\mem (\texttt{projAddr}(\env \variable)))) \mem} \\
-  \denotationdesc{0}{(\mkref \: \variable \: \pi)}{} \\
-  \denotationdesc{0}{(\writeref \: \variable \: \pi)}{
-      \denotation{0}{\pi} \lambda \val \mem_1 . (\cont \val \mem_1 [(\env
-      \variable) \rightarrow \val]) \mem } \\
-  \denotationdesc{0}{(\ifm \: \pi_0 \: \pi_1 \: \pi_2)}{\denotation{0}{\pi_0}\env
-    \lambda \val \mem_1 .(\text{if } \val  \\
-    \text{then } \denotation{0}{\pi_1}  \\
-    \text{else } \denotation{0}{\pi_2} \\
-    \text{endif } \env \cont \mem_1)  \mem ) } \\
-  \denotationdesc{0}{(\pi \pi+ )}{
-      \denotation{0}{\pi_0}\env \lambda \val \mem_1 . (\denotation{0}{\pi+}
-      \env \cont \mem_1) \mem
-  }
-\end{align*}
-\caption{Denotational semantics for $\mathcal{E}_{0}$}
-\label{f:denotationalsem0}
-\end{figure}
-
-After a redefinition of \texttt{eval}, the denotation of an expression is the
-denotation of \texttt{eval} prior to the redefinition, applied to the
-\emph{quoted} expression, as show in Figure \ref{f:denotationalsemn}.
-
-\begin{figure}[H]
-\begin{align*}
-  \denotationdesc{n}{\pi}{(\denotation{n-1}{\evalm} (\quotem \pi))\env\cont\mem}
-\end{align*}
-\caption{Denotational semantics for $\mathcal{E}_{n}$}
-\label{f:denotationalsemn}
-\end{figure}
-
-Besides the forms described so far, additional forms exist which may be
-implemented via \texttt{eval} redefinitions. They may also be implemented as
-primitives; in either case, these forms must not be shadowable via
-\texttt{define}s.
+Given a program $p$ and a state $(e,m) \in S$,
+\[
+\S(p,s) = \B( (\mathtt{eval} \ p), s).
+\]
