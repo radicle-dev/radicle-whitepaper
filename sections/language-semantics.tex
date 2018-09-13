@@ -481,13 +481,6 @@ where (assuming no errors and that $f$ is a function):
   \B(p, (e,m)) &= ((e',m'), f)\\
   \B(q, (e',m')) &= ((e'',m''), v).
 \end{align*}
-\item
-  Eval:
-  If $p \in P$, then
-  \[
-    \B((\mathtt{base-eval} \ p), ) = \B(p', s')
-  \]
-  where $\B(p,s) = (s', p')$.
 \end{itemize}
 
 \subsubsection{State-machine semantics}
@@ -500,14 +493,12 @@ transition function
 The initial state is defined to be $(e_0,m_0)$ where $m_0 = \iota_L \circ !_A$
 is the empty memory, and
 \[
-  e_0 := (\iota_L \circ !_I)[\mathtt{eval} \mapsto f]
-\]
-where $f$ is the identity function:
-\[
-  (v,s) \mapsto (s,v).
+  e_0 := (\iota_L \circ !_I)[\mathtt{eval} \mapsto \B].
 \]
 
 Given a program $p$ and a state $(e,m) \in S$,
+if $e(\mathtt{eval})$ is undefined, or not a function, then the machine crashes.
+Otherwise
 \[
-\S(p,s) = \B( (\mathtt{eval} \ p), s).
+  \S(p, (e,m)) = s' \text{ where } e(\mathtt{eval})(p,(e,m)) = (s', v').
 \]
