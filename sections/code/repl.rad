@@ -1,0 +1,6 @@
+(define repl
+  (dict 'name "repl" 'getter read-line!))
+
+(subscribe-to! repl
+  (lambda (x)
+    (print! (default-impure-handler! x))))

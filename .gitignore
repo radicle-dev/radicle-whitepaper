@@ -1,0 +1,11 @@
+*.fls
+*.out
+*.log
+*.pdf
+*.toc
+*.dvi
+*.aux
+*.gz
+*.fdb_latexmk
+out/*
+!out/oscoin.pdf

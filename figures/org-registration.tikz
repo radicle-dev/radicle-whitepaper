@@ -1,0 +1,47 @@
+\documentclass[tikz]{standalone}
+
+\usetikzlibrary{fit}
+\usetikzlibrary{positioning}
+
+\begin{document}
+\begin{tikzpicture}[scale=0.96]
+    \tikzstyle{root} = [
+        draw=black, thick, fill=black!20, rectangle, minimum height=4.5em, minimum width=4.5em, node distance=3em
+    ];
+    \tikzstyle{org-block} = [
+        draw, thick, fill=white, rectangle, minimum height=3.5em, minimum width=3.5em, node distance=2em
+    ];
+    \tikzstyle{genesis-block} = [
+        draw, fill=white, rectangle, minimum height=1em, minimum width=2em
+    ];
+    \tikzstyle{block-header} = [
+        rectangle, minimum height=1em, minimum width=2em
+    ];
+    \tikzstyle{pointer} = [thin, -latex];
+
+    \node (root-0) at (-3, 3) {$\cdots$};
+    \node (root-1) at (-1, 3) [root] {} edge [pointer] (root-0.east) {};
+    \node (root-2) at ( 3, 3) [root] {} edge [pointer] (root-1.east) {};
+    \node (root-3) at ( 7, 3) [root] {} edge [pointer] (root-2.east) {};
+
+    \node (root-1-header) [block-header, below=(2mm of root-1.north)] {$B_{\rootchain}$};
+    \node (root-2-header) [block-header, below=(2mm of root-2.north)] {$B_{\rootchain+1}$};
+    \node (root-3-header) [block-header, below=(2mm of root-3.north)] {$B_{\rootchain+2}$};
+
+    \node[genesis-block] (genesis-a) [above=(2.5mm of root-1.south)] {\small{$B_{^A{0}}$}};
+    \node                (genesis-b) [above=(2.5mm of root-2.south)] {$\cdots$};
+    \node                (genesis-c) [above=(2.5mm of root-3.south)] {$\cdots$};
+
+    \node[org-block] (org-a-1) [below right=2em of root-1] {$B_{^A{1}}$};
+    \node[org-block] (org-a-2) [right=of org-a-1] {$B_{^A{2}}$}
+        edge [pointer] (org-a-1.east);
+    \node[org-block] (org-a-3) [right=of org-a-2] {$B_{^A{3}}$}
+        edge [pointer] (org-a-2.east);
+    \node[org-block] (org-a-4) [right=of org-a-3] {$B_{^A{4}}$}
+        edge [pointer] (org-a-3.east);
+    \node[org-block] (org-a-5) [right=of org-a-4] {$B_{^A{5}}$}
+        edge [pointer] (org-a-4.east);
+
+    \draw [pointer, bend left=40] (org-a-1.west) to (genesis-a.south);
+\end{tikzpicture}
+\end{document}

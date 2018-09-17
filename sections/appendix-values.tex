@@ -1,0 +1,29 @@
+\section{Definition of \rad values}
+\label{value-definition}
+
+The set of values manipulated by the \rad interpreter is defined as a coproduct
+of other sets (symbols, keywords, functions etc.). The definitions rely on two
+other sets being defined: $\Ident$, the set of valid identifiers, and $\String$,
+the set of valid strings. These can be considered implementation dependent, but
+the definitions for the OSCoin network can be found here: <formal spec website>.
+
+TODO: formal spec website address.
+
+\begin{align*}
+  V &:= \Sym + \Keyword + \String + \Bool + \Num + \Func + \List + \Dict + \Ref\\
+  \overline{V} &:= \Sym + \Keyword + \String + \Bool + \Num + \overline{\List} + \overline{\Dict}\\
+  \List &:= V^*\\
+  \overline{\List} &:= \overline{V}^*\\
+  \Dict &:= \overline{V} \to 1 + V\\
+  \overline{\Dict} &:= \overline{V} \to 1 + \overline{V}\\
+  \Func &:= V \times S \to S \times V\\
+  \Sym &:= I\\
+  \Keyword &:= I\\
+  \Bool &:= \{\#t, \#f\}\\
+  \Ref &:= \mathbb{N}\\
+  \Num &:= \mathbb{Q}
+\end{align*}
+The canonical injections of $\Sym, \Keyword, \String, \Bool, \Num, \Func, \List,
+\Dict$ and $\Ref$ into $V$ are denoted by $\iatom, \ikeyword, \ibool, \ifunc,
+\ilist, \idict$ and $\iref$ respectively. However we shall often suppress these
+from the notation.

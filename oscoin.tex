@@ -1,0 +1,235 @@
+\documentclass[a4paper, 9pt, draft]{amsart}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{diagbox}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{accents}
+\usepackage{standalone}
+\usepackage{bm}
+\usepackage{multicol}
+\usepackage{stmaryrd}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{syntax}
+\usepackage[final]{listings}
+\usepackage{textcomp}
+\usepackage[font={small,sc}]{caption}
+\usepackage{fancyvrb}
+
+\usetikzlibrary{fit}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{positioning}
+\usetikzlibrary{decorations}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{chains}
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{scopes}
+\usetikzlibrary{arrows}
+
+
+\hyphenation{block-chain block-chains}
+\hyphenation{crypto-graphically}
+
+\hypersetup{colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=blue,
+    pdftex}
+
+\setlist[description]{leftmargin=1.2cm, labelindent=\parindent}
+\setlist[enumerate]{leftmargin=1.2cm, labelindent=\parindent}
+
+\lstset{
+  language=Scheme,
+  numbers=left,
+  basewidth=0.5em
+  }
+
+% \lst@definelanguage{Scheme}{
+%   morekeywords=[1]{define, define-syntax, define-macro, lambda, define-stream, stream-lambda},
+%   morekeywords=[2]{begin, call-with-current-continuation, call/cc,
+%     call-with-input-file, call-with-output-file, case, cond,
+%     do, else, for-each, if,
+%     let*, let, let-syntax, letrec, letrec-syntax,
+%     let-values, let*-values,
+%     and, or, not, delay, force,
+%     quasiquote, quote, unquote, unquote-splicing,
+%     map, fold, syntax, syntax-rules, eval, environment, query },
+%   morekeywords=[3]{import, export},
+%   alsodigit=!\$\%&*+-./:<=>?@^_~,
+%   sensitive=true,
+%   morecomment=[l]{;},
+%   morecomment=[s]{\#|}{|\#},
+%   morestring=[b]",
+%   basicstyle=\small\ttfamily,
+%   keywordstyle=\bf\ttfamily\color[rgb]{0,.3,.7},
+%   commentstyle=\color[rgb]{0.133,0.545,0.133},
+%   stringstyle={\color[rgb]{0.75,0.49,0.07}},
+%   upquote=true,
+%   breaklines=true,
+%   breakatwhitespace=true,
+%   literate=*{`}{{`}}{1}
+% }
+  
+\newcommand*\eg{e.g.\ }
+\newcommand*\ie{i.e.\ }
+
+\title[Radicle]{Radicle}
+\author{Monadic}
+\date{2018}
+
+\newcommand{\oscoin}{\textsc{\small{oscoin}}}
+\newcommand{\blake}{\textsc{\small{blake2}}}
+\newcommand{\hash}{\mathsc{hash}}
+\newcommand{\coin}{$\Theta$}
+\newcommand{\mathsc}[1]{\text{\normalfont\scshape#1}}
+\newcommand{\tx}[2]{\langle \mathsc{#1}, #2 \rangle}
+\newcommand{\tuple}[1]{\langle #1 \rangle}
+\newcommand{\cvdots}{\multicolumn{1}{c}{\small{\vdots}}}
+\newcommand{\dep}{\xrightharpoondown[e]{d}}
+\newcommand{\notice}[1]{{\color{red}#1}}
+\newcommand{\comment}[1]{{\color{gray}#1}}
+\newcommand{\todo}[1]{\comment{\noindent\texttt{\small\emph{TODO: #1}}}}
+
+\newcommand{\rootchain}{\gamma}
+\newcommand{\State}{\mathcal{S}}
+\newcommand{\state}{\mathcal{S}}
+\newcommand{\Ledger}{\mathcal{L}}
+\newcommand{\ledger}{\mathcal{L}}
+\newcommand{\Orgs}{\mathcal{O}}
+\newcommand{\apply}{\Upsilon}
+\newcommand{\fold}{\Upsilon}
+\newcommand{\tree}{\mathcal{C}}
+\newcommand{\op}{T}
+\newcommand{\env}{\rho}
+\newcommand{\cont}{\kappa}
+\newcommand{\mem}{\sigma}
+\newcommand{\val}{\epsilon}
+\newcommand{\denotation}[2]{
+    \ensuremath{\mathcal{E}_{#1} \llbracket #2 \rrbracket }}
+\newcommand{\denotationdesc}[3]{
+    \ensuremath{\mathcal{E}_{#1} \llbracket #2 \rrbracket \env \cont \mem &= #3  }}
+\newcommand{\variable}{\nu}
+\newcommand{\prog}{\pi}
+\newcommand{\rad}{\textsc{Radicle}}
+\newcommand{\lam}{\text{\texttt{lambda }}}
+\newcommand{\define}{\text{\texttt{define}}}
+\newcommand{\deref}{\text{\texttt{deref!}}}
+\newcommand{\mkref}{\text{\texttt{ref!}}}
+\newcommand{\writeref}{\text{\texttt{write-ref!}}}
+\newcommand{\quotem}{\text{\texttt{quote}}}
+\newcommand{\evalm}{\text{\texttt{eval}}}
+\newcommand{\ifm}{\text{\texttt{if}}}
+\newcommand{\stdfn}[2]{
+    \texttt{#1}
+    #2
+    }
+
+\def\S{\mathcal{S}}
+\def\B{\mathcal{B}}
+
+\def\Ident{\mathrm{Ident}}
+\def\String{\mathrm{String}}
+\def\Func{\mathrm{Func}}
+\def\Bool{\mathrm{Bool}}
+\def\Num{\mathrm{Num}}
+\def\Sym{\mathrm{Sym}}
+\def\Keyword{\mathrm{Keyword}}
+\def\String{\mathrm{String}}
+\def\List{\mathrm{List}}
+\def\Dict{\mathrm{Dict}}
+\def\Ref{\mathrm{Ref}}
+\def\evalAddr{\text{\texttt{eval-addr}}}
+\def\ikeyword{\mathrm{keyword}}
+\def\iatom{\mathrm{atom}}
+\def\inum{\mathrm{num}}
+\def\ibool{\mathrm{bool}}
+\def\istring{\mathrm{string}}
+\def\ilist{\mathrm{list}}
+\def\idict{\mathrm{dict}}
+\def\iref{\mathrm{ref}}
+\def\ifunc{\mathrm{func}}
+
+\DeclareMathOperator{\eval}{\Xi}
+
+% Adjust spacing around equations. It can be a bit tight!
+\expandafter\def\expandafter\normalsize\expandafter{%
+    \normalsize%
+    \addtolength{\abovedisplayskip}{2pt}%
+    \addtolength{\abovedisplayshortskip}{2pt}%
+    \addtolength{\belowdisplayskip}{2pt}%
+    \addtolength{\belowdisplayshortskip}{2pt}%
+}%
+
+\newenvironment{fig}
+  {\par\bigskip\noindent\minipage{\linewidth}}
+  {\endminipage\par\bigskip}
+
+% No paragraph indentation after section headers.
+\makeatletter
+\let\@afterindenttrue\@afterindentfalse
+\makeatother
+
+% Issue amend operator.
+\DeclareMathOperator{\amend}{\times}
+
+\newenvironment{epigraph}[2][]
+{\leftskip=1cm \def\epigraph@author{#2} \smallskip\itshape}
+{\par\vspace{0.5em}\normalfont\hfill---\ \epigraph@author\hspace*{0.2cm}\par\medskip}
+\makeatother
+
+% Tikz stuff
+
+\tikzstyle{block} = [rectangle, draw,
+    text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+
+\setlength{\textwidth}{\paperwidth}
+\addtolength{\textwidth}{-4cm}
+\setlength{\textheight}{\paperheight}
+\addtolength{\textheight}{-5cm}
+\calclayout
+
+\begin{document}
+\begin{abstract}
+    Though replicated state machines have a wide range of applications, their
+    semantics must always possess certain properties, such as determinism.
+    Rather than program such semantics anew, we propose a language, \rad{},
+    which substantially simplifies the process of defining such state machines.
+    Because \rad{} may be made into any RSM via \emph{eval-redefinition}, it
+    can be considered a universal replicated state machine.
+
+    This mechanism also allows changing the semantics of running state machines
+    without loss of state, and with the same consensus guarantees as provided
+    by the underlying consensus system.
+\end{abstract}
+\maketitle
+\tableofcontents
+
+\setlength{\columnsep}{20pt}
+\begin{multicols}{2}
+
+\input{sections/introduction.tex}
+\input{sections/language-semantics.tex}
+\input{sections/radicle-examples.tex}
+
+\bibliographystyle{plain}
+\bibliography{bibliography,additional}
+\end{multicols}
+
+
+\appendix
+%\input{sections/appendix-syntax.tex}
+\input{sections/appendix-values.tex}
+\input{sections/appendix-initial-env.tex}
+\input{sections/appendix-derived-forms.tex}
+\end{document}

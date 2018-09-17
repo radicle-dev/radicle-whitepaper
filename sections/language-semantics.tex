@@ -1,0 +1,483 @@
+\section{Language Syntax and Semantics}
+\label{s:language}
+
+None of the individual parts of \rad{} bring anything
+new to programming language theory. However, as its intended domain of use
+differs significantly from that of other programming languages, the set of
+design choices that characterize it make for a unique language. \rad{} strives:
+\begin{itemize}
+\item[(1)] To be deterministic, so that \rad{} programs specifiy deterministic
+  state machines.
+\item[(2)] To be powerful enough to be a `universal state-machine'.
+\item[(3)] To be able to restrict this power appropriately, so that malicious
+  inputs can be rejected, and to aid reasoning about the behaviour of valid
+  inputs.
+\item[(4)] To be concise, expressive and emphasize correctness, so that new
+  chains, with new semantics can be created cheaply (in terms of development
+  time), be easily understood by all participants, and hopefully be bug-free.
+\item[(5)] To work well in a collaborative setting, in which code is submitted
+  by multiple parties in a potentially unspecified order.
+% TODO: point (5) is unconvincing
+\item[(6)] To have the simplest possible underlying underlying semantics, so
+  that \rad{} interpreters are well specified, and so that \rad{} can be used in
+  security sensitive situations.
+\item[(7)] To have the ability to interpret itself, so that chain semantics may
+  be modified on-chain.
+\end{itemize}
+
+The design choices we made with \rad{} are:
+\begin{itemize}
+\item[(a)] It is a high-level, homoiconic LISP dialect.
+\item[(b)] It has the ability to redefine a special function \texttt{eval}, which
+  is used as part of its own evaluation.
+\item[(c)] It has first-class functions.
+\item[(d)] It is dynamically typed.
+\item[(e)] It is lexically scoped with a `hyperstatic' global environment.
+\item[(f)] It only has immutable values.
+\item[(g)] It has deterministic effect system for managing state (references).
+\end{itemize}
+
+LISP is well-known for being a high-level family of languages having very concise
+self-interpreters, and the Scheme specification has boiled down the
+semantics to a small core. Choosing a LISP helps with (2), (4) and (7), and in
+particular basing the design on Scheme helps with (6).
+
+The redefinition of \texttt{eval} is what enables (3).
+
+Languages with first-class functions are particularly expressive, so (c) helps
+with (4).
+
+
+Point (d) is a compromise: it is hard to satisfy the other points (especially
+(7)) with strong static types, even though this would help with (4). Though
+adding types to a language which can interpret itself is not impossible (see
+\cite{brown-papers}), this constraint would also inhibit the ability to
+compile other languages into \rad{}.
+
+The \emph{hyperstatic} global environment means that the resolution of free
+variables takes place at the definition site rather than call-site. See Section
+\ref{s:hyperstatic} for explanations for how this helps with (6).
+
+The language is kept as pure and immutable as possible, which limits
+expressivity but emphasizes clarity and correctness (goal (4)). The abundance of
+mutability would also probably hinder (6).
+
+Since chains are inherently stateful, we felt that the inclusion of a reference
+type for managing state would help in the specification of chain semantics.
+However we will discuss the alternatives.
+
+The rest of this section goes into the details of these goals and
+design choices.
+
+
+\subsection{LISP}
+
+Scheme has the particularity that a minimal interpreter of itself can
+be implemented in a few lines of code. This is achieved by:
+\begin{itemize}
+  \item Code being represented by the core data-structures of the language, so
+      that manipulating code is as straighforward as any data manipulation.
+  \item The language being built up by a very small set of primitives: a few
+    special forms and some primitive functions.
+\end{itemize}
+Let's consider a basic example of a chain which might want to change a part of
+its semantics. In this chain participants may \texttt{boot} certain other
+participants, if some condition is met, which is defined by a predicate
+\texttt{bootable?}. For example, \texttt{bootable?} might be defined as:
+\begin{lstlisting}
+(define bootable?
+  (lambda (a p)
+    (and (admin? a) (not (admin? b)))))
+\end{lstlisting}
+That is, admins may boot non-admins. At some point the participants may decide
+that this is too crude, and that a participant should only be booted if the
+majority of participants agree. For the change to take place, most likely one of
+the inputs to the system will contain code for a new version of
+\texttt{bootable?} (the semantics of when such a message is to be accepted would
+probably be defined by yet another predicate). This code must be transmited and
+interpreted in the simplest and and most transparent way possible. By choosing a LISP,
+this code is represented by simple data-structures, and the interpretation process is
+very direct (simplifying parsing and abstract syntax trees, etc.). This
+gives the participants better confidence in understanding what the current and
+proposed semantics are.
+
+\subsection{Data types}
+\rad{}'s data types are: booleans (\texttt{\#t} and
+\texttt{\#f}); strings (a sequence of characters within double quotes, with
+\texttt{\textbackslash} as the escape character), symbols, lists, dictionaries
+(maps), and numbers (currently only arbitrary-precision decimals). These
+datatypes are all immutable; additionally \rad{} supports \emph{refs}--mutable
+references--that can hold any other datatype.
+
+For more details on radicle values, see appendix \ref{value-definition}.
+
+\subsection{Hyperstatic Environments}
+\label{s:hyperstatic}
+
+Most scripting languages are intended for programs where the developer can
+decide exactly where code should be placed, and be fully aware of the context
+that precedes it. One can always add a line \texttt{y = bar(x)} immediately
+\emph{after} \texttt{x = foo(3)}, and not worry that perhaps something else was
+added in between that changes what \texttt{x} is (excepting pathological cases
+of distributed code collaboration).
+
+This is not true in the environment \rad{} is intended to run. In that
+environment, users submit individual expressions or declarations to a running
+system that is \emph{at the same time} also accepting inputs from other
+users. Moreover, the view of the program that the submitter has at the time of
+submission may \emph{already} be outdated. This aspect is even more significant
+in the context of a blockchain, where expressions are queued until a block is
+created by a node, but what those expressions in the queue are is not
+accessible to other nodes.
+
+This fact may lead to bugs or attacks. Consider the following snippet:
+
+\begin{lstlisting}
+(define transfer (lambda (from to amount) ...))
+(define account-alice ...)
+(define account-bob ...)
+(define transfer-to-alice (lambda (from amount)
+  (transfer from account-alice amount))
+\end{lstlisting}
+
+A user now wants to transfer some amount to Alice. However, in a language such
+as Scheme the function call \texttt{(transfer-to-alice account-bob 10)} may
+behave differently than this snippet alone indicates in two ways. First,
+\texttt{transfer-to-alice} and \texttt{account-bob}, which explicitly appear in
+the expression being submitted, may be shadowed by a new definition. Second, the
+variables \texttt{transfer}, \texttt{account-alice}, and \emph{any other} free
+variables used in the body of \texttt{transfer} or transitively, in the function
+bodies of the functions \texttt{transfer} calls, may have been redefined.
+
+One solution is to not allow the redefinition of variables at all. This is
+indeed what some smart contract languages do, and can easily be implemented in
+\rad{} as well (see Section \ref{s:reflective-towers}). But this comes with its
+own problems; one cannot define an improved version of a function that shadows
+the old one, and must instead accept a more and more polluted environment (which
+additionally may impact memory usage).
+
+An alternative is to have a mechanism (call it \texttt{protect-at-line}) to
+make expressions invalid if any of the variables they rely on have been
+redefined since a specified line of code.
+However this option is quite severe. Consider:
+
+\begin{Verbatim}[fontsize=\small]
+(define x 3) ;; line 1
+(define foo (lambda () x)) ;; line 2
+(define x 5) ;; line 3
+\end{Verbatim}
+
+The function call \texttt{(protect-at-line 2 (foo))} will fail despite having a
+perfectly reasonable interpretation - namely, \texttt{(foo)} \emph{with}
+\texttt{x} \emph{as if used after line 2} (i.e., with \texttt{x} being
+\texttt{3}). For more complex expressions, which may rely on many variables,
+this problem becomes more significant.
+
+This reasonable interpretation is in fact precisely what hyperstatic
+environments provide. The function call \texttt{(foo)} in line 4 would, in this
+model, still evaluate to \texttt{3}. The free variables of a function refer to
+the values of variables \emph{when they were defined}. This is the semantics
+\rad{} adopts in general (and can be found in some other languages, such as
+Forth and Standard ML\cite{SML1997}).
+
+Now \texttt{(protect-at-line (foo))} may be given a much simpler definition:
+\texttt{(foo)} if \texttt{foo} \emph{alone} has not been redefined, and otherwise
+an exception. If \texttt{x} has been redefined, that is no matter, since it
+anyhow does not change the meaning of \texttt{foo}.
+
+%%% End section
+
+\subsection{\texttt{eval} redefinition}
+
+\rad{} should be able to emulate any state machine. Of course, most state-machines
+don't accept arbitrary inputs, and certainly not inputs which change the
+semantics of the state-machine. Thus \rad{} should have some built in mechanism
+for controlling how inputs get interpreted. At the start inputs are sent
+directly for evaluation by the `base' evaluator, so it is natural to associate
+modifying this process with redefining a function which represents evaluation.
+When taken to the extreme, \emph{all} evaluation is done with a call to the
+special function \texttt{eval}, and this creates a reflective tower of
+interpreters. In \rad{}, a more limited form of \texttt{eval}-redefinition is
+available. As an example:
+\begin{Verbatim}[fontsize=\small]
+> (write-ref eval-ref (lambda (expr) 3))
+=> ()
+> 5
+=> 3
+\end{Verbatim}
+
+Contrast this with the sort of \texttt{eval}-redefinition that is available in
+the language Black(\cite{Asai1997}):
+
+\begin{lstlisting}
+(exec-at-metalevel
+  (let ((old-eval base-eval))
+    (set! base-eval
+          (lambda (exp env cont)
+            (write exp) (newline) (old-eval exp env cont)))))
+\end{lstlisting}
+After this the Black REPL will behave as follows:
+\begin{Verbatim}[fontsize=\small]
+> (+ 1 2)
+(+ 1 2)
++
+1
+2
+=> 3
+\end{Verbatim}
+Thus, the new evaluation function is used recursively, at all levels of the
+expression \texttt{(+ 1 2)}.
+
+Compare this to the following \rad{} session:
+\begin{Verbatim}[fontsize=\small]
+> (define old (read-ref eval-ref))
+> (define new (lambda (e) (do (print! e) (old e))))
+> (write-ref eval-ref new)
+=> ()
+rad> (+ 1 2)
+(+ 1.0 2.0)
+=> 3.0
+\end{Verbatim}
+In Black, \texttt{old-eval} calls out to
+\texttt{base-eval}, and in subsequent evaluation this will refer to the new
+definition. This is what makes the new evalution behaviour take effect at all
+levels of evaluation. In \rad{}, the new evaluation only gets invoked at the
+topmost level, on new inputs. If one wants to make the evaluation behaviour
+recursive this has to be coded explicitely.
+
+In most cases chains will define a domain-specific language to be interpreted in
+some narrow way, with only some calls to the base eval to reify function
+definitions, in case one wants to modify the behaviour of the state-machine in
+some way. Furthermore, this form of evaluation redefinition doesn't (by default)
+create a tower of interpreters. Evaluating in a tower requires advanced
+interpretation methods to avoid performance overheads, and this is all
+the more important in \rad{}'s case where chains may be very long-lived. Such
+methods are still the subject of active reasearch (see for example \cite{Asai2014},
+\cite{Thyer1999}, \cite{Amin2017}, \cite{Brown2017}), and may interfere with other
+requirements of the language. Moreover, since eval-redefinition affects all
+sub-expressions, and may affect not just the ``immediate'' interpreter but ones
+in which it is defined, reasoning about eval-redefinitions in towers can be
+very difficult.
+For these reasons we believe that this limited
+form of eval-redefinition suits the needs of \rad{} better than the sort of
+reflection that can be found in languages such as Black.
+
+%% \rad does not have macros. Instead, it allows for a complete redefinition of
+%% the intepreter via redefinitions of \texttt{eval}.
+
+%% \begin{verbatim}
+%% (define eval (lambda (expr) 3)) ;;
+%% 5 ;; => 3
+%% \end{verbatim}
+
+%% This enables users to very easily define sublanguages for new chains, or amend
+%% the language running in the current one.
+
+For a more involved example, consider a simplistic key-value store:
+
+\input{out/kv0.rad-tex}
+
+After which we have:
+
+\begin{Verbatim}[fontsize=\small]
+> (set key1 3)
+=> ()
+> (get key1)
+=> 3
+> (+ 3 2)
+=> 'invalid-command
+
+;; Note that nested expressions are not evaluated:
+> (set key2 (+ 3 2))
+=> ()
+> (get key2)
+=> '(+ 3 2)
+\end{Verbatim}
+
+% TODO: maybe move to Related Work section
+\subsection{Connection to Reflective Towers}
+\label{s:reflective-towers}
+
+The \texttt{eval}-redefinition mechanism resembles prior work on
+\emph{reflective towers}. A reflective tower is an infinite sequence of
+interpreters (called `levels') $L_0$, $L_1$, ..., where level $L_n$ is
+interpreted by $L_{n+1}$. Reflective towers allow both \emph{reification}---the
+ability to inspect a computation via constructs of a higher level---and
+\emph{reflection}, that is, the ability to define and enter new, lower levels.
+Conceptually, \rad{} differs from reflective towers by only allowing reflection.
+Thus, the only levels that exist are the ones programs create. Queinnec has
+quipped that reflective languages ``plunge us into a world with few laws, and
+hardly any gravity''\cite{Queinnec1994}; the more disciplined approach to
+reflection that \rad{} takes does not possess the semantic fragility of modifying
+meta-meta-intepreters.
+
+The techniques that have been developed for reducing the interpretive overhead
+of such towers of interpreters, however, still
+apply (see, for example, \cite{Amin2017}, \cite{Asai2014}), as do simpler
+partial-evaluation-based approaches such as \cite{Brown2017}.
+
+\subsection{Immutable values and refs}
+In \rad{} all values are immutable: once created they cannot be modified in any
+way. This follows in the footsteps of languages such as functional programming
+languages such as Haskell, Clojure, Erlang, etc.
+
+This allows a more \textit{local} reasoning of the behaviour of programs;
+values are guaranteed to not change as the result of calling a function. This
+is particularly important in the context of a massively collaborative
+program where programmers cannot rely on a global picture of the program,
+maintained by knowledge-dissemination via code reviews and standardized
+practices.
+
+However state-machines are inherently stateful, so a reference type is included
+in the language. Reading or modifying the reference must be done explicitly,
+with the primops \texttt{read-ref} and \texttt{write-ref}, respectively.
+
+\subsection{Effects} In order to maintain determinism and safety in on-chain
+computations, the primitives available on-chain, $\rho$, are pure. \rad{} also
+comes with an additional set of primitives, $\rho_{!}$, intended for off-chain
+computations, such as scripting interactions with RSMs (these primitives are
+by convention textually distinguished by identifiers ending with an exclamation
+mark).
+
+Expressions in the RSM therefore cannot have
+side-effects; instead, they may evaluate to a value that \emph{describes} an effect,
+but the decision of whether or how to actually carry on that effect happens at an
+effect-handling layer. This architecture, with a central authority
+administering effects received via messages, resembles work following
+\cite{Cartwright1994} and \cite{Bauer2013}.
+
+The value that results from evaluating an expression purely may, in addition to
+\emph{describing} an effect, pass a continuation with the result of that
+effect (if any). The effect-handling layer can chose to only call continuations
+without arguments. This in turn means the continuation will not have access to
+the result of effectful computations, though it may (at the discretion of the
+effect-handling layers) have output effects.
+
+\subsection{Semantics}
+
+The semantics of \rad{} is defined in terms of an abstract state machine, that
+is, a mathematical function between sets. For the precise definitions of the
+sets we use in this definition, see appendix \ref{value-definition}.
+
+The particularity of \rad{} is that it defines a state machine whose behaviour
+can change in response to some input. for this reason, the semantics of \rad{}
+is defined in two steps: First we define the \emph{base semantics} $\B$, which
+is the semantics of the `underlying' programming language, and then the
+state-machine semantics $\S$, which specifies the particular way in which the
+base semantics are invoked on each item of the input stream. Both will be
+defined in terms of endomaps of the \emph{state} $S$ of the machine, associated
+with each possible input, which are just elements of $V$, the set of
+\emph{values}. Note that technically any value is permitted as an input, but in
+practice when deployed the inputs will be deserialised from some transmission
+format which will most likely exclude values such as closures.
+
+The state is composed of the \emph{environment} $E$, which associates identifiers to
+values, and the \emph{memory} $M$ which tracks the values of refs:
+\[
+S := E \times M
+\]
+with
+\[
+E := \Ident \to 1 + V \quad \text{and} \quad M := A \to 1 + V,
+\]
+The set $\Ident$ is the (implementation specific) specification of valid
+identifiers. The set $A = \mathbb{N} + \{\evalAddr\}$ is the set of memory
+addresses, that is, a memory address is either a natural number or the special
+address $\evalAddr$ which is used for storing the evaluation function. The set
+of values is defined in appendix \ref{value-definition}.
+
+We shall adopt the following convention to make the definitions more readable:
+many of the functions have as codomain a set $1 + X$ (for some set $X$), with
+the left summand indicating an error. When defining such a partial function in
+terms of another, the errors propagate naturally, so these cases will be
+supressed from the definitions.
+
+\subsubsection{Base semantics $\B$}
+
+The base semantics is defined as a function
+\[
+\B \colon V \times S \to 1 + S \times V.
+\]
+\begin{itemize}
+\item Identifiers: If $i \in \Ident$ is an identifier then
+  \[
+    B(i,(e,m)) := ((e,m),e(i)),
+  \]
+  unless $i$ is undefined in which case $B(i, (e,m))$ results in an
+  error.
+\item Conditionals: For $c,t,f \in P$,
+  \[
+    \B( (\mathtt{if} \ c \ t \ f), (e,m)) :=
+    \begin{cases}
+      \B(t, (e', m')) & \text{if $c' \neq \mathtt{\#f}$,}\\
+      \B(f, (e', m')) & \text{otherwise,}
+    \end{cases}
+  \]
+  where $\B(c, (e,m)) = ((e',m'), c')$.
+\item
+  \def\defe{\mathrm{def}}
+  \def\calle{\mathrm{call}}
+  \def\rete{\mathrm{rete}}
+  Lambdas: If $p^+ \in V^*$, and $x$ is an identifier, then
+  \[
+    \B((\mathtt{lambda} (x) \ p^+), (e_\defe, m_\defe)) :=
+    ((e_\defe,m_\defe), f)
+  \]
+  where $f$ is the function:
+  \[
+    (v, (e_\calle,m_\calle)) \mapsto \B^+(p^+, (e_\defe, m_\calle)).
+  \]
+  See below for the definition of the sequence semantics $\B^+$.
+\item Definitions: When $x \in \Ident$ and $p \in V$,
+\[
+\B((\mathtt{define} \ x \ p), (e,m)) := ((e'[x \mapsto v], m'), ())
+\]
+where $\B(p, (e,m)) = ((e', m'), v)$.
+\item Applications: When $p \in V$ and $q^+ \in V^*$, then
+\[
+\B((p \ q^+), (e,m)) := f(v, (e'',m''))
+\]
+where (assuming no errors and that $f$ is a function):
+\begin{align*}
+  \B(p, (e,m)) &= ((e',m'), f)\\
+  \B(q, (e',m')) &= ((e'',m''), v).
+\end{align*}
+If $f$ is not a function then this is an error.
+\item All other inputs yield an error.
+\end{itemize}
+
+The auxiliary sequence semantics $\B^+$ is defined on sequences of values $V^*$, as follows:
+  \[
+    \B^+(p_0 \ldots p_n, s) =
+    \begin{cases}
+      \mathtt{error} & \text{if $n = 0$,}\\
+      \B(p_0, s) & \text{if $n = 1$,}\\
+      \B^+(p_1 \ldots p_n, s') & \text{otherwise,}
+    \end{cases}
+  \]
+  where $\B(p_0, s') = (s, v')$.
+
+\subsubsection{State-machine semantics}
+The \rad{} state machine is given by an \emph{initial state} $s_0$ and a
+transition function
+\[
+  \S \colon P \times S \to S.
+\]
+
+The initial state is defined to be $(e_0,m_0)$ where $e_0$ is the \emph{initial
+  environment} (see appendix \ref{initial-env}), and
+\[
+  m_0 := (\iota_L \circ !_A)[\text{\texttt{eval-addr}} \mapsto \B].
+\]
+is the memory which associates a value to the special address
+\texttt{eval-addr}; a function which evaluates values according to the base
+evaluation.
+
+Given a value $p$ and a state $(e,m) \in S$, if $m(\text{\texttt{eval-addr}})$
+is undefined, or not a function, then the machine crashes. Otherwise
+\[
+  \S(p, (e,m)) = s'
+\]
+where $m(\text{\texttt{eval-addr}})(p,(e,m)) = (s', v')$.
+That is, evaluation proceeds as specified by the original base evaluation, or
+any new evaluation that has been set in the special ref with address $\evalAddr$.

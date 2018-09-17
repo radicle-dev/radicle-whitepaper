@@ -1,0 +1,116 @@
+\section{Definition of \rad's initial environment}
+\label{initial-env}
+
+The initial environment is filled with a few functions that deal with
+manipulating the core data-structures.
+
+\subsection{Pure functions}
+
+\emph{Pure functions} are those which have no effect on the state. Thus when we
+say $\mathtt{f}$ is defined as the pure function $f$, we mean that in $V$ it is
+represented by:
+\[
+  (s, v) \mapsto (s, f(v)).
+\]
+In this section we only define pure functions.
+
+\begin{itemize}
+\item \texttt{eq?} tests values for equality:
+  \[
+    (v_1, v_2) \mapsto
+    \begin{cases}
+      \mathtt{t}\# & \text{if } v_1 \sim v_2,\\
+      \mathtt{f}\# & \text{otherwise.}
+    \end{cases}
+  \]
+  Where the relation $\sim$ is the least equivalence relation on values $V$ such
+  that
+  \begin{itemize}
+  \item
+    it restricts to equality on the coproduct components $\Sym, \Keyword, \String,
+    \Bool, \Num$ and $\Ref$,
+  \item
+    $\forall (x_1 \ldots x_n), (y_1 \ldots y_n) \in V^*, \ilist((x_1 \ldots
+    x_n)) \sim \ilist((x_1 \ldots x_n)) \Leftrightarrow x_1 \sim y_1, \ldots, x_n
+    \sim y_n$
+  \item
+    $\forall d_1, d_2 \in (V \to 1 + V), \idict(d_1) \sim \idict(d_2)
+    \Leftrightarrow \forall x \in V, d_1(x) \sim d_2(x).$
+  \end{itemize}
+\item
+  \texttt{empty-list} returns the empty-list.
+  \texttt{cons} adds elements to the front of lists:
+  \[
+    (v, (v_1 \ldots v_n)) \mapsto (v v_1 \ldots v_n).
+  \]
+\item
+  \texttt{head} and \texttt{tail} deconstruct lists, they correspond to the pure
+  functions:
+  \begin{align*}
+    (v_1 \ldots v_n) &\mapsto
+    \begin{cases}
+      v_1 & \text{if } n \geq 1,\\
+      \mathtt{error} & \text{otherwise}
+    \end{cases},\\
+    (v_1 \ldots v_n) &\mapsto
+    \begin{cases}
+      (v_2 \ldots v_n) & \text{if } n \geq 1,\\
+      \mathtt{error} & \text{otherwise.}
+    \end{cases}
+  \end{align*}
+\item \texttt{empty-dict}, \texttt{lookup} and \texttt{insert} allow the
+  creation and querying of dicts. They correspond to the pure functions:
+  \begin{align*}
+    () &\mapsto (k \mapsto \mathtt{error}),\\
+    (k, d) &\mapsto d(k),\\
+    (k, v, d) &\mapsto \left(x \mapsto
+                \begin{cases}
+                  v & \text{if $x \sim k$,}\\
+                  d(x) & \text{otherwise.}
+                \end{cases}
+                \right)
+  \end{align*}
+\item The pure function \texttt{string-append} concatenates a list of strings
+  (implementation specific).
+\item The pure functions $\mathtt{+}, \mathtt{*}, \mathtt{-}, \mathtt{<},
+  \mathtt{>}$ correspond to the mathematical functions $+, \times, -, <, >$
+  respectively.
+\end{itemize}
+
+\subsection{Impure functions}
+
+There are only three impure functions and they deal with reference cells.
+\begin{itemize}
+\item \texttt{ref} creates a new reference cell and returns it:
+  \[
+    ((e,m), v) \mapsto ((e,m[a \mapsto v]), \iref(a))
+  \]
+  where $a$ is a new memory address, that is, $m(a) = \mathtt{error}$. How $a$
+  is generated is implementation specific.
+\item \texttt{read-ref!} dereferences a reference cell:
+  \[
+    ((e,m), r) \mapsto
+    \begin{cases}
+      ((e,m), m(a)) & \text{if $r = \iref(a)$ for some address $a$,}\\
+      \mathtt{error} & \text{otherwise.}
+    \end{cases}
+  \]
+\item \texttt{write-ref!} writes a new value to a reference cell:
+  \[
+    ((e,m), r, v) \mapsto
+    \begin{cases}
+      ((e,m[a \mapsto v]), ()) & \text{if $r = \iref(a)$ for some address $a$,}\\
+      \mathtt{error} & \text{otherwise.}
+    \end{cases}
+  \]
+\item Lastly, \texttt{eval-ref} holds the evaluation function, that is the
+  initial environment associates the symbol \texttt{eval-ref} to the value
+  $\iref(\evalAddr)$, where $\evalAddr \in A$ is the special address for the
+  evaluation function. We will usually define:
+  \begin{lstlisting}
+    (define eval
+      (lambda (expr)
+        ((read-ref! eval-ref) expr)))
+  \end{lstlisting}
+  so that the function \texttt{eval} evaluates expressions with the current evaluator.
+\end{itemize}

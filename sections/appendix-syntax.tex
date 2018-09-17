@@ -1,0 +1,49 @@
+\section{Syntax of \rad}
+
+\setlength{\grammarindent}{5em}
+\begin{figure}[H]
+\begin{center}
+\begin{grammar}
+<expr> ::= <identifier>
+\alt <literal>
+\alt <application>
+\alt <lambda>
+\alt <define>
+\alt <conditional>
+
+<identifier> ::= <initial> <subsequent>*
+\alt <special identifier>
+
+<special identifier> ::= <special char>+
+
+<special char> ::= `+' \alt `-' \alt <extended char>
+
+<initial> ::= <letter> \alt <extended char>
+
+<subsequent> ::= <letter> \alt <number> \alt <extended char>
+
+<literal> ::= <boolean>
+\alt <number>
+\alt <string>
+
+<boolean> ::= `#t' \alt `#f'
+
+<string> ::= `"' <string element> `"'
+
+<string element> ::= <any character other than `"' or `\'>
+\alt `\\\"'
+\alt `\\\\'
+
+<comment> ::= `;;' <any character except newline> <newline>
+\alt `#|' <character sequence not containing `|#'> `|#'
+
+<application> ::= `(' <expr> <expr*> `)'
+
+<conditional> ::= `(' `if' <expr> <expr> <expr> `)'
+
+
+<define> ::= `(' `define' <identifier> <expr*> `)'
+\end{grammar}
+\end{center}
+\caption{Syntax of \rad}
+\end{figure}

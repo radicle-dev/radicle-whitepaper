@@ -1,0 +1,58 @@
+\section{Derived Forms}
+
+Derived forms are defined here as sample redefinitions of \texttt{eval}.
+
+
+\subsection*{\texttt{quote}}
+
+\begin{verbatim}
+\end{verbatim}
+
+\subsection*{\texttt{quasiquote}}
+
+\begin{verbatim}
+\end{verbatim}
+
+\subsection*{\texttt{unquote}}
+
+\begin{verbatim}
+\end{verbatim}
+
+\subsection*{\texttt{def}}
+
+\begin{verbatim}
+
+;; TODO: doc handling
+
+(define eval (lambda (expr)
+   (if (eq? (head expr) 'def)
+       ((lambda ()
+         (define pat (head (tail expr)))
+         (define body (head (tail (tail expr))))
+         (if (list? pat)
+             (if (null? pat)
+                 (error "def: bad name or pattern")
+                 `(define ,(head pat) (lambda ,(tail pat) ,body)))
+             `(define ,pat ,body))))
+       expr))
+
+\end{verbatim}
+
+Example:
+
+\begin{verbatim}
+(def (factorial n)
+  (:doc-str "The factorial function")
+  (if (<= n 0)
+      1
+      (* n (factorial (- n 1))))
+
+;; Which is equivalent to:
+
+(begin
+  (define factorial (lambda (n)
+    (if (<= n 0)
+        1
+        (* n (factorial (- n 1)))))
+  (add-doc-str factorial "The factorial function")
+\end{verbatim}

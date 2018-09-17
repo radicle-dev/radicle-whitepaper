@@ -1,0 +1,65 @@
+;; Helper to modify a dict at a key.
+(define modify-dict
+  (lambda (key fn mp)
+    (insert key (fn (lookup key mp)) mp)))
+
+;; Creates a currency and returns the relevant evaluation function.
+(define create-currency (lambda ()
+
+  ;; The dict of all accounts
+  (define accounts (ref (dict)))
+
+  ;; Create an account with 10 coins.
+  (define new-account
+    (lambda (name)
+      (modify-ref accounts
+        (lambda (acc)
+          (insert name 10 acc)))
+      :ok))
+
+  ;; Get an account's balance.
+  (define balance
+    (lambda (name)
+      (lookup name (read-ref accounts))))
+
+  ;; Apply a function to an account.
+  (define modify-account
+    (lambda (f)
+      (lambda (name amount)
+        (modify-ref
+          accounts
+          (lambda (acc)
+            (modify-dict
+              name
+              (lambda (x)
+                (f x amount))
+              acc)))
+        :ok)))
+
+  ;; Debit an account.
+  (define debit (modify-account -))
+
+  ;; Credit an account.
+  (define credit (modify-account +))
+
+  ;; Transfer money from one account to another.
+  (define transfer (from to amount)
+    (if (< amount (balance from))
+        (do (debit  from amount)
+            (credit to   amount))
+      fail))
+
+  (define currency-eval
+    (lambda (expr)
+      (define c (head expr))
+      (cond
+        (eq? c 'new-account)
+          (new-account (nth 1 expr))
+        (eq? c 'account-balance)
+          (balance (nth 2 expr))
+        (eq? c 'transfer)
+          (transfer (nth 1 expr) (nth 2 expr) (nth 3 expr))
+        :else fail)))
+
+  ;; We return the evaluation function for this currency.
+  currency-eval))

@@ -1,0 +1,111 @@
+\section{Sample Programs and Chains}
+
+In this section, we develop a better sense for the language and its
+applications by considering sample programs.
+
+\subsection{Self-amending key-value store}
+
+In Section \ref{s:language}, we defined a simple key-value store language. It
+was not, however, an \emph{amendable} one---once defined, it was impossible to
+change the semantics of the running system. For short-lived chains with a narrow
+purpose, this might be satisfactory. For long-lived chains, the participants
+ideas on the purpose of the chain may morph over time. Forking to a new chain is
+an option, but this is not ideal for two reasons:
+\begin{itemize}
+  \item Consensus on the purpose and semantics of the new chain must be achieved
+    ``of chain''.
+  \item Participants must agree on the process and logistics of migrating to a
+    new chain, how to decide from which block this takes place, etc.
+\end{itemize}
+In radicle this can all take place in-chain, by updating the eval function.
+
+\input{out/kv1.rad-tex}
+
+Note that in this case, the new evaluation function that is instantiated as a
+result of a an \texttt{update} command, is the result of evaluating an
+expression with the original \texttt{eval} function, because of the hyperstatic
+environments. Thus, in this case, no tower of interpreters is formed. Instead,
+we are swapping out one eval for another.
+
+\subsection{Currency}
+
+TODO: discuss how we can insure that only bob can submit the command
+\texttt{(transfer "bob" x n)}.
+
+In this section we define a currency. This example demonstrates both higher
+order functions and data-hiding. Indeed the \texttt{create-currency} function
+defines all the state needed for the operation of the currency but then only
+returns the relevant evaluation function, making the internals of the currency
+unavailable to the caller. Furthermore, by returning a potential evaluation
+function (rather than setting it directly), this function may be used as a
+sub-behaviour of a more featurefull RSM.
+
+\input{out/currency.rad-tex}
+
+After loading this code, we can imagine the following \rad{} session:
+\begin{Verbatim}[fontsize=\small]
+> (write-ref eval-ref (create-currency))
+=> ()
+> (new-account "alice")
+=> :ok
+> (new-account "bob")
+=> :ok
+> (transfer "alice" "bob" 3)
+=> :ok
+> (balance "alice")
+=> 7
+\end{Verbatim}
+
+\subsection{Updatable state-machine}
+
+Most chains will operate simple state machines with state $S$, inputs $I$ and
+transitions governed by a function
+\[
+t \colon S \times I \to S.
+\]
+
+During the lifetime of the chain, participants may decide to modify the
+state-machine in some way. The target state machine they have in mind is
+specified by states $S'$, inputs $I'$ and transition function $t' \colon S'
+\times I' \to S'$. In order for the old-state to be preserved they must also
+choose a way to map the old state into the new format, with a function $f \colon
+S \to S'$.
+
+In order to achieve this, we define a chain that accepts two sorts of inputs:
+\emph{basic inputs}:
+\[
+\mathtt{(basic} \ s), \quad s \in S
+\]
+and \emph{meta-inputs}:
+\[
+\mathtt{(meta} \ s), \quad s \in S
+\]
+which are messages the participants use to coordinate in choosing a new
+transition function. All basic-inputs are simply handled by $t$ to update the
+current state. The meta-inputs $\bar I$ are handled by a function
+\[
+m \colon \bar S \times S \times \bar I \to \bar S + V
+\]
+which modifies the meta-state $\bar S$ of the chain, while also having read-only
+access to the state $S$. When $m$ produces a value in the right summand, this is
+an expression which is evaluated to a dictionary containing $f$, $t'$ and
+possibly $m'$. If only $f$ and $t'$ are present, the state is translated to the
+new format with $f$, and the new state machine operated by $t'$ starts accepting
+new basic inputs. If $m'$ is also provided, then the protocol for redefinition
+of the state-machine is also updated.
+
+Using this higher-order function we can now demonstrate several interesting
+examples of chains:
+\begin{itemize}
+\item Issue chain, only person who opened issue and maintainers can close, only
+  maintainers can update the transition function.
+\item Ultimate example: chain managing a repo. The set of maintainers is
+  maintained in a config file in master branch. only maintainers can accept PRs
+  to master. Only maintainers can vote on new transition functions. This means
+  that the function $m$ reads not only from the vote state $\bar S$ but also the
+  basic state $S$ (i.e. the source code under version control).
+\item etc.
+\end{itemize}
+
+\subsection{Nomic}
+\label{s:examples}
