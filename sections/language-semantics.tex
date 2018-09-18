@@ -355,21 +355,23 @@ effect-handling layers) have output effects.
 
 \subsection{Semantics}
 
-The semantics of \rad{} is defined in terms of an abstract state machine, that
-is, a mathematical function between sets. For the precise definitions of the
-sets we use in this definition, see appendix \ref{value-definition}.
+\rad{}'s semantics are defined in terms of an abstract state machine, that is, a
+set of possible states $S$, an initial state $s_0 \in S$, a set of possible
+inputs $I$, and a transition function $\S \colon S \times I \to S$.
+For the precise definitions of the sets in use, see appendix
+\ref{value-definition}.
 
 The particularity of \rad{} is that it defines a state machine whose behaviour
-can change in response to some input. for this reason, the semantics of \rad{}
-is defined in two steps: First we define the \emph{base semantics} $\B$, which
-is the semantics of the `underlying' programming language, and then the
+can change in response to some input. for this reason, \rad{}'s semantics is
+defined in two steps: First we define the \emph{base semantics} $\B$, which is
+the semantics of the `underlying' programming language, and then the
 state-machine semantics $\S$, which specifies the particular way in which the
 base semantics are invoked on each item of the input stream. Both will be
 defined in terms of endomaps of the \emph{state} $S$ of the machine, associated
 with each possible input, which are just elements of $V$, the set of
 \emph{values}. Note that technically any value is permitted as an input, but in
-practice when deployed the inputs will be deserialised from some transmission
-format which will most likely exclude values such as closures.
+practice when deployed on a network the inputs will be deserialised from some
+transmission format which will most likely exclude values such as closures.
 
 The state is composed of the \emph{environment} $E$, which associates identifiers to
 values, and the \emph{memory} $M$ which tracks the values of refs:
@@ -380,88 +382,111 @@ with
 \[
 E := \Ident \to 1 + V \quad \text{and} \quad M := A \to 1 + V,
 \]
-The set $\Ident$ is the (implementation specific) specification of valid
-identifiers. The set $A = \mathbb{N} + \{\evalAddr\}$ is the set of memory
-addresses, that is, a memory address is either a natural number or the special
-address $\evalAddr$ which is used for storing the evaluation function. The set
-of values is defined in appendix \ref{value-definition}.
+The (implementation specific) set $\Ident$ describes the valid identifiers. The
+set $A = \mathbb{N} + \{\evalAddr\}$ contains the memory addresses used for
+reference cells, that is, a memory address is either a natural number or the
+special address $\evalAddr$ which is used for storing the evaluation function.
+The set of values is defined in appendix \ref{value-definition}.
 
 We shall adopt the following convention to make the definitions more readable:
 many of the functions have as codomain a set $1 + X$ (for some set $X$), with
-the left summand indicating an error. When defining such a partial function in
-terms of another, the errors propagate naturally, so these cases will be
-supressed from the definitions.
+the left summand indicating an error. The unique element of $1$ is denoted
+\texttt{error}. When defining such a function in terms of another, the errors
+propagate naturally, so these cases will be supressed from the definitions.
 
 \subsubsection{Base semantics $\B$}
 
 The base semantics is defined as a function
 \[
-\B \colon V \times S \to 1 + S \times V.
+\B \colon S \times V \to 1 + S \times V.
 \]
 \begin{itemize}
+\item Sequences: If $p_1, \ldots, p_n \in V$, then
+  \[
+    \B(s, (\mathtt{do} \ p_1 \ldots p_n)) := \B^+(s, (p_i)).
+  \]
+  See below for the definition of the sequence semantics $\B^+$, which defines
+  the semantics over a finite sequence of inputs (not to be confused with the
+  state machine semantics $\S$ which comes later).
 \item Identifiers: If $i \in \Ident$ is an identifier then
   \[
-    B(i,(e,m)) := ((e,m),e(i)),
+    B((e,m), i) := ((e,m),e(i)),
   \]
-  unless $i$ is undefined in which case $B(i, (e,m))$ results in an
-  error.
-\item Conditionals: For $c,t,f \in P$,
+  unless $e(i) = \mathtt{error}$ in which case $B((e,m), i) = \mathtt{error}$.
+\item Conditionals: For $c,t,f \in V$,
   \[
-    \B( (\mathtt{if} \ c \ t \ f), (e,m)) :=
+    \B( s, (\mathtt{if} \ c \ t \ f)) :=
     \begin{cases}
-      \B(t, (e', m')) & \text{if $c' \neq \mathtt{\#f}$,}\\
-      \B(f, (e', m')) & \text{otherwise,}
+      \B(s', t) & \text{if $c' \neq \mathtt{\#f}$,}\\
+      \B(s', f) & \text{otherwise,}
     \end{cases}
   \]
-  where $\B(c, (e,m)) = ((e',m'), c')$.
+  where $\B(s, c) = (s', c')$.
+
+  For $n \geq 0$, $c_i, x_i \in V$, $1 \leq i \leq n$,
+  \begin{multline*}
+    \B(s, (\mathtt{cond} \ c_1 \ x_1 \ldots c_n \ x_n)) :=\\
+    \begin{cases}
+      \mathtt{error} & \text{if $n = 0$,}\\
+      \B(s', x_1) & \text{if $v \neq \#\mathtt{f}$,}\\
+      \B(s', (\mathtt{cond} \ c_2 \ x_2 \ldots c_n \ x_n)) & \text{otherwise}.
+    \end{cases}
+  \end{multline*}
+  where $\B(s, c_1) = (s', v)$.
 \item
   \def\defe{\mathrm{def}}
   \def\calle{\mathrm{call}}
   \def\rete{\mathrm{rete}}
-  Lambdas: If $p^+ \in V^*$, and $x$ is an identifier, then
-  \[
-    \B((\mathtt{lambda} (x) \ p^+), (e_\defe, m_\defe)) :=
+  Lambdas: If $(x_1 \ldots x_n) \in I^*$ and $(p_1 \ldots p_m) \in V^*$, then
+  \begin{multline*}
+    \B((e_\defe, m_\defe), (\mathtt{lambda} \ (x_1 \ldots x_n) \ p_1 \ldots p_m)) :=\\
     ((e_\defe,m_\defe), f)
-  \]
+  \end{multline*}
   where $f$ is the function:
-  \[
-    (v, (e_\calle,m_\calle)) \mapsto \B^+(p^+, (e_\defe, m_\calle)).
-  \]
-  See below for the definition of the sequence semantics $\B^+$.
+  \begin{multline*}
+    ((e_\calle,m_\calle), (v_1 \ldots v_{n'})) \mapsto\\
+    \begin{cases}
+      \B^+((e_\defe[x_i \mapsto v_i], m_\calle), (p_i)) & \text{if $n = n'$,}\\
+      \mathtt{error} & \text{otherwise.}
+    \end{cases}
+  \end{multline*}
 \item Definitions: When $x \in \Ident$ and $p \in V$,
 \[
-\B((\mathtt{define} \ x \ p), (e,m)) := ((e'[x \mapsto v], m'), ())
+\B((e,m), (\mathtt{define} \ x \ p)) := ((e'[x \mapsto v], m'), ())
 \]
-where $\B(p, (e,m)) = ((e', m'), v)$.
-\item Applications: When $p \in V$ and $q^+ \in V^*$, then
+where $\B((e,m), p) = ((e', m'), v)$.
+\item Applications: When $p \in V$ and $(q_1 \ldots q_n) \in V^*$, then
 \[
-\B((p \ q^+), (e,m)) := f(v, (e'',m''))
+\B(s, (p \ q_1 \ldots q_n)) := f(s_n, (v_1 \ldots v_n))
 \]
-where (assuming no errors and that $f$ is a function):
+where
 \begin{align*}
-  \B(p, (e,m)) &= ((e',m'), f)\\
-  \B(q, (e',m')) &= ((e'',m''), v).
+  \B(s, p) &= (s_0, f),\\
+  \B(s_0, q_1) &= (s_1, v_1),\\
+  \ldots\\
+  \B(s_{n-1}, q_n) &= (s_n, v_n)
 \end{align*}
-If $f$ is not a function then this is an error.
+and $f$ is a function. If any of these result in an error, or $f$ is not a
+function, then the whole computation results in an error.
 \item All other inputs yield an error.
 \end{itemize}
 
 The auxiliary sequence semantics $\B^+$ is defined on sequences of values $V^*$, as follows:
   \[
-    \B^+(p_0 \ldots p_n, s) =
+    \B^+(s, (p_i)_{1 \leq i \leq n}) =
     \begin{cases}
       \mathtt{error} & \text{if $n = 0$,}\\
-      \B(p_0, s) & \text{if $n = 1$,}\\
-      \B^+(p_1 \ldots p_n, s') & \text{otherwise,}
+      \B(s, p_1) & \text{if $n = 1$,}\\
+      \B^+(s', (p_i)_{2 \leq i \leq n}) & \text{otherwise,}
     \end{cases}
   \]
-  where $\B(p_0, s') = (s, v')$.
+  where $\B(s', p_1) = (s', v')$.
 
 \subsubsection{State-machine semantics}
 The \rad{} state machine is given by an \emph{initial state} $s_0$ and a
 transition function
 \[
-  \S \colon P \times S \to S.
+  \S \colon S \times V \to S.
 \]
 
 The initial state is defined to be $(e_0,m_0)$ where $e_0$ is the \emph{initial
@@ -473,11 +498,12 @@ is the memory which associates a value to the special address
 \texttt{eval-addr}; a function which evaluates values according to the base
 evaluation.
 
-Given a value $p$ and a state $(e,m) \in S$, if $m(\text{\texttt{eval-addr}})$
-is undefined, or not a function, then the machine crashes. Otherwise
+Given a value $p \in V$ and a state $(e,m) \in S$, if
+$m(\text{\texttt{eval-addr}})$ is undefined, or not a function, then the machine
+crashes. Otherwise
 \[
-  \S(p, (e,m)) = s'
+  \S((e,m), p) = s'
 \]
-where $m(\text{\texttt{eval-addr}})(p,(e,m)) = (s', v')$.
+where $m(\text{\texttt{eval-addr}})((e,m), p) = (s', v')$.
 That is, evaluation proceeds as specified by the original base evaluation, or
 any new evaluation that has been set in the special ref with address $\evalAddr$.

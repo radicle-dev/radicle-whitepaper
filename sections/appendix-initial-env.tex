@@ -10,9 +10,11 @@ manipulating the core data-structures.
 say $\mathtt{f}$ is defined as the pure function $f$, we mean that in $V$ it is
 represented by:
 \[
-  (s, v) \mapsto (s, f(v)).
+  (s, (v_i)_i) \mapsto (s, f((v_i)_i)).
 \]
-In this section we only define pure functions.
+In this section we only define pure functions. Furthermore, these functions will
+have a fixed arity. Calling a function with an argment of a different length
+than that in the definition results in an error.
 
 \begin{itemize}
 \item \texttt{eq?} tests values for equality:
@@ -34,8 +36,8 @@ In this section we only define pure functions.
     x_n)) \sim \ilist((x_1 \ldots x_n)) \Leftrightarrow x_1 \sim y_1, \ldots, x_n
     \sim y_n$
   \item
-    $\forall d_1, d_2 \in (V \to 1 + V), \idict(d_1) \sim \idict(d_2)
-    \Leftrightarrow \forall x \in V, d_1(x) \sim d_2(x).$
+    $\forall d_1, d_2 \in (\bar V \to 1 + V), \idict(d_1) \sim \idict(d_2)
+    \Leftrightarrow \forall x \in \bar V, d_1(x) \sim d_2(x).$
   \end{itemize}
 \item
   \texttt{empty-list} returns the empty-list.
@@ -63,12 +65,7 @@ In this section we only define pure functions.
   \begin{align*}
     () &\mapsto (k \mapsto \mathtt{error}),\\
     (k, d) &\mapsto d(k),\\
-    (k, v, d) &\mapsto \left(x \mapsto
-                \begin{cases}
-                  v & \text{if $x \sim k$,}\\
-                  d(x) & \text{otherwise.}
-                \end{cases}
-                \right)
+    (k, v, d) &\mapsto d[k \mapsto v].
   \end{align*}
 \item The pure function \texttt{string-append} concatenates a list of strings
   (implementation specific).
