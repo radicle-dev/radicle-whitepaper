@@ -37,6 +37,22 @@ The design choices we made with \rad{} are:
 \item[(g)] It has deterministic effect system for managing state (references).
 \end{itemize}
 
+\begin{figure}[H]
+\small
+\begin{tabular}{l|ccccccc}
+    & a & b & c & d & e & f & g\\
+  \hline
+  1 &   &   &   &   &   &   & + \\
+  2 & + &   &   &   &   &   & \\
+  3 &   & +\\
+  4 & + &   & + & - &   & +\\
+  5 & \\
+  6 & + &   &   &   & + & +
+\end{tabular}
+\normalsize
+\caption{Summary of design choices and how they interact with \rad{}'s design goals.}
+\end{figure}
+
 LISP is well-known for being a high-level family of languages having very concise
 self-interpreters, and the Scheme specification has boiled down the
 semantics to a small core. Choosing a LISP helps with (2), (4) and (7), and in
