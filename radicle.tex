@@ -3,6 +3,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsfonts}
+\usepackage{amsaddr}
 \usepackage{mathtools}
 \usepackage{diagbox}
 \usepackage{booktabs}
@@ -59,8 +60,12 @@
 \newcommand*\ie{i.e.\ }
 
 \title[Radicle]{Radicle}
-\author{Monadic}
-\date{2018}
+\author{\Small Julian K. Arni}
+\address{\normalfont \texttt{julian@monadic.xyz}}
+\author{\Small James Haydon}
+\address{\normalfont \texttt{james@monadic.xyz}}
+
+\date{September 2018}
 
 \newcommand{\oscoin}{\textsc{\small{oscoin}}}
 \newcommand{\mathsc}[1]{\text{\normalfont\scshape#1}}
@@ -76,6 +81,7 @@
 \newcommand{\variable}{\nu}
 \newcommand{\prog}{\pi}
 \newcommand{\rad}{\textsc{\small{Radicle}}}
+\newcommand{\rads}{\textsc{\footnotesize{Radicle}}}
 \newcommand{\lam}{\text{\texttt{lambda }}}
 \newcommand{\define}{\text{\texttt{define}}}
 \newcommand{\deref}{\text{\texttt{deref!}}}
@@ -163,9 +169,9 @@
 \begin{abstract}
     Though replicated state machines have a wide range of applications, their
     semantics must always possess certain properties, such as determinism.
-    Rather than program such semantics anew, we propose a language, \rad{},
+    Rather than program such semantics anew, we propose a language, \rads{}
     which substantially simplifies the process of defining such state machines.
-    Because \rad{} may be made into any RSM via \emph{eval-redefinition}, it
+    Because \rads{} may be made into any RSM via \emph{eval-redefinition}, it
     can be considered a universal replicated state machine.
 
     This mechanism also allows changing the semantics of running state machines
