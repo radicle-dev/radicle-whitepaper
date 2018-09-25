@@ -8,7 +8,7 @@ all: $(SAMPLES) LATEX
 
 clean:
 	rm $(SAMPLES)
-	rm out/oscoin.pdf
+	rm -f out/radicle.pdf
 
 $(SAMPLES): $(OUT_DIR)/%.rad-tex : $(SAMPLE_DIR)/%.rad
 	echo '\begin{lstlisting}' > $@
@@ -17,4 +17,4 @@ $(SAMPLES): $(OUT_DIR)/%.rad-tex : $(SAMPLE_DIR)/%.rad
 
 .PHONY: LATEX
 LATEX:
-	latexmk -pdf -jobname=./out/oscoin -interaction=errorstopmode -halt-on-error oscoin.tex
+	latexmk -pdf -jobname=./out/radicle -interaction=errorstopmode -halt-on-error radicle.tex
