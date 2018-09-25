@@ -159,9 +159,9 @@ make expressions invalid if any of the variables they rely on have been
 redefined since a specified line of code.
 However this option is quite severe. Consider:
 \begin{lstlisting}
-(define x 3) ;; line 1
-(define foo (lambda () x)) ;; line 2
-(define x 5) ;; line 3
+(define x 3)
+(define foo (lambda () x))
+(define x 5)
 \end{lstlisting}
 The function call \texttt{(protect-at-line 2 (foo))} will fail despite having a
 perfectly reasonable interpretation - namely, \texttt{(foo)} \emph{with}
