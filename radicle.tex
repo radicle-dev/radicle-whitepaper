@@ -129,6 +129,11 @@
   {\par\bigskip\noindent\minipage{\linewidth}}
   {\endminipage\par\bigskip}
 
+% Customize Verbatim environment.
+\RecustomVerbatimEnvironment
+    {Verbatim}{Verbatim}
+    {framesep=2mm, frame=single, label=REPL, rulecolor=\color{black}, fontsize=\small}
+
 % No paragraph indentation after section headers.
 \makeatletter
 \let\@afterindenttrue\@afterindentfalse
