@@ -35,10 +35,6 @@
 \usetikzlibrary{scopes}
 \usetikzlibrary{arrows}
 
-
-\hyphenation{block-chain block-chains}
-\hyphenation{crypto-graphically}
-
 \hypersetup{colorlinks,
     citecolor=black,
     filecolor=black,
@@ -143,14 +139,6 @@
 % No paragraph indentation after section headers.
 \makeatletter
 \let\@afterindenttrue\@afterindentfalse
-\makeatother
-
-% Issue amend operator.
-\DeclareMathOperator{\amend}{\times}
-
-\newenvironment{epigraph}[2][]
-{\leftskip=1cm \def\epigraph@author{#2} \smallskip\itshape}
-{\par\vspace{0.5em}\normalfont\hfill---\ \epigraph@author\hspace*{0.2cm}\par\medskip}
 \makeatother
 
 % Tikz stuff
