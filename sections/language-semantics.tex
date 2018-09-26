@@ -147,7 +147,6 @@ created by a node, but what those expressions in the queue are is not
 accessible to other nodes.
 
 This fact may lead to bugs or attacks. Consider the following snippet:
-
 \begin{lstlisting}
 (define transfer (lambda (from to amount) ...))
 (define account-alice ...)
@@ -155,7 +154,6 @@ This fact may lead to bugs or attacks. Consider the following snippet:
 (define transfer-to-alice (lambda (from amount)
   (transfer from account-alice amount))
 \end{lstlisting}
-
 A user now wants to transfer some amount to Alice. However, in a language such
 as Scheme the function call \texttt{(transfer-to-alice account-bob 10)} may
 behave differently than this snippet alone indicates in two ways. First,
@@ -176,13 +174,11 @@ An alternative is to have a mechanism (call it \texttt{protect-at-line}) to
 make expressions invalid if any of the variables they rely on have been
 redefined since a specified line of code.
 However this option is quite severe. Consider:
-
-\begin{Verbatim}[fontsize=\small]
-(define x 3) ;; line 1
-(define foo (lambda () x)) ;; line 2
-(define x 5) ;; line 3
-\end{Verbatim}
-
+\begin{lstlisting}
+(define x 3)
+(define foo (lambda () x))
+(define x 5)
+\end{lstlisting}
 The function call \texttt{(protect-at-line 2 (foo))} will fail despite having a
 perfectly reasonable interpretation - namely, \texttt{(foo)} \emph{with}
 \texttt{x} \emph{as if used after line 2} (i.e., with \texttt{x} being
@@ -215,16 +211,15 @@ When taken to the extreme, \emph{all} evaluation is done with a call to the
 special function \texttt{eval}, and this creates a reflective tower of
 interpreters. In \rad{}, a more limited form of \texttt{eval}-redefinition is
 available. As an example:
-\begin{Verbatim}[fontsize=\small]
+\bigskip
+\begin{Verbatim}
 > (write-ref eval-ref (lambda (expr) 3))
 => ()
 > 5
 => 3
 \end{Verbatim}
-
 Contrast this with the sort of \texttt{eval}-redefinition that is available in
-the language Black(\cite{Asai1997}):
-
+the language Black\cite{Asai1997}:
 \begin{lstlisting}
 (exec-at-metalevel
   (let ((old-eval base-eval))
@@ -233,7 +228,8 @@ the language Black(\cite{Asai1997}):
             (write exp) (newline) (old-eval exp env cont)))))
 \end{lstlisting}
 After this the Black REPL will behave as follows:
-\begin{Verbatim}[fontsize=\small]
+\bigskip
+\begin{Verbatim}
 > (+ 1 2)
 (+ 1 2)
 +
@@ -245,12 +241,13 @@ Thus, the new evaluation function is used recursively, at all levels of the
 expression \texttt{(+ 1 2)}.
 
 Compare this to the following \rad{} session:
-\begin{Verbatim}[fontsize=\small]
+\bigskip
+\begin{Verbatim}
 > (define old (read-ref eval-ref))
 > (define new (lambda (e) (do (print! e) (old e))))
 > (write-ref eval-ref new)
 => ()
-rad> (+ 1 2)
+> (+ 1 2)
 (+ 1.0 2.0)
 => 3.0
 \end{Verbatim}
@@ -290,20 +287,20 @@ reflection that can be found in languages such as Black.
 %% the language running in the current one.
 
 For a more involved example, consider a simplistic key-value store:
-
 \input{out/kv0.rad-tex}
-
 After which we have:
-
-\begin{Verbatim}[fontsize=\small]
+\bigskip
+\begin{Verbatim}
 > (set key1 3)
 => ()
 > (get key1)
 => 3
 > (+ 3 2)
 => 'invalid-command
-
-;; Note that nested expressions are not evaluated:
+\end{Verbatim}
+Note that nested expressions are not evaluated:
+\medskip
+\begin{Verbatim}
 > (set key2 (+ 3 2))
 => ()
 > (get key2)

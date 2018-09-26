@@ -3,6 +3,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsfonts}
+\usepackage{amsaddr}
 \usepackage{mathtools}
 \usepackage{diagbox}
 \usepackage{booktabs}
@@ -34,10 +35,6 @@
 \usetikzlibrary{scopes}
 \usetikzlibrary{arrows}
 
-
-\hyphenation{block-chain block-chains}
-\hyphenation{crypto-graphically}
-
 \hypersetup{colorlinks,
     citecolor=black,
     filecolor=black,
@@ -49,78 +46,38 @@
 \setlist[enumerate]{leftmargin=1.2cm, labelindent=\parindent}
 
 \lstset{
-  language=Scheme,
-  numbers=left,
-  basewidth=0.5em
-  }
+    language=Scheme,
+    numbers=left,
+    basewidth=0.5em,
+    xleftmargin=5.0ex
+}
 
-% \lst@definelanguage{Scheme}{
-%   morekeywords=[1]{define, define-syntax, define-macro, lambda, define-stream, stream-lambda},
-%   morekeywords=[2]{begin, call-with-current-continuation, call/cc,
-%     call-with-input-file, call-with-output-file, case, cond,
-%     do, else, for-each, if,
-%     let*, let, let-syntax, letrec, letrec-syntax,
-%     let-values, let*-values,
-%     and, or, not, delay, force,
-%     quasiquote, quote, unquote, unquote-splicing,
-%     map, fold, syntax, syntax-rules, eval, environment, query },
-%   morekeywords=[3]{import, export},
-%   alsodigit=!\$\%&*+-./:<=>?@^_~,
-%   sensitive=true,
-%   morecomment=[l]{;},
-%   morecomment=[s]{\#|}{|\#},
-%   morestring=[b]",
-%   basicstyle=\small\ttfamily,
-%   keywordstyle=\bf\ttfamily\color[rgb]{0,.3,.7},
-%   commentstyle=\color[rgb]{0.133,0.545,0.133},
-%   stringstyle={\color[rgb]{0.75,0.49,0.07}},
-%   upquote=true,
-%   breaklines=true,
-%   breakatwhitespace=true,
-%   literate=*{`}{{`}}{1}
-% }
-  
 \newcommand*\eg{e.g.\ }
 \newcommand*\ie{i.e.\ }
 
 \title[Radicle]{Radicle}
-\author{Monadic}
-\date{2018}
+\author{\Small Julian K. Arni}
+\address{\normalfont \texttt{julian@monadic.xyz}}
+\author{\Small James Haydon}
+\address{\normalfont \texttt{james@monadic.xyz}}
+
+\date{September 2018}
 
 \newcommand{\oscoin}{\textsc{\small{oscoin}}}
-\newcommand{\blake}{\textsc{\small{blake2}}}
-\newcommand{\hash}{\mathsc{hash}}
-\newcommand{\coin}{$\Theta$}
 \newcommand{\mathsc}[1]{\text{\normalfont\scshape#1}}
-\newcommand{\tx}[2]{\langle \mathsc{#1}, #2 \rangle}
-\newcommand{\tuple}[1]{\langle #1 \rangle}
 \newcommand{\cvdots}{\multicolumn{1}{c}{\small{\vdots}}}
-\newcommand{\dep}{\xrightharpoondown[e]{d}}
 \newcommand{\notice}[1]{{\color{red}#1}}
 \newcommand{\comment}[1]{{\color{gray}#1}}
 \newcommand{\todo}[1]{\comment{\noindent\texttt{\small\emph{TODO: #1}}}}
 
-\newcommand{\rootchain}{\gamma}
-\newcommand{\State}{\mathcal{S}}
-\newcommand{\state}{\mathcal{S}}
-\newcommand{\Ledger}{\mathcal{L}}
-\newcommand{\ledger}{\mathcal{L}}
-\newcommand{\Orgs}{\mathcal{O}}
-\newcommand{\apply}{\Upsilon}
-\newcommand{\fold}{\Upsilon}
-\newcommand{\tree}{\mathcal{C}}
-\newcommand{\op}{T}
-\newcommand{\env}{\rho}
-\newcommand{\cont}{\kappa}
-\newcommand{\mem}{\sigma}
-\newcommand{\val}{\epsilon}
 \newcommand{\denotation}[2]{
     \ensuremath{\mathcal{E}_{#1} \llbracket #2 \rrbracket }}
 \newcommand{\denotationdesc}[3]{
     \ensuremath{\mathcal{E}_{#1} \llbracket #2 \rrbracket \env \cont \mem &= #3  }}
 \newcommand{\variable}{\nu}
 \newcommand{\prog}{\pi}
-\newcommand{\rad}{\textsc{Radicle}}
+\newcommand{\rad}{\textsc{\small{Radicle}}}
+\newcommand{\rads}{\textsc{\footnotesize{Radicle}}}
 \newcommand{\lam}{\text{\texttt{lambda }}}
 \newcommand{\define}{\text{\texttt{define}}}
 \newcommand{\deref}{\text{\texttt{deref!}}}
@@ -174,17 +131,14 @@
   {\par\bigskip\noindent\minipage{\linewidth}}
   {\endminipage\par\bigskip}
 
+% Customize Verbatim environment.
+\RecustomVerbatimEnvironment
+    {Verbatim}{Verbatim}
+    {framesep=2mm, frame=single, label=REPL, rulecolor=\color{black}, fontsize=\small}
+
 % No paragraph indentation after section headers.
 \makeatletter
 \let\@afterindenttrue\@afterindentfalse
-\makeatother
-
-% Issue amend operator.
-\DeclareMathOperator{\amend}{\times}
-
-\newenvironment{epigraph}[2][]
-{\leftskip=1cm \def\epigraph@author{#2} \smallskip\itshape}
-{\par\vspace{0.5em}\normalfont\hfill---\ \epigraph@author\hspace*{0.2cm}\par\medskip}
 \makeatother
 
 % Tikz stuff
@@ -203,9 +157,9 @@
 \begin{abstract}
     Though replicated state machines have a wide range of applications, their
     semantics must always possess certain properties, such as determinism.
-    Rather than program such semantics anew, we propose a language, \rad{},
+    Rather than program such semantics anew, we propose a language, \rads{}
     which substantially simplifies the process of defining such state machines.
-    Because \rad{} may be made into any RSM via \emph{eval-redefinition}, it
+    Because \rads{} may be made into any RSM via \emph{eval-redefinition}, it
     can be considered a universal replicated state machine.
 
     This mechanism also allows changing the semantics of running state machines
@@ -213,7 +167,6 @@
     by the underlying consensus system.
 \end{abstract}
 \maketitle
-\tableofcontents
 
 \setlength{\columnsep}{20pt}
 \begin{multicols}{2}
@@ -226,10 +179,9 @@
 \bibliography{bibliography,additional}
 \end{multicols}
 
-
 \appendix
-%\input{sections/appendix-syntax.tex}
 \input{sections/appendix-values.tex}
 \input{sections/appendix-initial-env.tex}
 \input{sections/appendix-derived-forms.tex}
+
 \end{document}

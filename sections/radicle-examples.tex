@@ -18,9 +18,7 @@ an option, but this is not ideal for two reasons:
     new chain, how to decide from which block this takes place, etc.
 \end{itemize}
 In radicle this can all take place in-chain, by updating the eval function.
-
 \input{out/kv1.rad-tex}
-
 Note that in this case, the new evaluation function that is instantiated as a
 result of a an \texttt{update} command, is the result of evaluating an
 expression with the original \texttt{eval} function, because of the hyperstatic
@@ -39,10 +37,9 @@ returns the relevant evaluation function, making the internals of the currency
 unavailable to the caller. Furthermore, by returning a potential evaluation
 function (rather than setting it directly), this function may be used as a
 sub-behaviour of a more featurefull RSM.
-
 \input{out/currency.rad-tex}
-
 After loading this code, we can imagine the following \rad{} session:
+\bigskip
 \begin{Verbatim}[fontsize=\small]
 > (write-ref eval-ref (create-currency))
 => ()
