@@ -155,12 +155,13 @@
 
 \begin{document}
 \begin{abstract}
-    Though replicated state machines have a wide range of applications, their
-    semantics must always possess certain properties, such as determinism.
-    Rather than program such semantics anew, we propose a language, \rads{}
-    which substantially simplifies the process of defining such state machines.
-    Because \rads{} may be made into any RSM via \emph{eval-redefinition}, it
-    can be considered a universal replicated state machine.
+    Replicated state machines are employed in a wide variety of applications
+    requiring distributed coordination. Because RSMs must always adhere to
+    particular semantic conditions, foremost determinism, rather than reprogram
+    their semantics in every new instance, we propose a language, \rads{}, which
+    substantially simplifies the process of defining such state machines. As
+    \rads{} may be made into any RSM via \emph{eval-redefinition}, it can be
+    considered a universal replicated state machine.
 
     This mechanism also allows changing the semantics of running state machines
     without loss of state, and with the same consensus guarantees as provided

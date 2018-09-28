@@ -22,31 +22,29 @@
 % Section 2) Some examples: an upgradable key-value store. A version of nomic.
 % Section 3) Formal description of language.
 
-Replicated state machines are a widely used paradigm to program fault-tolerant
-systems. The paradigm involves deploying a deterministic state machine across
-multiple nodes (servers); these nodes can respond to client requests, and by
-agreeing on the order of these requests (consensus), ensure agreement on their
-state and output. If some fraction of nodes is unavailable (or in the looser
-requirement of byzantine fault tolerance, if they are responding in arbitrary
-ways), the overall system can
-still function correctly.
+Replicated state machines are an essential paradigm for programming
+fault-tolerant systems. The prototypical RSM pattern involves deploying a
+deterministic state machine across multiple server nodes; these nodes respond
+to client requests and, by agreeing on an ordered set of messages, ensure consensus
+on their state and output. If some fraction of nodes is unavailable (or responding
+arbitrarily in the permissive condition of byzantine fault tolerance), the overall
+system can still function correctly.
 
-The service these systems replicate may be key-value stores, file-systems,
-append-only logs, account balances, etc. Each of these
-services is often re-implemented anew, leading to substantial development
-costs, as well as subtle bugs in the interim state of the system during the
+Replicated services may include key-value stores, file-systems,
+append-only logs, account balances, etc., each of which
+is typically re-implemented for any new instance, leading to substantial development
+costs, as well as the introduction of subtle bugs in interim states, during
 inevitable software upgrades. In this paper, we describe a language, \rad{}, for
 defining the behaviour of replicated state machines (RSMs) independently of the
 underlying consensus. The language is designed so that new domain-specific
 languages (DSLs) can easily be defined for each service provided by the system.
 Each such DSL is the definition of an RSM. The expressions of the DSL
-are the RSMs inputs; the value such an expression evaluates to its outputs; and
+are the RSMs inputs, the value such an expression evaluates to its outputs, and
 the changes in the environment its state changes.
 
-Thus, if for example the RSM we are interested
-in is a ledger of accounts, expressions or inputs may be transfers, the
+Thus, if an RSM represents a ledger of accounts, expressions or inputs may be transfers, the
 state may be the balance and ownership of accounts, and outputs may be the new
-balances of affected accounts or an error message if the transfers are not
+balances of affected accounts, or an error message if the transfers are not
 allowed (due to insufficient funds or incorrect permissions).
 
 Additionally, using the same mechanism as for DSL-definition (namely, an
@@ -54,7 +52,7 @@ Additionally, using the same mechanism as for DSL-definition (namely, an
 \emph{with the same guarantees of agreement} between nodes as the underlying
 consensus, reducing the coordination difficulty of an upgrade. DSLs can be
 defined in such a way that their \emph{re}-definitions are themselves just one of the
-sorts of inputs RSM accepts; thus nodes will agree on the ordering of the
+sorts of inputs the RSM accepts; thus nodes will agree on the ordering of an
 upgrade with respect to other inputs, and will not go out of sync as a
 consequence of update.
 
@@ -62,20 +60,20 @@ While (crucially for the purpose of ensuring consensus) the core of the language
 is deterministic, \rad{} also possesses an additional set of primitive operations
 that allow side-effects. We show how a publish-subscribe model for side-effects
 (or in the formalism of \cite{Cartwright1994}, an effect-handling central which
-is never provided continuations) allows responding to outputs of the state
+is never provided continuations) allows for responding to outputs of the state
 machine or state changes in a non-deterministic way, without endangering the
-determism of the state machine itself. This in turn makes the separation between
+determism of the state machine itself. This, in turn, makes the separation between
 reads and writes correct by construction.
 
 \rad{} has been developed in the context of a broader effort to create a
 community-owned platform for open-source development (\oscoin{}), which
-includes a consensus algorithm and a networking component. The \oscoin{}
+includes a consensus algorithm and networking component. The \oscoin{}
 platform allows users and communities to create permissioned and permissionless
-RSMs with their own semantics, be it to maintain decentralized
+RSMs with their own semantics, be it to maintain decentralized,
 version-controled code, issues, pull requests, or collective decision-making.
 \rad{} is
-oriented towards making that process as simple and clear as possible. We do
-not in this paper further discuss the broader \oscoin{} system.
+oriented towards making that process as simple and clear as possible. We leave further
+discussion of the broader \oscoin{} system for a subsequent manuscript.
 
 In the rest of the paper, we describe the language in more detail (Section
 \ref{s:language}) and show some example applications built with \rad{}---first,
