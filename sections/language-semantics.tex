@@ -1,10 +1,10 @@
 \section{Language Syntax and Semantics}
 \label{s:language}
 
-None of the individual parts of \rad{} bring anything
-new to programming language theory. However, as its intended domain of use
-differs significantly from that of other programming languages, the set of
-design choices that characterize it make for a unique language. \rad{} strives:
+While the individual parts of \rad{} do not bring anything
+new to programming language theory, its intended domain of use
+differs significantly from that of other programming languages and the set of
+design choices that characterize \rad{} make for a unique language. \rad{} strives:
 \begin{itemize}
 \item[(1)] To be deterministic, so that \rad{} programs specifiy deterministic
   state machines.
@@ -14,13 +14,13 @@ design choices that characterize it make for a unique language. \rad{} strives:
   inputs.
 \item[(4)] To be concise, expressive and emphasize correctness, so that new
   chains, with new semantics can be created cheaply (in terms of development
-  time), be easily understood by all participants, and hopefully be bug-free.
+  time), be easily understood by all participants, and hopefully bug-free.
 \item[(5)] To work well in a collaborative setting, in which code is submitted
-  by multiple parties in a potentially unspecified order.
+  by multiple parties, in a potentially unspecified order.
 % TODO: point (5) is unconvincing
 \item[(6)] To have the simplest possible underlying semantics, so
   that \rad{} interpreters are well specified, and so that \rad{} can be used in
-  security sensitive situations.
+  security-sensitive situations.
 \item[(7)] To have the ability to interpret itself, so that chain semantics may
   be modified on-chain.
 \end{itemize}
@@ -53,10 +53,10 @@ The design choices we made with \rad{} are:
 \caption{Summary of design choices and how they interact with \rad{}'s design goals.}
 \end{figure}
 
-LISP is well-known for being a high-level family of languages having very concise
+LISP is well-known for being a high-level family of languages, having very concise
 self-interpreters, and the Scheme specification has boiled down the
-semantics to a small core. Choosing a LISP helps with (2), (4) and (7), and in
-particular basing the design on Scheme helps with (6).
+semantics to a small core. Choosing a LISP helps with (2), (4) and (7), and, in
+particular, basing the design on Scheme helps with (6).
 
 The redefinition of \texttt{eval} is what enables (3).
 
@@ -79,10 +79,10 @@ expressivity but emphasizes clarity and correctness (goal (4)). The abundance of
 mutability would also probably hinder (6).
 
 Since chains are inherently stateful, we felt that the inclusion of a reference
-type for managing state would help in the specification of chain semantics.
-However we will discuss the alternatives.
+type for managing state would help in the specification of chain semantics, however
+we will discuss the alternatives.
 
-The rest of this section goes into the details of these goals and
+The remainder of this section expands upon these goals and
 design choices.
 
 
@@ -97,8 +97,8 @@ be implemented in a few lines of code. This is achieved by:
     special forms and some primitive functions.
 \end{itemize}
 Let's consider a basic example of a chain which might want to change a part of
-its semantics. In this chain participants may \texttt{boot} certain other
-participants, if some condition is met, which is defined by a predicate
+its semantics. In this chain, participants may want to \texttt{boot} other
+participants if some condition is met, which is defined by a predicate
 \texttt{bootable?}. For example, \texttt{bootable?} might be defined as:
 \begin{lstlisting}
 (define bootable?
@@ -107,15 +107,15 @@ participants, if some condition is met, which is defined by a predicate
 \end{lstlisting}
 That is, admins may boot non-admins. At some point the participants may decide
 that this is too crude, and that a participant should only be booted if the
-majority of participants agree. For the change to take place, most likely one of
+majority of participants agree. For this change to take place, most likely one of
 the inputs to the system will contain code for a new version of
 \texttt{bootable?} (the semantics of when such a message is to be accepted would
 probably be defined by yet another predicate). This code must be transmited and
-interpreted in the simplest and and most transparent way possible. By choosing a LISP,
+interpreted in the simplest and most transparent way possible. By choosing a LISP,
 this code is represented by simple data-structures, and the interpretation process is
 very direct (simplifying parsing and abstract syntax trees, etc.). This
-gives the participants better confidence in understanding what the current and
-proposed semantics are.
+gives the participants more confidence in their understanding of the current and
+proposed semantics.
 
 \subsection{Data types}
 \rad{}'s data types are: booleans (\texttt{\#t} and
@@ -133,18 +133,18 @@ For more details on radicle values, see Appendix \ref{value-definition}.
 Most scripting languages are intended for programs where the developer can
 decide exactly where code should be placed, and be fully aware of the context
 that precedes it. One can always add a line \texttt{y = bar(x)} immediately
-\emph{after} \texttt{x = foo(3)}, and not worry that perhaps something else was
-added in between that changes what \texttt{x} is (excepting pathological cases
+\emph{after} \texttt{x = foo(3)}, and not worry if something else was
+added in between, changing \texttt{x} (excepting pathological cases
 of distributed code collaboration).
 
-This is not true in the environment \rad{} is intended to run. In this
+This is not true in the environment \rad{} is intended to operate. In this
 environment, users submit individual expressions or declarations to a running
 system that is \emph{at the same time} also accepting inputs from other users.
 Moreover, the view of the program that the submitter has at the time of
 submission may \emph{already} be outdated. This aspect is even more significant
 in the context of a blockchain \cite{Nakamoto2008}, where expressions are
-queued until a block is created by a node, but what those expressions in the
-queue are is not accessible to other nodes.
+queued until a block is created by a node, but the expressions in one queue are not
+necessarily accessible to other nodes.
 
 This fact may lead to bugs or attacks. Consider the following snippet:
 \begin{lstlisting}
@@ -164,13 +164,13 @@ variables used in the body of \texttt{transfer} or transitively, in the function
 bodies of the functions \texttt{transfer} calls, may have been redefined.
 
 One solution is to not allow the redefinition of variables at all. This is
-indeed what some smart contract \cite{Szabo94} languages do, and can easily be
-implemented in \rad{} as well (see Section \ref{s:reflective-towers}). But this
-comes with its own problems; one cannot define an improved version of a
-function that shadows the old one, and must instead accept a more and more
-polluted environment (which additionally may impact memory usage).
+indeed what some smart contract \cite{Szabo94} languages do, and can be implemented easily in
+\rad{} as well (see Section \ref{s:reflective-towers}). But this comes with its
+own problems; one cannot define an improved version of a function that shadows
+the old one, and must instead accept a more and more polluted environment (which
+additionally may impact memory usage).
 
-An alternative is to have a mechanism (call it \texttt{protect-at-line}) to
+An alternative is to implement a mechanism (call it \texttt{protect-at-line}) to
 make expressions invalid if any of the variables they rely on have been
 redefined since a specified line of code.
 However this option is quite severe. Consider:
@@ -185,17 +185,17 @@ perfectly reasonable interpretation---namely, \texttt{(foo)} \emph{with}
 \texttt{3}). For more complex expressions, which may rely on many variables,
 this problem becomes more significant.
 
-This reasonable interpretation is in fact precisely what hyperstatic
+This reasonable interpretation is---in fact---precisely what hyperstatic
 environments provide. The function call \texttt{(foo)} in line 4 would, in this
 model, still evaluate to \texttt{3}. The free variables of a function refer to
 the values of variables \emph{when they were defined}. This is the semantics
-\rad{} adopts in general (and can be found in some other languages, such as
+\rad{} adopts in general (and can be found sporadically in other languages, such as
 Forth and Standard ML\cite{SML1997}).
 
 Now \texttt{(protect-at-line (foo))} may be given a much simpler definition:
 \texttt{(foo)} if \texttt{foo} \emph{alone} has not been redefined, and otherwise
-an exception. If \texttt{x} has been redefined, that is no matter, since it
-anyhow does not change the meaning of \texttt{foo}.
+an exception. If \texttt{x} has been redefined, this is no longer of concern, as this
+redefinition does not change the meaning of \texttt{foo}.
 
 %%% End section
 
@@ -204,7 +204,7 @@ anyhow does not change the meaning of \texttt{foo}.
 \rad{} should be able to emulate any state machine. Of course, most state-machines
 don't accept arbitrary inputs, and certainly not inputs which change the
 semantics of the state-machine. Thus \rad{} should have some built in mechanism
-for controlling how inputs get interpreted. At the start, inputs are sent
+for controlling how inputs are interpreted. To begin, inputs are sent
 directly for evaluation by the `base' evaluator, so it is natural to associate
 modifying this process with redefining a function which represents evaluation.
 When taken to the extreme, \emph{all} evaluation is done with a call to the
@@ -252,27 +252,27 @@ Compare this to the following \rad{} session:
 => 3.0
 \end{Verbatim}
 In Black, \texttt{old-eval} calls out to
-\texttt{base-eval}, and in subsequent evaluation this will refer to the new
+\texttt{base-eval} and, upon subsequent evaluation, this will refer to the new
 definition. This is what makes the new evalution behaviour take effect at all
-levels of evaluation. In \rad{}, the new evaluation only gets invoked at the
+levels of evaluation. In \rad{}, the new evaluation is only invoked at the
 topmost level, on new inputs. If one wants to make the evaluation behaviour
-recursive this has to be coded explicitely.
+recursive this must be coded explicitely.
 
-In most cases, chains will define a domain-specific language to be interpreted in
-some narrow way, with only some calls to the base eval to reify function
-definitions, in case one wants to modify the behaviour of the state-machine in
-some way. Furthermore, this form of evaluation redefinition doesn't (by default)
+In most cases chains will define a domain-specific language to be interpreted in
+some narrow way, with only some calls to the base eval for reifying function
+definitions in case one wants to modify the behaviour of the state-machine.
+Furthermore, this form of evaluation redefinition doesn't (by default)
 create a tower of interpreters. Evaluating in a tower requires advanced
 interpretation methods to avoid performance overheads, and this is all
 the more important in \rad{}'s case where chains may be very long-lived. Such
 methods are still the subject of active reasearch (see for example \cite{Asai2014},
 \cite{Thyer1999}, \cite{Amin2017}, \cite{Brown2017}), and may interfere with other
 requirements of the language. Moreover, since eval-redefinition affects all
-sub-expressions, and may affect not just the ``immediate'' interpreter but ones
+sub-expressions, and may affect not just the ``immediate'' interpreter, but ones
 in which it is defined, reasoning about eval-redefinitions in towers can be
 very difficult.
 For these reasons we believe that this limited
-form of eval-redefinition suits the needs of \rad{} better than the sort of
+form of eval-redefinition suits the needs of \rad{} better than the degree of
 reflection that can be found in languages such as Black.
 
 %% \rad does not have macros. Instead, it allows for a complete redefinition of
@@ -326,20 +326,20 @@ meta-meta-intepreters.
 
 The techniques that have been developed for reducing the interpretive overhead
 of such towers of interpreters, however, still
-apply (see for example \cite{Amin2017} and \cite{Asai2014}), as do simpler
-partial-evaluation-based approaches such as \cite{Brown2017}.
+apply (see, for example, \cite{Amin2017}, \cite{Asai2014}), as do simpler
+partial-evaluation-based approaches such as those described in \cite{Brown2017}.
 
 \subsection{Immutable values and refs}
 In \rad{} all values are immutable: once created they cannot be modified in any
-way. This follows in the footsteps of functional programming languages such as
-Haskell, Clojure and Erlang.
+way. This follows in the footsteps of functional programming
+languages such as Haskell, Clojure, Erlang.
 
-This allows a more \textit{local} reasoning of the behaviour of programs;
-values are guaranteed to not change as the result of calling a function. This
-is particularly important in the context of a massively collaborative
-program where programmers cannot rely on a global picture of the program,
-maintained by knowledge-dissemination via code reviews and standardized
-practices.
+Immutable values and refs allows for more \textit{local} reasoning of the
+behaviour of programs; values are guaranteed not to change as a result of
+calling a function. This is particularly important in the context of a
+massively collaborative program where developers cannot rely on a global
+view, and the program is maintained by knowledge-dissemination via code reviews
+and standardized practices.
 
 However state-machines are inherently stateful, so a reference type is included
 in the language. Reading or modifying the reference must be done explicitly,
@@ -348,8 +348,8 @@ with the primops \texttt{read-ref} and \texttt{write-ref}, respectively.
 \subsection{Effects} In order to maintain determinism and safety in on-chain
 computations, the primitives available on-chain, $\rho$, are pure. \rad{} also
 comes with an additional set of primitives, $\rho_{!}$, intended for off-chain
-computations, such as scripting interactions with RSMs (these primitives are
-by convention textually distinguished by identifiers ending with an exclamation
+computations, such as scripting interactions with RSMs (these primitives are,
+by convention, textually distinguished by identifiers ending with an exclamation
 mark).
 
 Expressions in the RSM therefore cannot have
@@ -362,7 +362,7 @@ administering effects received via messages, resembles work following
 The value that results from evaluating an expression purely may, in addition to
 \emph{describing} an effect, pass a continuation with the result of that
 effect (if any). The effect-handling layer can chose to only call continuations
-without arguments. This in turn means the continuation will not have access to
+without arguments. In turn, this means the continuation will not have access to
 the result of effectful computations, though it may (at the discretion of the
 effect-handling layers) have output effects.
 
@@ -375,8 +375,8 @@ For the precise definitions of the sets in use, see Appendix
 \ref{value-definition}.
 
 The particularity of \rad{} is that it defines a state machine whose behaviour
-can change in response to some input. for this reason, \rad{}'s semantics is
-defined in two steps: First we define the \emph{base semantics} $\B$, which is
+can change in response to some input. For this reason, \rad{}'s semantics is
+defined in two steps: first we define the \emph{base semantics} $\B$, which is
 the semantics of the `underlying' programming language, and then the
 state-machine semantics $\S$, which specifies the particular way in which the
 base semantics are invoked on each item of the input stream. Both will be
@@ -397,8 +397,8 @@ E := \Ident \to 1 + V \quad \text{and} \quad M := A \to 1 + V,
 \]
 the (implementation specific) set $\Ident$ describes the valid identifiers. The
 set $A = \mathbb{N} + \{\evalAddr\}$ contains the memory addresses used for
-reference cells, that is, a memory address is either a natural number or the
-special address $\evalAddr$ which is used for storing the evaluation function.
+reference cells (a memory address is either a natural number or the
+special address $\evalAddr$ which is used for storing the evaluation function).
 The set of values is defined in Appendix \ref{value-definition}.
 
 We shall adopt the following convention to make the definitions more readable:
@@ -420,8 +420,8 @@ The base semantics is defined as a function
   \]
   See below for the definition of the sequence semantics $\B^+$, which defines
   the semantics over a finite sequence of inputs (not to be confused with the
-  state machine semantics $\S$ which comes later).
-\item Identifiers: If $i \in \Ident$, then
+  state machine semantics $\S$, which comes later).
+\item Identifiers: If $i \in \Ident$ is an identifier then
   \[
     B((e,m), i) := ((e,m),e(i)),
   \]
