@@ -120,12 +120,12 @@ proposed semantics are.
 \subsection{Data types}
 \rad{}'s data types are: booleans (\texttt{\#t} and
 \texttt{\#f}); strings (a sequence of characters within double quotes, with
-\texttt{\textbackslash} as the escape character), symbols, lists, dictionaries
+\verb$\$ as the escape character), symbols, lists, dictionaries
 (maps), and numbers (currently only arbitrary-precision decimals). These
-datatypes are all immutable; additionally \rad{} supports \emph{refs}--mutable
-references--that can hold any other datatype.
+datatypes are all immutable; additionally \rad{} supports \emph{refs}---mutable
+references that can hold any other datatype.
 
-For more details on radicle values, see appendix \ref{value-definition}.
+For more details on radicle values, see Appendix \ref{value-definition}.
 
 \subsection{Hyperstatic Environments}
 \label{s:hyperstatic}
@@ -137,14 +137,14 @@ that precedes it. One can always add a line \texttt{y = bar(x)} immediately
 added in between that changes what \texttt{x} is (excepting pathological cases
 of distributed code collaboration).
 
-This is not true in the environment \rad{} is intended to run. In that
+This is not true in the environment \rad{} is intended to run. In this
 environment, users submit individual expressions or declarations to a running
-system that is \emph{at the same time} also accepting inputs from other
-users. Moreover, the view of the program that the submitter has at the time of
+system that is \emph{at the same time} also accepting inputs from other users.
+Moreover, the view of the program that the submitter has at the time of
 submission may \emph{already} be outdated. This aspect is even more significant
-in the context of a blockchain, where expressions are queued until a block is
-created by a node, but what those expressions in the queue are is not
-accessible to other nodes.
+in the context of a blockchain \cite{Nakamoto12}, where expressions are
+queued until a block is created by a node, but what those expressions in the
+queue are is not accessible to other nodes.
 
 This fact may lead to bugs or attacks. Consider the following snippet:
 \begin{lstlisting}
@@ -164,7 +164,7 @@ variables used in the body of \texttt{transfer} or transitively, in the function
 bodies of the functions \texttt{transfer} calls, may have been redefined.
 
 One solution is to not allow the redefinition of variables at all. This is
-indeed what some smart contract languages do, and can easily be implemented in
+indeed what some smart contract \cite{Szabo94} languages do, and can easily be implemented in
 \rad{} as well (see Section \ref{s:reflective-towers}). But this comes with its
 own problems; one cannot define an improved version of a function that shadows
 the old one, and must instead accept a more and more polluted environment (which
@@ -180,7 +180,7 @@ However this option is quite severe. Consider:
 (define x 5)
 \end{lstlisting}
 The function call \texttt{(protect-at-line 2 (foo))} will fail despite having a
-perfectly reasonable interpretation - namely, \texttt{(foo)} \emph{with}
+perfectly reasonable interpretation---namely, \texttt{(foo)} \emph{with}
 \texttt{x} \emph{as if used after line 2} (i.e., with \texttt{x} being
 \texttt{3}). For more complex expressions, which may rely on many variables,
 this problem becomes more significant.
@@ -204,7 +204,7 @@ anyhow does not change the meaning of \texttt{foo}.
 \rad{} should be able to emulate any state machine. Of course, most state-machines
 don't accept arbitrary inputs, and certainly not inputs which change the
 semantics of the state-machine. Thus \rad{} should have some built in mechanism
-for controlling how inputs get interpreted. At the start inputs are sent
+for controlling how inputs get interpreted. At the start, inputs are sent
 directly for evaluation by the `base' evaluator, so it is natural to associate
 modifying this process with redefining a function which represents evaluation.
 When taken to the extreme, \emph{all} evaluation is done with a call to the
@@ -258,7 +258,7 @@ levels of evaluation. In \rad{}, the new evaluation only gets invoked at the
 topmost level, on new inputs. If one wants to make the evaluation behaviour
 recursive this has to be coded explicitely.
 
-In most cases chains will define a domain-specific language to be interpreted in
+In most cases, chains will define a domain-specific language to be interpreted in
 some narrow way, with only some calls to the base eval to reify function
 definitions, in case one wants to modify the behaviour of the state-machine in
 some way. Furthermore, this form of evaluation redefinition doesn't (by default)
