@@ -371,7 +371,7 @@ effect-handling layers) have output effects.
 \rad{}'s semantics are defined in terms of an abstract state machine, that is, a
 set of possible states $S$, an initial state $s_0 \in S$, a set of possible
 inputs $I$, and a transition function $\S \colon S \times I \to S$.
-For the precise definitions of the sets in use, see appendix
+For the precise definitions of the sets in use, see Appendix
 \ref{value-definition}.
 
 The particularity of \rad{} is that it defines a state machine whose behaviour
@@ -399,7 +399,7 @@ The (implementation specific) set $\Ident$ describes the valid identifiers. The
 set $A = \mathbb{N} + \{\evalAddr\}$ contains the memory addresses used for
 reference cells, that is, a memory address is either a natural number or the
 special address $\evalAddr$ which is used for storing the evaluation function.
-The set of values is defined in appendix \ref{value-definition}.
+The set of values is defined in Appendix \ref{value-definition}.
 
 We shall adopt the following convention to make the definitions more readable:
 many of the functions have as codomain a set $1 + X$ (for some set $X$), with
@@ -503,7 +503,7 @@ transition function
 \]
 
 The initial state is defined to be $(e_0,m_0)$ where $e_0$ is the \emph{initial
-  environment} (see appendix \ref{initial-env}), and
+  environment} (see Appendix \ref{initial-env}), and
 \[
   m_0 := (\iota_L \circ !_A)[\text{\texttt{eval-addr}} \mapsto \B].
 \]
