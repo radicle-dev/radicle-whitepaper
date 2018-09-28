@@ -102,7 +102,7 @@ participants, if some condition is met, which is defined by a predicate
 \texttt{bootable?}. For example, \texttt{bootable?} might be defined as:
 \begin{lstlisting}
 (define bootable?
-  (lambda (a p)
+  (lambda (a b)
     (and (admin? a) (not (admin? b)))))
 \end{lstlisting}
 That is, admins may boot non-admins. At some point the participants may decide
