@@ -164,11 +164,11 @@ variables used in the body of \texttt{transfer} or transitively, in the function
 bodies of the functions \texttt{transfer} calls, may have been redefined.
 
 One solution is to not allow the redefinition of variables at all. This is
-indeed what some smart contract \cite{Szabo94} languages do, and can easily be implemented in
-\rad{} as well (see Section \ref{s:reflective-towers}). But this comes with its
-own problems; one cannot define an improved version of a function that shadows
-the old one, and must instead accept a more and more polluted environment (which
-additionally may impact memory usage).
+indeed what some smart contract \cite{Szabo94} languages do, and can easily be
+implemented in \rad{} as well (see Section \ref{s:reflective-towers}). But this
+comes with its own problems; one cannot define an improved version of a
+function that shadows the old one, and must instead accept a more and more
+polluted environment (which additionally may impact memory usage).
 
 An alternative is to have a mechanism (call it \texttt{protect-at-line}) to
 make expressions invalid if any of the variables they rely on have been
