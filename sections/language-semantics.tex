@@ -320,19 +320,19 @@ ability to inspect a computation via constructs of a higher level---and
 Conceptually, \rad{} differs from reflective towers by only allowing reflection.
 Thus, the only levels that exist are the ones programs create. Queinnec has
 quipped that reflective languages ``plunge us into a world with few laws, and
-hardly any gravity''\cite{Queinnec1994}; the more disciplined approach to
+hardly any gravity'' \cite{Queinnec1994}. The more disciplined approach to
 reflection that \rad{} takes does not possess the semantic fragility of modifying
 meta-meta-intepreters.
 
 The techniques that have been developed for reducing the interpretive overhead
 of such towers of interpreters, however, still
-apply (see, for example, \cite{Amin2017}, \cite{Asai2014}), as do simpler
+apply (see for example \cite{Amin2017} and \cite{Asai2014}), as do simpler
 partial-evaluation-based approaches such as \cite{Brown2017}.
 
 \subsection{Immutable values and refs}
 In \rad{} all values are immutable: once created they cannot be modified in any
-way. This follows in the footsteps of languages such as functional programming
-languages such as Haskell, Clojure, Erlang, etc.
+way. This follows in the footsteps of functional programming languages such as
+Haskell, Clojure and Erlang.
 
 This allows a more \textit{local} reasoning of the behaviour of programs;
 values are guaranteed to not change as the result of calling a function. This
