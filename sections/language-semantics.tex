@@ -431,7 +431,7 @@ The base semantics is defined as a function
   \[
     \B( s, (\mathtt{if} \ c \ t \ f)) :=
     \begin{cases}
-      \B(s', t) & \text{if $c' \neq \mathtt{\#f}$,}\\
+      \B(s', t) & \text{if $c' \neq \texttt{\#}\mathtt{f}$,}\\
       \B(s', f) & \text{otherwise,}
     \end{cases}
   \]
@@ -442,7 +442,7 @@ The base semantics is defined as a function
     \B(s, (\mathtt{cond} \ c_1 \ x_1 \ldots c_n \ x_n)) :=\\
     \begin{cases}
       \mathtt{error} & \text{if $n = 0$,}\\
-      \B(s', x_1) & \text{if $v \neq \#\mathtt{f}$,}\\
+      \B(s', x_1) & \text{if $v \neq \texttt{\#}\mathtt{f}$,}\\
       \B(s', (\mathtt{cond} \ c_2 \ x_2 \ldots c_n \ x_n)) & \text{otherwise}.
     \end{cases}
   \end{multline*}
