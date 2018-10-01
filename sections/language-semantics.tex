@@ -32,9 +32,9 @@ The design choices we made with \rad{} are:
   is used as part of its own evaluation.
 \item[(c)] It has first-class functions.
 \item[(d)] It is dynamically typed.
-\item[(e)] It is lexically scoped with a `hyperstatic' global environment.
+\item[(e)] It is lexically scoped with a \emph{hyperstatic} global environment.
 \item[(f)] It only has immutable values.
-\item[(g)] It has deterministic effect system for managing state (references).
+\item[(g)] It has a deterministic effect system for managing state (references).
 \end{itemize}
 
 \begin{figure}[H]
@@ -102,7 +102,7 @@ participants, if some condition is met, which is defined by a predicate
 \texttt{bootable?}. For example, \texttt{bootable?} might be defined as:
 \begin{lstlisting}
 (define bootable?
-  (lambda (a p)
+  (lambda (a b)
     (and (admin? a) (not (admin? b)))))
 \end{lstlisting}
 That is, admins may boot non-admins. At some point the participants may decide
@@ -120,12 +120,12 @@ proposed semantics are.
 \subsection{Data types}
 \rad{}'s data types are: booleans (\texttt{\#t} and
 \texttt{\#f}); strings (a sequence of characters within double quotes, with
-\texttt{\textbackslash} as the escape character), symbols, lists, dictionaries
+\verb$\$ as the escape character), symbols, lists, dictionaries
 (maps), and numbers (currently only arbitrary-precision decimals). These
-datatypes are all immutable; additionally \rad{} supports \emph{refs}--mutable
-references--that can hold any other datatype.
+datatypes are all immutable; additionally \rad{} supports \emph{refs}---mutable
+references that can hold any other datatype.
 
-For more details on radicle values, see appendix \ref{value-definition}.
+For more details on radicle values, see Appendix \ref{value-definition}.
 
 \subsection{Hyperstatic Environments}
 \label{s:hyperstatic}
@@ -137,14 +137,14 @@ that precedes it. One can always add a line \texttt{y = bar(x)} immediately
 added in between that changes what \texttt{x} is (excepting pathological cases
 of distributed code collaboration).
 
-This is not true in the environment \rad{} is intended to run. In that
+This is not true in the environment \rad{} is intended to run. In this
 environment, users submit individual expressions or declarations to a running
-system that is \emph{at the same time} also accepting inputs from other
-users. Moreover, the view of the program that the submitter has at the time of
+system that is \emph{at the same time} also accepting inputs from other users.
+Moreover, the view of the program that the submitter has at the time of
 submission may \emph{already} be outdated. This aspect is even more significant
-in the context of a blockchain, where expressions are queued until a block is
-created by a node, but what those expressions in the queue are is not
-accessible to other nodes.
+in the context of a blockchain \cite{Nakamoto2008}, where expressions are
+queued until a block is created by a node, but what those expressions in the
+queue are is not accessible to other nodes.
 
 This fact may lead to bugs or attacks. Consider the following snippet:
 \begin{lstlisting}
@@ -164,11 +164,11 @@ variables used in the body of \texttt{transfer} or transitively, in the function
 bodies of the functions \texttt{transfer} calls, may have been redefined.
 
 One solution is to not allow the redefinition of variables at all. This is
-indeed what some smart contract languages do, and can easily be implemented in
-\rad{} as well (see Section \ref{s:reflective-towers}). But this comes with its
-own problems; one cannot define an improved version of a function that shadows
-the old one, and must instead accept a more and more polluted environment (which
-additionally may impact memory usage).
+indeed what some smart contract \cite{Szabo94} languages do, and can easily be
+implemented in \rad{} as well (see Section \ref{s:reflective-towers}). But this
+comes with its own problems; one cannot define an improved version of a
+function that shadows the old one, and must instead accept a more and more
+polluted environment (which additionally may impact memory usage).
 
 An alternative is to have a mechanism (call it \texttt{protect-at-line}) to
 make expressions invalid if any of the variables they rely on have been
@@ -180,7 +180,7 @@ However this option is quite severe. Consider:
 (define x 5)
 \end{lstlisting}
 The function call \texttt{(protect-at-line 2 (foo))} will fail despite having a
-perfectly reasonable interpretation - namely, \texttt{(foo)} \emph{with}
+perfectly reasonable interpretation---namely, \texttt{(foo)} \emph{with}
 \texttt{x} \emph{as if used after line 2} (i.e., with \texttt{x} being
 \texttt{3}). For more complex expressions, which may rely on many variables,
 this problem becomes more significant.
@@ -204,7 +204,7 @@ anyhow does not change the meaning of \texttt{foo}.
 \rad{} should be able to emulate any state machine. Of course, most state-machines
 don't accept arbitrary inputs, and certainly not inputs which change the
 semantics of the state-machine. Thus \rad{} should have some built in mechanism
-for controlling how inputs get interpreted. At the start inputs are sent
+for controlling how inputs get interpreted. At the start, inputs are sent
 directly for evaluation by the `base' evaluator, so it is natural to associate
 modifying this process with redefining a function which represents evaluation.
 When taken to the extreme, \emph{all} evaluation is done with a call to the
@@ -258,7 +258,7 @@ levels of evaluation. In \rad{}, the new evaluation only gets invoked at the
 topmost level, on new inputs. If one wants to make the evaluation behaviour
 recursive this has to be coded explicitely.
 
-In most cases chains will define a domain-specific language to be interpreted in
+In most cases, chains will define a domain-specific language to be interpreted in
 some narrow way, with only some calls to the base eval to reify function
 definitions, in case one wants to modify the behaviour of the state-machine in
 some way. Furthermore, this form of evaluation redefinition doesn't (by default)
@@ -320,19 +320,19 @@ ability to inspect a computation via constructs of a higher level---and
 Conceptually, \rad{} differs from reflective towers by only allowing reflection.
 Thus, the only levels that exist are the ones programs create. Queinnec has
 quipped that reflective languages ``plunge us into a world with few laws, and
-hardly any gravity''\cite{Queinnec1994}; the more disciplined approach to
+hardly any gravity'' \cite{Queinnec1994}. The more disciplined approach to
 reflection that \rad{} takes does not possess the semantic fragility of modifying
 meta-meta-intepreters.
 
 The techniques that have been developed for reducing the interpretive overhead
 of such towers of interpreters, however, still
-apply (see, for example, \cite{Amin2017}, \cite{Asai2014}), as do simpler
+apply (see for example \cite{Amin2017} and \cite{Asai2014}), as do simpler
 partial-evaluation-based approaches such as \cite{Brown2017}.
 
 \subsection{Immutable values and refs}
 In \rad{} all values are immutable: once created they cannot be modified in any
-way. This follows in the footsteps of languages such as functional programming
-languages such as Haskell, Clojure, Erlang, etc.
+way. This follows in the footsteps of functional programming languages such as
+Haskell, Clojure and Erlang.
 
 This allows a more \textit{local} reasoning of the behaviour of programs;
 values are guaranteed to not change as the result of calling a function. This
@@ -371,7 +371,7 @@ effect-handling layers) have output effects.
 \rad{}'s semantics are defined in terms of an abstract state machine, that is, a
 set of possible states $S$, an initial state $s_0 \in S$, a set of possible
 inputs $I$, and a transition function $\S \colon S \times I \to S$.
-For the precise definitions of the sets in use, see appendix
+For the precise definitions of the sets in use, see Appendix
 \ref{value-definition}.
 
 The particularity of \rad{} is that it defines a state machine whose behaviour
@@ -395,11 +395,11 @@ with
 \[
 E := \Ident \to 1 + V \quad \text{and} \quad M := A \to 1 + V,
 \]
-The (implementation specific) set $\Ident$ describes the valid identifiers. The
+the (implementation specific) set $\Ident$ describes the valid identifiers. The
 set $A = \mathbb{N} + \{\evalAddr\}$ contains the memory addresses used for
 reference cells, that is, a memory address is either a natural number or the
 special address $\evalAddr$ which is used for storing the evaluation function.
-The set of values is defined in appendix \ref{value-definition}.
+The set of values is defined in Appendix \ref{value-definition}.
 
 We shall adopt the following convention to make the definitions more readable:
 many of the functions have as codomain a set $1 + X$ (for some set $X$), with
@@ -421,7 +421,7 @@ The base semantics is defined as a function
   See below for the definition of the sequence semantics $\B^+$, which defines
   the semantics over a finite sequence of inputs (not to be confused with the
   state machine semantics $\S$ which comes later).
-\item Identifiers: If $i \in \Ident$ is an identifier then
+\item Identifiers: If $i \in \Ident$, then
   \[
     B((e,m), i) := ((e,m),e(i)),
   \]
@@ -503,9 +503,9 @@ transition function
 \]
 
 The initial state is defined to be $(e_0,m_0)$ where $e_0$ is the \emph{initial
-  environment} (see appendix \ref{initial-env}), and
+  environment} (see Appendix \ref{initial-env}), and
 \[
-  m_0 := (\iota_L \circ !_A)[\text{\texttt{eval-addr}} \mapsto \B].
+  m_0 := (\iota_L \circ !_A)[\text{\texttt{eval-addr}} \mapsto \B]
 \]
 is the memory which associates a value to the special address
 \texttt{eval-addr}; a function which evaluates values according to the base

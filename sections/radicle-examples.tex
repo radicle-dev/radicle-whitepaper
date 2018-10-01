@@ -1,4 +1,5 @@
 \section{Sample Programs and Chains}
+\label{s:examples}
 
 In this section, we develop a better sense for the language and its
 applications by considering sample programs.
@@ -13,11 +14,11 @@ ideas on the purpose of the chain may morph over time. Forking to a new chain is
 an option, but this is not ideal for two reasons:
 \begin{itemize}
   \item Consensus on the purpose and semantics of the new chain must be achieved
-    ``of chain''.
+    ``off chain''.
   \item Participants must agree on the process and logistics of migrating to a
     new chain, how to decide from which block this takes place, etc.
 \end{itemize}
-In radicle this can all take place in-chain, by updating the eval function.
+In radicle this can all take place on-chain, by updating the eval function.
 \input{out/kv1.rad-tex}
 Note that in this case, the new evaluation function that is instantiated as a
 result of a an \texttt{update} command, is the result of evaluating an
@@ -101,8 +102,4 @@ examples of chains:
   to master. Only maintainers can vote on new transition functions. This means
   that the function $m$ reads not only from the vote state $\bar S$ but also the
   basic state $S$ (i.e. the source code under version control).
-\item etc.
 \end{itemize}
-
-\subsection{Nomic}
-\label{s:examples}
