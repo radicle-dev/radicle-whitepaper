@@ -25,10 +25,10 @@
 Replicated state machines are an essential paradigm for programming
 fault-tolerant systems. The prototypical RSM pattern involves deploying a
 deterministic state machine across multiple server nodes; these nodes respond
-to client requests and, by agreeing on an ordered set of messages, ensure consensus
-on their state and output. If some fraction of nodes is unavailable (or responding
-arbitrarily in the permissive condition of byzantine fault tolerance), the overall
-system can still function correctly.
+to client requests and, by agreeing on an ordered for these requests, ensure consensus
+on their state and output. If some fraction of nodes is unavailable (or in the looser
+requirements of byzantine fault tolerence, if they are responding arbitrarily),
+the overall system can still function correctly.
 
 Replicated services may include key-value stores, file-systems,
 append-only logs, account balances, etc., each of which
@@ -62,7 +62,7 @@ that allow side-effects. We show how a publish-subscribe model for side-effects
 (or in the formalism of \cite{Cartwright1994}, an effect-handling central which
 is never provided continuations) allows for responding to outputs of the state
 machine or state changes in a non-deterministic way, without endangering the
-determism of the state machine itself. This, in turn, makes the separation between
+determism of the state machine itself. This in turn makes the separation between
 reads and writes correct by construction.
 
 \rad{} has been developed in the context of a broader effort to create a

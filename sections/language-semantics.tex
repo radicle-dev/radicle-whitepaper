@@ -53,7 +53,7 @@ The design choices we made with \rad{} are:
 \caption{Summary of design choices and how they interact with \rad{}'s design goals.}
 \end{figure}
 
-LISP is well-known for being a high-level family of languages, having very concise
+LISP is well-known for being a high-level family of languages having very concise
 self-interpreters, and the Scheme specification has boiled down the
 semantics to a small core. Choosing a LISP helps with (2), (4) and (7), and, in
 particular, basing the design on Scheme helps with (6).
@@ -134,10 +134,10 @@ Most scripting languages are intended for programs where the developer can
 decide exactly where code should be placed, and be fully aware of the context
 that precedes it. One can always add a line \texttt{y = bar(x)} immediately
 \emph{after} \texttt{x = foo(3)}, and not worry if something else was
-added in between, changing \texttt{x} (excepting pathological cases
-of distributed code collaboration).
+added in between that changes what \texttt{x} refers to (excepting pathological
+cases of distributed code collaboration).
 
-This is not true in the environment \rad{} is intended to operate. In this
+This is not true in the environment in which \rad{} is intended to operate. In this
 environment, users submit individual expressions or declarations to a running
 system that is \emph{at the same time} also accepting inputs from other users.
 Moreover, the view of the program that the submitter has at the time of
@@ -185,11 +185,11 @@ perfectly reasonable interpretation---namely, \texttt{(foo)} \emph{with}
 \texttt{3}). For more complex expressions, which may rely on many variables,
 this problem becomes more significant.
 
-This reasonable interpretation is---in fact---precisely what hyperstatic
+This reasonable interpretation is in fact precisely what hyperstatic
 environments provide. The function call \texttt{(foo)} in line 4 would, in this
 model, still evaluate to \texttt{3}. The free variables of a function refer to
 the values of variables \emph{when they were defined}. This is the semantics
-\rad{} adopts in general (and can be found sporadically in other languages, such as
+\rad{} adopts in general (and can be found in a few other languages, such as
 Forth and Standard ML\cite{SML1997}).
 
 Now \texttt{(protect-at-line (foo))} may be given a much simpler definition:
@@ -327,14 +327,14 @@ meta-meta-intepreters.
 The techniques that have been developed for reducing the interpretive overhead
 of such towers of interpreters, however, still
 apply (see, for example, \cite{Amin2017}, \cite{Asai2014}), as do simpler
-partial-evaluation-based approaches such as those described in \cite{Brown2017}.
+partial-evaluation-based approaches such as the one described in \cite{Brown2017}.
 
 \subsection{Immutable values and refs}
 In \rad{} all values are immutable: once created they cannot be modified in any
 way. This follows in the footsteps of functional programming
-languages such as Haskell, Clojure, Erlang.
+languages such as Haskell, Clojure, and Erlang.
 
-Immutable values and refs allows for more \textit{local} reasoning of the
+Immutable values and allows for a more \textit{local} reasoning of the
 behaviour of programs; values are guaranteed not to change as a result of
 calling a function. This is particularly important in the context of a
 massively collaborative program where developers cannot rely on a global
@@ -421,7 +421,7 @@ The base semantics is defined as a function
   See below for the definition of the sequence semantics $\B^+$, which defines
   the semantics over a finite sequence of inputs (not to be confused with the
   state machine semantics $\S$, which comes later).
-\item Identifiers: If $i \in \Ident$ is an identifier then
+\item Identifiers: If $i \in \Ident$ then
   \[
     B((e,m), i) := ((e,m),e(i)),
   \]
