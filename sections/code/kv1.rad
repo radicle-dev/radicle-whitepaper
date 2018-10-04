@@ -1,13 +1,13 @@
-(define password "very secret")
-(define store (ref (dict)))
+(def password "very secret")
+(def store (ref (dict)))
 
 ;; self-amending key-val store
-(define starting-eval
-  (lambda (expr)
-    (define command (head expr))
+(def starting-eval
+  (fn [expr]
+    (def command (head expr))
     (cond
      (eq? command 'get) (lookup (nth 1 expr) (read-ref store))
-     (eq? command 'set) (modify-ref store (lambda (s) (insert (nth 1 expr) (nth 2 expr) s)))
+     (eq? command 'set) (modify-ref store (fn [s] (insert (nth 1 expr) (nth 2 expr) s)))
      (and (eq? command 'update)
           (eq? (nth 1 expr)
                password))
