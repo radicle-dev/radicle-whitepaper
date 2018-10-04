@@ -66,7 +66,7 @@ and returns a new state. For example we might want to maintain a number:
     (+ current-state input)))
 \end{lstlisting}
 Given such a function, and an \texttt{initial-state}, it's simple to turn
-\rads{} into the specified state-machine:
+\rad{} into the specified state-machine:
 \begin{lstlisting}
 (define state (ref initial-state))
 (define new-eval
@@ -77,15 +77,14 @@ Given such a function, and an \texttt{initial-state}, it's simple to turn
 (write-ref eval-ref new-eval)
 \end{lstlisting}
 
-The problem is that once this new evaluation is set, the state-machine defined
-by \texttt{transition} is no longer modifiable in any way.
+However, in so doing we have lost the ability to modify \texttt{transition} in
+any way.
 
-In order to acheive this we define a state-machine which runs other
+So as to allow for such modifications, we define a state-machine which runs other
 state-machines while also accepting meta-commands for operations such as voting
 for a new transition function.
 
-In order to achieve this, we define a state-machine that accepts two sorts of
-inputs: \emph{basic inputs}:
+Inputs are partitioned into \emph{basic inputs}:
 \[
 \mathtt{(basic} \ i),
 \]
@@ -93,9 +92,9 @@ where $i$ are values accepted by \texttt{transition}, and \emph{meta-inputs}:
 \[
 \mathtt{(meta} \ c),
 \]
-where the $c$ are messages the participants use to coordinate in choosing a new
-transition function. All basic-inputs are simply handled by \texttt{transition}
-to update the current state. Examples of meta-inputs are
+where the $c$ are messages participants use to coordinate in choosing a new
+transition function. All basic-inputs are handled by \texttt{transition}
+to update the current state. Examples of meta-inputs are:
 \begin{align*}
   (\text{\texttt{new-transition-function}} \ f \ u)\\
   (\text{\texttt{vote-agree}} \ uid \ s)\\
