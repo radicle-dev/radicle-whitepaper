@@ -28,9 +28,6 @@ we are swapping out one eval for another.
 
 \subsection{Currency}
 
-TODO: discuss how we can insure that only bob can submit the command
-\texttt{(transfer "bob" x n)}.
-
 In this section we define a currency. This example demonstrates both higher
 order functions and data-hiding. Indeed the \texttt{create-currency} function
 defines all the state needed for the operation of the currency but then only
@@ -53,6 +50,22 @@ After loading this code, we can imagine the following \rad{} session:
 > (balance "alice")
 => 7
 \end{Verbatim}
+
+An obvious problem with this chain is that anyone can submit the command
+\texttt{(transfer "bob" "malicious123" n)}, not just Bob. We foresee two
+solutions to this:
+\begin{itemize}
+\item When deployed in a setting with identities, the \rad{} semantics are
+  augmented with a special command \texttt{get-identity} which returns the
+  identity of the user which submitted the transaction to the consensus layer.
+  The \texttt{transfer} function is then modified to make the further check
+  \texttt{(eq? from (get-identity))}.
+\item Another solution is to augment the \rad{} semantics with a function
+  \texttt{signature-valid?} which checks that a cryptographically signed message
+  has been signed by a specific public key. One can then create a token
+  currency, with the transfer of tokens only taking place if the command is
+  appropriately signed.
+\end{itemize}
 
 \subsection{Updatable state-machine}
 
