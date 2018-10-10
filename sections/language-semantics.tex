@@ -4,7 +4,23 @@
 While the individual parts of \rad{} do not bring anything
 new to programming language theory, its intended domain of use
 differs significantly from that of other programming languages and the set of
-design choices that characterize \rad{} make for a unique language. \rad{} strives:
+design choices that characterize \rad{} make for a unique language.
+
+\rad{} provides a way to program the behaviour of RSMs. A particular instance of
+a \rad{} RSM is an append-only sequence of \rad{} inputs, which grows over time,
+and is managed by some form of \emph{consensus} (Paxos, Raft, proof-of-work,
+etc.), which is valid according to the \rad{} semantics (see section
+\ref{semantics-spec}), that is, the inputs are accepted, in order and without
+error. We'll refer to such an RSM as a \emph{\rad{} RSM}, but because we usually
+think of \rad{} as being used on a proof-of-work blockchain, or e.g. on a
+Scuttlebutt feed (unforgeable, single-owner, append-only logs), we'll also refer
+to such RSMs simply as \emph{chains}. In such a context it is still useful to
+run some computations through the \rad{} interpreter locally, that is, evaluate
+some inputs speculatively without submitting them the underlying consensus
+mechanism. Such computations are referred to as \emph{off-chain}, while those of
+the RSM that are under consensus are referred to as \emph{on-chain}.
+
+\rad{} strives:
 \begin{itemize}
 \item[(1)] To be deterministic, so that \rad{} programs specifiy deterministic
   state machines.
@@ -21,8 +37,8 @@ design choices that characterize \rad{} make for a unique language. \rad{} striv
 \item[(6)] To have the simplest possible underlying semantics, so
   that \rad{} interpreters are well specified, and so that \rad{} can be used in
   security-sensitive situations.
-\item[(7)] To have the ability to interpret itself, so that chain semantics may
-  be modified on-chain.
+\item[(7)] To have the ability to interpret itself, so that the semantics of a
+  chain may be modified according to its own semantics, that is, on-chain.
 \end{itemize}
 
 The design choices we made with \rad{} are:
@@ -78,9 +94,9 @@ The language is kept as pure and immutable as possible, which limits
 expressivity but emphasizes clarity and correctness (goal (4)). The abundance of
 mutability would also probably hinder (6).
 
-Since chains are inherently stateful, we felt that the inclusion of a reference
-type for managing state would help in the specification of chain semantics, however
-we will discuss the alternatives.
+Since RSMs are inherently stateful, we felt that the inclusion of a reference
+type for managing state would help in the specification of semantics, however we
+will discuss the alternatives.
 
 The remainder of this section expands upon these goals and
 design choices.
@@ -258,22 +274,21 @@ levels of evaluation. In \rad{}, the new evaluation is only invoked at the
 topmost level, on new inputs. If one wants to make the evaluation behaviour
 recursive this must be coded explicitely.
 
-In most cases chains will define a domain-specific language to be interpreted in
-some narrow way, with only some calls to the base eval for reifying function
-definitions in case one wants to modify the behaviour of the state-machine.
-Furthermore, this form of evaluation redefinition doesn't (by default)
-create a tower of interpreters. Evaluating in a tower requires advanced
-interpretation methods to avoid performance overheads, and this is all
-the more important in \rad{}'s case where chains may be very long-lived. Such
-methods are still the subject of active reasearch (see for example \cite{Asai2014},
-\cite{Thyer1999}, \cite{Amin2017}, \cite{Brown2017}), and may interfere with other
-requirements of the language. Moreover, since eval-redefinition affects all
-sub-expressions, and may affect not just the ``immediate'' interpreter, but ones
-in which it is defined, reasoning about eval-redefinitions in towers can be
-very difficult.
-For these reasons we believe that this limited
-form of eval-redefinition suits the needs of \rad{} better than the degree of
-reflection that can be found in languages such as Black.
+In most cases a \rad{} chain will define a domain-specific language to be
+interpreted in some narrow way, with only some calls to the base eval for
+reifying function definitions in case one wants to modify the behaviour of the
+state-machine. Furthermore, this form of evaluation redefinition doesn't (by
+default) create a tower of interpreters. Evaluating in a tower requires advanced
+interpretation methods to avoid performance overheads, and this is all the more
+important in \rad{}'s case where the chains may be very long-lived. Such methods
+are still the subject of active reasearch (see for example \cite{Asai2014},
+\cite{Thyer1999}, \cite{Amin2017}, \cite{Brown2017}), and may interfere with
+other requirements of the language. Moreover, since eval-redefinition affects
+all sub-expressions, and may affect not just the ``immediate'' interpreter, but
+ones in which it is defined, reasoning about eval-redefinitions in towers can be
+very difficult. For these reasons we believe that this limited form of
+eval-redefinition suits the needs of \rad{} better than the degree of reflection
+that can be found in languages such as Black.
 
 %% \rad does not have macros. Instead, it allows for a complete redefinition of
 %% the intepreter via redefinitions of \texttt{eval}.
@@ -367,6 +382,7 @@ the result of effectful computations, though it may (at the discretion of the
 effect-handling layers) have output effects.
 
 \subsection{Semantics}
+\label{semantics-spec}
 
 \rad{}'s semantics are defined in terms of an abstract state machine, that is, a
 set of possible states $S$, an initial state $s_0 \in S$, a set of possible
