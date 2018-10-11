@@ -124,15 +124,3 @@ The resulting function \texttt{run-state-machine} could also take in other
 parameters, for example to instantiate different voting processes, etc. In fact,
 one could conceivably include a command for upgrading the whole function which
 handles meta-level commands.
-
-Using this higher-order function we can now demonstrate several interesting
-examples of different chains:
-\begin{itemize}
-\item Issue chain: only the person who opened an issue and maintainers can close the
-  issue, only maintainers can update the transition function.
-\item Ultimate example: chain managing a repo. The set of maintainers is
-  maintained in a config file in a master branch. Only maintainers can accept PRs
-  to master. Only maintainers can vote on new transition functions. This means
-  that the function $m$ reads not only from the vote state $\bar S$, but also the
-  basic state $S$ (i.e. the source code under version control).
-\end{itemize}
