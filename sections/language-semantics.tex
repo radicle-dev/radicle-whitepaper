@@ -66,10 +66,11 @@ with (4).
 
 
 Point (d) is a compromise: it is hard to satisfy the other points (especially
-(7)) with strong static types, even though this would help with (4). Though
-adding types to a language which can interpret itself is not impossible (see
-\cite{brown-papers}), this constraint would also inhibit the ability to
-compile other languages into \rad{}.
+(7)) with strong static types, even though this would help with (4). Although 
+recent research indicates that it is possible to add type systems to even 
+strongly-normalizing languages with self-interpreters (see for example
+\cite{Brown2016}), this constraint would also inhibit the ability to compile
+other languages into \rad{}.
 
 The \emph{hyperstatic} global environment means that the resolution of free
 variables takes place at the definition site rather than call-site. See Section
@@ -102,8 +103,8 @@ its semantics. In this chain, participants may want to \texttt{boot} other
 participants if some condition is met, which is defined by a predicate
 \texttt{bootable?}. For example, \texttt{bootable?} might be defined as:
 \begin{lstlisting}
-(define bootable?
-  (lambda (a b)
+(def bootable?
+  (fn [a b]
     (and (admin? a) (not (admin? b)))))
 \end{lstlisting}
 That is, admins may boot non-admins. At some point the participants may decide
@@ -122,7 +123,7 @@ proposed semantics.
 \rad{}'s data types are: booleans (\texttt{\#t} and
 \texttt{\#f}); strings (a sequence of characters within double quotes, with
 \verb$\$ as the escape character), symbols, lists, dictionaries
-(maps), and numbers (currently only arbitrary-precision decimals). These
+(maps), vectors, and numbers (currently only arbitrary-precision decimals). These
 datatypes are all immutable; additionally \rad{} supports \emph{refs}---mutable
 references that can hold any other datatype.
 
@@ -149,10 +150,10 @@ necessarily accessible to other nodes.
 
 This fact may lead to bugs or attacks. Consider the following snippet:
 \begin{lstlisting}
-(define transfer (lambda (from to amount) ...))
-(define account-alice ...)
-(define account-bob ...)
-(define transfer-to-alice (lambda (from amount)
+(def transfer (fn [from to amount] ...))
+(def account-alice ...)
+(def account-bob ...)
+(def transfer-to-alice (fn [from amount]
   (transfer from account-alice amount))
 \end{lstlisting}
 A user now wants to transfer some amount to Alice. However, in a language such
@@ -176,9 +177,9 @@ make expressions invalid if any of the variables they rely on have been
 redefined since a specified line of code.
 However this option is quite severe. Consider:
 \begin{lstlisting}
-(define x 3)
-(define foo (lambda () x))
-(define x 5)
+(def x 3)
+(def foo (fn [] x))
+(def x 5)
 \end{lstlisting}
 The function call \texttt{(protect-at-line 2 (foo))} will fail despite having a
 perfectly reasonable interpretation---namely, \texttt{(foo)} \emph{with}
@@ -187,7 +188,7 @@ perfectly reasonable interpretation---namely, \texttt{(foo)} \emph{with}
 this problem becomes more significant.
 
 This reasonable interpretation is in fact precisely what hyperstatic
-environments provide. The function call \texttt{(foo)} in line 4 would, in this
+environments provide. A function call \texttt{(foo)} after line 3 would, in this
 model, still evaluate to \texttt{3}. The free variables of a function refer to
 the values of variables \emph{when they were defined}. This is the semantics
 \rad{} adopts in general (and can be found in a few other languages, such as
@@ -214,7 +215,7 @@ interpreters. In \rad{}, a more limited form of \texttt{eval}-redefinition is
 available. As an example:
 \bigskip
 \begin{Verbatim}
-> (write-ref eval-ref (lambda (expr) 3))
+> (write-ref eval-ref (fn [expr] 3))
 => ()
 > 5
 => 3
@@ -225,7 +226,7 @@ the language Black\cite{Asai1997}:
 (exec-at-metalevel
   (let ((old-eval base-eval))
     (set! base-eval
-          (lambda (exp env cont)
+          (fn [exp env cont]
             (write exp) (newline) (old-eval exp env cont)))))
 \end{lstlisting}
 After this the Black REPL will behave as follows:
@@ -244,8 +245,8 @@ expression \texttt{(+ 1 2)}.
 Compare this to the following \rad{} session:
 \bigskip
 \begin{Verbatim}
-> (define old (read-ref eval-ref))
-> (define new (lambda (e) (do (print! e) (old e))))
+> (def old (read-ref eval-ref))
+> (def new (fn [e] (do (print! e) (old e))))
 > (write-ref eval-ref new)
 => ()
 > (+ 1 2)
@@ -280,7 +281,7 @@ reflection that can be found in languages such as Black.
 %% the intepreter via redefinitions of \texttt{eval}.
 
 %% \begin{verbatim}
-%% (define eval (lambda (expr) 3)) ;;
+%% (def eval (fn [expr] 3)) ;;
 %% 5 ;; => 3
 %% \end{verbatim}
 
@@ -453,7 +454,7 @@ The base semantics is defined as a function
   \def\rete{\mathrm{rete}}
   Lambdas: If $(x_1 \ldots x_n) \in I^*$ and $(p_1 \ldots p_m) \in V^*$, then
   \begin{multline*}
-    \B((e_\defe, m_\defe), (\mathtt{lambda} \ (x_1 \ldots x_n) \ p_1 \ldots p_m)) :=\\
+    \B((e_\defe, m_\defe), (\mathtt{fn} \ (x_1 \ldots x_n) \ p_1 \ldots p_m)) :=\\
     ((e_\defe,m_\defe), f)
   \end{multline*}
   where $f$ is the function:
@@ -466,7 +467,7 @@ The base semantics is defined as a function
   \end{multline*}
 \item Definitions: When $x \in \Ident$ and $p \in V$,
 \[
-\B((e,m), (\mathtt{define} \ x \ p)) := ((e'[x \mapsto v], m'), ())
+\B((e,m), (\mathtt{def} \ x \ p)) := ((e'[x \mapsto v], m'), ())
 \]
 where $\B((e,m), p) = ((e', m'), v)$.
 \item Applications: When $p \in V$ and $(q_1 \ldots q_n) \in V^*$, then

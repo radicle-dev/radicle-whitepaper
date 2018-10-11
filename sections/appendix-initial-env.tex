@@ -105,8 +105,8 @@ There are only three impure functions and they deal with reference cells.
   $\iref(\evalAddr)$, where $\evalAddr \in A$ is the special address for the
   evaluation function. We will usually define:
   \begin{lstlisting}
-    (define eval
-      (lambda (expr)
+    (def eval
+      (fn [expr]
         ((read-ref! eval-ref) expr)))
   \end{lstlisting}
   so that the function \texttt{eval} evaluates expressions with the current evaluator.
