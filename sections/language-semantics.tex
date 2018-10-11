@@ -8,9 +8,9 @@ design choices that characterize \rad{} make for a unique language.
 
 \rad{} provides a way to program the behaviour of RSMs. A particular instance of
 a \rad{} RSM is an append-only sequence of \rad{} inputs, which grows over time,
-and is managed by some form of \emph{consensus} (Paxos, Raft, proof-of-work,
-etc.), which is valid according to the \rad{} semantics (see section
-\ref{semantics-spec}). That is, the inputs are accepted, in order and without
+is managed by some form of \emph{consensus} (Paxos, Raft, proof-of-work,
+etc.), and which is valid according to the \rad{} semantics (see section
+\ref{semantics-spec}). That is, the inputs are accepted in order and without
 error. We'll refer to such an RSM as a \emph{\rad{} RSM}, but because we usually
 think of \rad{} as being used on a blockchain, or e.g. on a
 Scuttlebutt feed (unforgeable, single-owner, append-only logs), we'll also refer
