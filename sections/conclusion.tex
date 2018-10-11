@@ -11,7 +11,7 @@
 
 \rad's hyperstatic environment solves one problem but brings with it another:
 arbitrarily modifying the behaviour of previously defined functions is now
-impossible. If all the behaviours that a likely to be modified in the future of
+impossible. If all the behaviours that are likely to be modified in the future of
 a chain are stored as functions behind refs, then those behaviours can be
 updated during the lifetime of the chain using \texttt{write-ref}, and accessed
 in subsequent definitions using \texttt{read-ref}. However it is likely that the
@@ -28,9 +28,9 @@ behaves in the way the author of the code intended, and the participants (and
 readers of the code) expect.
 
 \begin{itemize}
-\item A type-system helps get rid of a large class of bugs (unexpected
+\item A type system helps get rid of a large class of bugs (unexpected
   behaviour), and thus promotes correctness. In the future we will explore if a
-  type-system can be added to \rad{} while still allowing for eval-redefinition.
+  type-system can be added to \rad{} while still allowing for eval redefinition.
 \item Most type-systems won't prevent serious problems such as security issues,
   and those that would are likely to be inconvenient for low-risk chains.
   Therefore we will also investigate developing other sorts of tooling around

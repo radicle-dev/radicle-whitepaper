@@ -10,14 +10,15 @@ design choices that characterize \rad{} make for a unique language.
 a \rad{} RSM is an append-only sequence of \rad{} inputs, which grows over time,
 and is managed by some form of \emph{consensus} (Paxos, Raft, proof-of-work,
 etc.), which is valid according to the \rad{} semantics (see section
-\ref{semantics-spec}), that is, the inputs are accepted, in order and without
+\ref{semantics-spec}). That is, the inputs are accepted, in order and without
 error. We'll refer to such an RSM as a \emph{\rad{} RSM}, but because we usually
 think of \rad{} as being used on a blockchain, or e.g. on a
 Scuttlebutt feed (unforgeable, single-owner, append-only logs), we'll also refer
 to such RSMs simply as \emph{chains}. In such a context it is still useful to
 run some computations through the \rad{} interpreter locally, that is, evaluate
-some inputs speculatively without submitting them the to underlying consensus
-mechanism. Such computations are referred to as \emph{off-chain}, while those of
+some inputs speculatively without submitting them to the underlying consensus
+mechanism. Such computations (and any other activity not regulated by the
+consensus protocol) are referred to as \emph{off-chain}, while those of
 the RSM that are under consensus are referred to as \emph{on-chain}.
 
 \rad{} strives:
@@ -38,7 +39,7 @@ the RSM that are under consensus are referred to as \emph{on-chain}.
   that \rad{} interpreters are well specified, and so that \rad{} can be used in
   security-sensitive situations.
 \item[(7)] To have the ability to interpret itself, so that the semantics of a
-  chain may be modified according to its own semantics, that is, on-chain.
+  chain may be modified according to its own semantics---that is, on-chain.
 \end{itemize}
 
 The design choices we made with \rad{} are:
