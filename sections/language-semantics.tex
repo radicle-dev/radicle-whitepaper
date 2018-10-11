@@ -66,10 +66,11 @@ with (4).
 
 
 Point (d) is a compromise: it is hard to satisfy the other points (especially
-(7)) with strong static types, even though this would help with (4). Though
-adding types to a language which can interpret itself is not impossible (see
-\cite{brown-papers}), this constraint would also inhibit the ability to
-compile other languages into \rad{}.
+(7)) with strong static types, even though this would help with (4). Although 
+recent research indicates that it is possible to add type systems to even 
+strongly-normalizing languages with self-interpreters (see for example
+\cite{Brown2016}), this constraint would also inhibit the ability to compile
+other languages into \rad{}.
 
 The \emph{hyperstatic} global environment means that the resolution of free
 variables takes place at the definition site rather than call-site. See Section
@@ -187,7 +188,7 @@ perfectly reasonable interpretation---namely, \texttt{(foo)} \emph{with}
 this problem becomes more significant.
 
 This reasonable interpretation is in fact precisely what hyperstatic
-environments provide. The function call \texttt{(foo)} in line 4 would, in this
+environments provide. A function call \texttt{(foo)} after line 3 would, in this
 model, still evaluate to \texttt{3}. The free variables of a function refer to
 the values of variables \emph{when they were defined}. This is the semantics
 \rad{} adopts in general (and can be found in a few other languages, such as

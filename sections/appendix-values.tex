@@ -1,13 +1,10 @@
 \section{Definition of \rad{} values}
 \label{value-definition}
 
-The set of values manipulated by the \rad interpreter is defined as a coproduct
+The set of values manipulated by the \rad{} interpreter is defined as a coproduct
 of other sets (symbols, keywords, functions etc.). The definitions rely on two
 other sets being defined: $\Ident$, the set of valid identifiers, and $\String$,
-the set of valid strings. These can be considered implementation dependent, but
-the definitions for the OSCoin network can be found here: <formal spec website>.
-
-TODO: formal spec website address.
+the set of valid strings. 
 
 \begin{align*}
   V &:= \Sym + \Keyword + \String + \Bool + \Num + \Func + \List + \Dict + \Ref\\
@@ -23,7 +20,7 @@ TODO: formal spec website address.
   \Ref &:= \mathbb{N}\\
   \Num &:= \mathbb{Q}
 \end{align*}
-The canonical injections of $\Sym, \Keyword, \String, \Bool, \Num, \Func, \List,
-\Dict$ and $\Ref$ into $V$ are denoted by $\iatom, \ikeyword, \ibool, \ifunc,
-\ilist, \idict$ and $\iref$ respectively. However we shall often suppress these
+The canonical injections of $\Sym$, $\Keyword$, $\String$, $\Bool$, $\Num$, $\Func$, $\List$,
+$\Dict$ and $\Ref$ into $V$ are denoted by $\iatom$, $\ikeyword$, $\ibool$, $\ifunc$,
+$\ilist$, $\idict$ and $\iref$ respectively. However we shall often suppress these
 from the notation.
