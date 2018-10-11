@@ -20,23 +20,23 @@ created. In that case, if a core function needs to be updated, then
 redefinitions of all the functions that depend on it also need to be submitted.
 This wholesale redefinition of most of the environment is computationally
 expensive and wasteful. In the future we would like to explore ways to mitigate
-this issue; possibly allowing environment modifications as a effect.
+this issue; possibly allowing environment modifications as an effect.
 
-Because \rad{} is used in a consensus environment, it is highly desirable that
-the semantics of a chain are \emph{correct}, that is, the chain behaves in the
-way the author of the code intended, and the participants (and readers of the
-code) expect.
+Because \rad{} is designed to be used in a consensus setting, it is highly
+desirable that the semantics of a chain are \emph{correct}, that is, the chain
+behaves in the way the author of the code intended, and the participants (and
+readers of the code) expect.
 
 \begin{itemize}
 \item A type-system helps get rid of a large class of bugs (unexpected
-  behaviour), and thus promote correctness. In the future we will explore if a
+  behaviour), and thus promotes correctness. In the future we will explore if a
   type-system can be added to \rad{} while still allowing for eval-redefinition.
 \item Most type-systems won't prevent serious problems such as security issues,
   and those that would are likely to be inconvenient for low-risk chains.
   Therefore we will also investigate developing other sorts of tooling around
-  \rad{} for verifying correctness. One example we have in mind is a
-  QuickCheck-like tool in which one specifies a schema for valid inputs to a
-  chain, and some properties which should be maintained. The tool would then
-  generate many simulations in an attempt to find a minimal counter-example to
-  the stated properties.
+  \rad{} for verifying correctness. One example we have in mind is a property
+  testing tool in which one specifies a schema for valid inputs to a chain, and
+  some properties which should be maintained. The tool would then generate many
+  simulations in an attempt to find a minimal counter-example to the stated
+  properties.
 \end{itemize}
