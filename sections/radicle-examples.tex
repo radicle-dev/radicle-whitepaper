@@ -116,3 +116,75 @@ The resulting function \texttt{run-state-machine} could also take in other
 parameters, for example to instantiate different voting processes, etc. In fact,
 one could conceivably include a command for upgrading the whole function which
 handles meta-level commands.
+
+\subsection{Pull request chain}
+
+As an example we will consider a chain used to manage the state of
+a \emph{pull request} (PR, a request to merge a git branch into another). In this
+case the state being maintained by the chains is composed of:
+\begin{itemize}
+  \item the discussion about the PR,
+  \item which users have accepted or rejected the change,
+  \item the final `result', one of \texttt{:accepted}, \texttt{:rejected} or
+    \texttt{:undecided}.
+\end{itemize}
+
+We'll assume that we have a few functions defined already:
+\begin{itemize}
+  \item A function \texttt{result-from-votes} which takes a dict from user IDs
+    to votes (on of \texttt{:accept} or \texttt{:reject}) and returns a result.
+  \item The library function \texttt{modify-dict} takes three arguments: a
+    dictionary, a key and a function. It returns a new version of the dictionary
+    where the value at the key has been updated according to the function.
+\end{itemize}
+
+\begin{lstlisting}
+;; In the initial state there are no comments,
+;; no votes, and the PR is still undecided.
+(def initial-state
+  {:comments []
+   :votes    {}
+   :result   :undecided})
+
+;; After any input we update the result.
+(def update-result
+  (fn [state]
+    (def new-result
+         (result-from-votes
+           (lookup :votes state)))
+    (insert :result new-result state)))
+
+;; Adds a comment to the list of comments.
+(def add-comment
+  (fn [state comment]
+    (modify-dict
+      :comments
+      (fn [cs] (append cs c))
+      state)))
+
+;; Updates a user's vote.
+(def update-votes
+  (fn [state user-vote]
+    (def user-id (lookup :user-id user-vote))
+    (def vote (lookup :vote user-vote))
+    (modify-dict
+      :votes
+      (fn [votes] (insert user-id vote votes))
+      state)))
+
+;; The state transition function.      
+(def transition
+  (fn [state input]
+    (def command (nth 0 input))
+    (def arg (nth 1 input))
+    (update-result
+      (cond
+        (eq? command 'vote)
+        (update-votes state arg)
+        (eq? command 'comment)
+        (add-comment state arg)))))
+\end{lstlisting}
+
+As in the currency example, in a real setting we would also add cryptographic
+signatures to comments and votes in order to verify they are only submitted by
+the stated user.
