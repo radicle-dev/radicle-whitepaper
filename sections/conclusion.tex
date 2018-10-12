@@ -22,8 +22,7 @@ This wholesale redefinition of most of the environment is computationally
 expensive and wasteful. In the future we would like to explore ways to mitigate
 this issue; possibly allowing environment modifications as an effect.
 
-Because \rad{} is designed to be used in a consensus setting, it is highly
-desirable that the semantics of a chain are \emph{correct}, that is, the chain
+\rad{} is designed to be used in scenarios where the traditional way of fixing a bug---simply rewriting the program---is not available, since once inputs are accepted they cannot be taken back. Moreover, for many of its applications, bugs can be critical: money may be lost, for example. These two factors put a significant premium on programs being \emph{correct}, that is, the chain
 behaves in the way the author of the code intended, and the participants (and
 readers of the code) expect.
 
