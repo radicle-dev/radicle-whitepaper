@@ -58,12 +58,11 @@ consequence of update.
 
 While (crucially for the purpose of ensuring consensus) the core of the language
 is deterministic, \rad{} also possesses an additional set of primitive operations
-that allow side-effects. We show how a publish-subscribe model for side-effects
-(or in the formalism of \cite{Cartwright1994}, an effect-handling central which
-is never provided continuations) allows for responding to outputs of the state
-machine or state changes in a non-deterministic way, without endangering the
-determism of the state machine itself. This in turn makes the separation between
-reads and writes correct by construction.
+that allow side-effects. This separation allows the same core language to be used
+both for RSMs, and the effectful functionality around them (such as printing
+new outputs, storing state in disk, or automatically running a script in
+predetermined circustances), in a manner not unlike that described in
+\cite{Cartwright1994}.
 
 \rad{} has been developed in the context of a broader effort to create a
 community-owned platform for open-source development (\oscoin{}), which
