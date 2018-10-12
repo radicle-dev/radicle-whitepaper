@@ -65,17 +65,17 @@ Some chains will operate simple state machines that are best described as a
 radicle function \texttt{transition} which takes the current state and an input
 and returns a new state. For example we might want to maintain a number:
 \begin{lstlisting}
-(define initial-state 0)
-(define transition
-  (lambda (current-state input)
+(def initial-state 0)
+(def transition
+  (fn [current-state input]
     (+ current-state input)))
 \end{lstlisting}
 Given such a function, and an \texttt{initial-state}, it's simple to turn
 \rad{} into the specified state-machine:
 \begin{lstlisting}
-(define state (ref initial-state))
-(define new-eval
-  (lambda (e)
+(def state (ref initial-state))
+(def new-eval
+  (fn [e]
     (write-ref state
                (transition (read-ref state) e))))
 
