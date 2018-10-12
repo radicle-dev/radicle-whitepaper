@@ -28,9 +28,6 @@ we are swapping out one eval for another.
 
 \subsection{Currency}
 
-TODO: discuss how we can insure that only bob can submit the command
-\texttt{(transfer "bob" x n)}.
-
 In this section we define a currency. This example demonstrates both higher
 order functions and data-hiding. Indeed the \texttt{create-currency} function
 defines all the state needed for the operation of the currency but then only
@@ -53,6 +50,14 @@ After loading this code, we can imagine the following \rad{} session:
 > (balance "alice")
 => 7
 \end{Verbatim}
+
+An obvious problem with this chain is that anyone can submit the command
+\texttt{(transfer "bob" "malicious123" n)}. To mitigate this one should use a
+function \texttt{signature-valid?} which checks that a cryptographically signed
+message has been signed by a specific public key. One can then create a token
+currency, with the transfer of tokens only taking place if the command is
+appropriately signed. Such a function could be written from scratch in \rad{},
+or provided as a built-in function.
 
 \subsection{Updatable state-machine}
 
@@ -111,15 +116,3 @@ The resulting function \texttt{run-state-machine} could also take in other
 parameters, for example to instantiate different voting processes, etc. In fact,
 one could conceivably include a command for upgrading the whole function which
 handles meta-level commands.
-
-Using this higher-order function we can now demonstrate several interesting
-examples of different chains:
-\begin{itemize}
-\item Issue chain: only the person who opened an issue and maintainers can close the
-  issue, only maintainers can update the transition function.
-\item Ultimate example: chain managing a repo. The set of maintainers is
-  maintained in a config file in a master branch. Only maintainers can accept PRs
-  to master. Only maintainers can vote on new transition functions. This means
-  that the function $m$ reads not only from the vote state $\bar S$, but also the
-  basic state $S$ (i.e. the source code under version control).
-\end{itemize}
