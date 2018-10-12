@@ -11,6 +11,8 @@ the set of valid strings.
   \overline{V} &:= \Sym + \Keyword + \String + \Bool + \Num + \overline{\List} + \overline{\Dict}\\
   \List &:= V^*\\
   \overline{\List} &:= \overline{V}^*\\
+  \Vect &:= V^*\\
+  \overline{\Vect} &:= \overline{V}^*\\
   \Dict &:= \overline{V} \to 1 + V\\
   \overline{\Dict} &:= \overline{V} \to 1 + \overline{V}\\
   \Func &:= S \times V^* \to S \times V\\
@@ -20,7 +22,22 @@ the set of valid strings.
   \Ref &:= \mathbb{N}\\
   \Num &:= \mathbb{Q}
 \end{align*}
-The canonical injections of $\Sym$, $\Keyword$, $\String$, $\Bool$, $\Num$, $\Func$, $\List$,
-$\Dict$ and $\Ref$ into $V$ are denoted by $\iatom$, $\ikeyword$, $\ibool$, $\ifunc$,
-$\ilist$, $\idict$ and $\iref$ respectively. However we shall often suppress these
-from the notation.
+The canonical injections of $\Sym$, $\Keyword$, $\String$, $\Bool$, $\Num$,
+$\Func$, $\List$, $\Vect$, $\Dict$ and $\Ref$ into $V$ are denoted by $\iatom$,
+$\ikeyword$, $\ibool$, $\ifunc$, $\ilist$, $\ivect$, $\idict$ and $\iref$ respectively.
+However we shall often suppress these from the notation.
+
+Note that there are two sorts of values representing sequences: lists and
+vectors. While this is not a formal requirement, implementations are encouraged
+to implement values of $\List$ as linked lists, and those of $\Vect$ as
+data-structures with efficient access, insertion and deletion at arbitrary
+indexes.
+
+Notation:
+\begin{itemize}
+  \item If $(v_1, \ldots, v_n) \in V^*$ then the corresponding element of
+    $\List$ is denoted by $(v_1 \ \ldots \ v_n)$, and similarly for
+    $\overline{\List}$.
+  \item If $(v_1, \ldots, v_n) \in V^*$ then the corresponding element of
+    $\Vect$ is denoted by $[v_1 \ \ldots \ v_n]$, and similarly for $\overline{\Vect}$.
+\end{itemize}

@@ -472,9 +472,9 @@ The base semantics is defined as a function
   \def\defe{\mathrm{def}}
   \def\calle{\mathrm{call}}
   \def\rete{\mathrm{rete}}
-  Lambdas: If $(x_1 \ldots x_n) \in I^*$ and $(p_1 \ldots p_m) \in V^*$, then
+  Lambdas: If $(x_1, \ldots, x_n) \in I^*$ and $(p_1, \ldots, p_m) \in V^*$, then
   \begin{multline*}
-    \B((e_\defe, m_\defe), (\mathtt{fn} \ (x_1 \ldots x_n) \ p_1 \ldots p_m)) :=\\
+    \B((e_\defe, m_\defe), (\mathtt{fn} \ [x_1 \ldots x_n] \ p_1 \ldots p_m)) :=\\
     ((e_\defe,m_\defe), f)
   \end{multline*}
   where $f$ is the function:
