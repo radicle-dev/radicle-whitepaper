@@ -32,8 +32,12 @@ than that in the definition results in an error.
     it restricts to equality on the coproduct components $\Sym, \Keyword, \String,
     \Bool, \Num$ and $\Ref$,
   \item
-    $\forall (x_1 \ldots x_n), (y_1 \ldots y_n) \in V^*, \ilist((x_1 \ldots
-    x_n)) \sim \ilist((x_1 \ldots x_n)) \Leftrightarrow x_1 \sim y_1, \ldots, x_n
+    $\forall (x_1, \ldots, x_n), (y_1, \ldots, y_n) \in V^*, \ilist((x_1, \ldots,
+    x_n)) \sim \ilist((x_1, \ldots, x_n)) \Leftrightarrow x_1 \sim y_1, \ldots, x_n
+    \sim y_n$
+  \item
+    $\forall (x_1, \ldots, x_n), (y_1, \ldots, y_n) \in V^*, \ivect((x_1, \ldots,
+    x_n)) \sim \ivect((x_1, \ldots, x_n)) \Leftrightarrow x_1 \sim y_1, \ldots, x_n
     \sim y_n$
   \item
     $\forall d_1, d_2 \in (\bar V \to 1 + V), \idict(d_1) \sim \idict(d_2)
@@ -43,8 +47,9 @@ than that in the definition results in an error.
   \texttt{empty-list} returns the empty-list.
   \texttt{cons} adds elements to the front of lists:
   \[
-    (v, (v_1 \ldots v_n)) \mapsto (v v_1 \ldots v_n).
+    (v, (v_1 \ldots v_n)) \mapsto (v \ v_1 \ldots v_n).
   \]
+  and results in an error if called on a non-list value.
 \item
   \texttt{head} and \texttt{tail} deconstruct lists, they correspond to the pure
   functions:
@@ -60,18 +65,37 @@ than that in the definition results in an error.
       \mathtt{error} & \text{otherwise.}
     \end{cases}
   \end{align*}
+  and result in error if called on non-lists.
 \item \texttt{empty-dict}, \texttt{lookup} and \texttt{insert} allow the
   creation and querying of dicts. They correspond to the pure functions:
   \begin{align*}
     () &\mapsto (k \mapsto \mathtt{error}),\\
-    (k, d) &\mapsto d(k),\\
-    (k, v, d) &\mapsto d[k \mapsto v].
+    (k, d) &\mapsto
+             \begin{cases}
+               d(k) & \text{if $k \in \bar V$ and $d \in \Dict$,}\\
+               \mathtt{error} & \text{otherwise,}
+             \end{cases}\\
+    (k, v, d) &\mapsto \begin{cases}
+                       d[k \mapsto v] & \text{if $k \in \bar V$ and $d \in \Dict$,}\\
+                       \mathtt{error} & \text{otherwise.}
+                       \end{cases}
   \end{align*}
+\item The pure function \texttt{nth} extracts elements from lists of sequences:
+  \[
+    (i, v) \mapsto
+    \begin{cases}
+      v_i & \text{if $v$ is the list $(v_1 \ldots v_n)$ and $0 \leq i \leq n$ is
+        a whole number,}\\
+      v_i & \text{if $v$ is the vector $[v_1 \ldots v_n]$ and $0 \leq i \leq n$ is
+      a whole number,}\\
+      \mathtt{error} & \text{otherwise}
+    \end{cases}
+  \]
 \item The pure function \texttt{string-append} concatenates a list of strings
   (implementation specific).
 \item The pure functions $\mathtt{+}, \mathtt{*}, \mathtt{-}, \mathtt{<},
   \mathtt{>}$ correspond to the mathematical functions $+, \times, -, <, >$
-  respectively.
+  respectively. If called on non-numbers they result in errors.
 \end{itemize}
 
 \subsection{Impure functions}
