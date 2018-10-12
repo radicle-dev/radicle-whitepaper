@@ -133,7 +133,7 @@ We'll assume that we have a few functions defined already:
 \begin{itemize}
   \item A function \texttt{result-from-votes} which takes a dict from user IDs
     to votes (on of \texttt{:accept} or \texttt{:reject}) and returns a result.
-  \item The library function \texttt{modify-dict} takes three arguments: a
+  \item A library function \texttt{modify-dict} takes three arguments: a
     dictionary, a key and a function. It returns a new version of the dictionary
     where the value at the key has been updated according to the function.
 \end{itemize}
@@ -186,5 +186,5 @@ We'll assume that we have a few functions defined already:
 \end{lstlisting}
 
 As in the currency example, in a real setting we would also add cryptographic
-signatures to comments and votes in order to verify they are only submitted by
-the stated user.
+signatures to comments and votes in order to verify that they are only submitted
+by the stated user.
