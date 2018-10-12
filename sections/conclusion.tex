@@ -22,6 +22,20 @@ This wholesale redefinition of most of the environment is computationally
 expensive and wasteful. In the future we would like to explore ways to mitigate
 this issue; possibly allowing environment modifications as an effect.
 
+Related to this is the lack of a module system: a system to package up common
+functionality. At the moment if a user wants to use some of the functions
+defined in a file \texttt{useful-fns.rad}, the easiest thing to do is to just
+send all the code contained in this file to the chain, and then to submit the
+definition which uses these functions. This is inefficient for several reasons:
+\begin{itemize}
+  \item Some of the definitions might already be in effect on the chain,
+  \item Most likely not all the definitions in the file are actually needed for
+    the functionality the user wants to add to a chain.
+\end{itemize}
+In the future we are likely to add tooling for defining a function locally, and
+then extracting the minimal set of dependencies needed before submitting this to
+a chain.
+
 \rad{} is designed to be used in scenarios where the traditional way of fixing a bug---simply rewriting the program---is not available, since once inputs are accepted they cannot be taken back. Moreover, for many of its applications, bugs can be critical: money may be lost, for example. These two factors put a significant premium on programs being \emph{correct}, that is, the chain
 behaves in the way the author of the code intended, and the participants (and
 readers of the code) expect.
