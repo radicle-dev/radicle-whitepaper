@@ -382,7 +382,7 @@ administering effects received via messages, resembles work following
 
 The value that results from evaluating an expression purely may, in addition to
 \emph{describing} an effect, pass a continuation with the result of that
-effect (if any). The effect-handling layer can chose to only call continuations
+effect (if any). The effect-handling layer can choose to only call continuations
 without arguments. In turn, this means the continuation will not have access to
 the result of effectful computations, though it may (at the discretion of the
 effect-handling layers) have output effects.
@@ -445,9 +445,9 @@ The base semantics is defined as a function
   state machine semantics $\S$, which comes later).
 \item Identifiers: If $i \in \Ident$ then
   \[
-    B((e,m), i) := ((e,m),e(i)),
+    \B((e,m), i) := ((e,m),e(i)),
   \]
-  unless $e(i) = \mathtt{error}$ in which case $B((e,m), i) = \mathtt{error}$.
+  unless $e(i) = \mathtt{error}$ in which case $\B((e,m), i) = \mathtt{error}$.
 \item Conditionals: For $c,t,f \in V$,
   \[
     \B( s, (\mathtt{if} \ c \ t \ f)) :=
